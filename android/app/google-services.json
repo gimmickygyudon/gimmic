@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "525502946293",
+    "project_id": "gimmic-gyudon",
+    "storage_bucket": "gimmic-gyudon.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:525502946293:android:63eac8b71376de8daa9ebc",
+        "android_client_info": {
+          "package_name": "com.example.gimmic"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "525502946293-vh1c3419h86a8hchrr8ujvlan2kar0ni.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCh7d_k_bV0dvq0tWlidxK6NzdyMe3jZus"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "525502946293-vh1c3419h86a8hchrr8ujvlan2kar0ni.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "525502946293-9vkptt776t255qh1sv8vekvmumslf8fj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.gimmic"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
