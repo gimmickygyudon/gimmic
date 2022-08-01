@@ -29,7 +29,6 @@ class LayoutDesktop extends StatelessWidget {
                   style: TextStyle(
                     color: ColorsResources.primarytextcolor,
                     fontSize: 48,
-                    //fontWeight: FontWeight.w500
                   ),
                 ),
               ),
@@ -41,7 +40,6 @@ class LayoutDesktop extends StatelessWidget {
                   style: const TextStyle(
                     color: Colors.black54,
                     fontSize: 18,
-                    //fontWeight: FontWeight.w500
                   ),
                 ),
               ),
@@ -66,7 +64,7 @@ class LayoutDesktop extends StatelessWidget {
                             tag: 'catHero',
                             child: Container(
                               height: 200.0,
-                              width: 410.0,
+                              width: 360.0,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12.0),
                                 image: const DecorationImage(
@@ -89,38 +87,43 @@ class LayoutDesktop extends StatelessWidget {
                                 StringResource.header,
                                 style: TextStyle(
                                   color: Colors.black87,
-                                  fontSize: 48,
-                                  //fontWeight: FontWeight.w500
+                                  fontSize: 34,
                                 ),
                               ),
                               Text(
                                 StringResource.paragraph,
                                 style: TextStyle(
                                     color: ColorsResources.primarytextcolor,
-                                    fontSize: 16),
+                                    fontSize: 14),
                               ),
                               SizedBox(height: 40.0),
                             ],
                           ),
-                          ButtonBar(
-                            alignment: MainAxisAlignment.start,
-                            children: [
-                              ElevatedButton(
-                                style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all(
-                                      Colors.orange.shade100),
-                                  foregroundColor:
-                                      MaterialStateProperty.all(Colors.orange),
-                                  /* minimumSize: MaterialStateProperty.all(
-                                      const Size(220, 50)), */
-                                  elevation: const MaterialStatePropertyAll(0),
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: ButtonBar(
+                              alignment: MainAxisAlignment.end,
+                              buttonPadding: const EdgeInsets.only(
+                                  top: 0.0, left: 0.0, right: 0.0, bottom: 0.0),
+                              children: [
+                                ElevatedButton(
+                                  style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all(
+                                        Colors.orange.shade100),
+                                    foregroundColor: MaterialStateProperty.all(
+                                        Colors.orange),
+                                    /* minimumSize: MaterialStateProperty.all(
+                                        const Size(220, 50)), */
+                                    elevation:
+                                        const MaterialStatePropertyAll(0),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pushNamed(context, '/resource');
+                                  },
+                                  child: const Text("Get Started"),
                                 ),
-                                onPressed: () {
-                                  Navigator.pushNamed(context, '/resource');
-                                },
-                                child: const Text("Get Started"),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),

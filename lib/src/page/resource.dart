@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
+import 'package:intl/intl.dart';
 
 class YourResources extends StatefulWidget {
   const YourResources({super.key});
@@ -17,6 +18,7 @@ class _YourResourcesState extends State<YourResources>
   late PageController _pageController;
   late TabController _tabController;
 
+  final String timenow = DateFormat("EEEEE, MMMM dd").format(DateTime.now());
   final ScrollController controller = ScrollController();
   final sink = StreamController<double>();
   int activePage = 1;
@@ -259,28 +261,83 @@ class _YourResourcesState extends State<YourResources>
                                 bottom: 0.0),
                             child: Align(
                               alignment: Alignment.centerLeft,
-                              child: TabBar(
-                                isScrollable: true,
-                                indicatorWeight: 3,
-                                labelColor: Colors.orange,
-                                unselectedLabelColor: Colors.black45,
-                                indicatorColor: Colors.orange.shade100,
-                                // labelPadding: const EdgeInsets.all(0),
-                                labelPadding: const EdgeInsets.only(
-                                    top: 0.0,
-                                    left: 10.0,
-                                    right: 10.0,
-                                    bottom: 5.0),
-                                controller: _tabController,
-                                tabs: const <Widget>[
-                                  Tab(
-                                    text: "Hello Cat",
+                              child: Stack(children: [
+                                TabBar(
+                                  indicator: UnderlineTabIndicator(
+                                      borderSide: BorderSide(
+                                          width: 3.0,
+                                          color: Colors.orange.shade200),
+                                      insets: EdgeInsets.symmetric(
+                                          horizontal: 20.0)),
+                                  isScrollable: true,
+                                  indicatorWeight: 3,
+                                  labelColor: Colors.orange,
+                                  unselectedLabelColor: Colors.black45,
+                                  indicatorColor: Colors.orange.shade100,
+                                  // labelPadding: const EdgeInsets.all(0),
+                                  labelPadding: const EdgeInsets.only(
+                                      top: 0.0,
+                                      left: 15.0,
+                                      right: 15.0,
+                                      bottom: 5.0),
+                                  controller: _tabController,
+                                  tabs: const <Widget>[
+                                    Tab(
+                                      text: "Hello Cat",
+                                    ),
+                                    Tab(
+                                      text: "Comments",
+                                    ),
+                                  ],
+                                ),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Container(
+                                    margin: const EdgeInsets.only(
+                                        top: 6.0,
+                                        left: 6.0,
+                                        right: 0.0,
+                                        bottom: 6.0),
+                                    decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20))),
+                                    child: PopupMenuButton<int>(
+                                      icon: const Icon(
+                                        Icons.more_vert,
+                                        color: Colors.black54,
+                                      ),
+                                      iconSize: 20.0,
+                                      itemBuilder: (context) => [
+                                        PopupMenuItem(
+                                          value: 1,
+                                          child: Row(
+                                            children: const [
+                                              Icon(Icons.star),
+                                              SizedBox(
+                                                width: 10,
+                                              ),
+                                              Text("Get The App")
+                                            ],
+                                          ),
+                                        ),
+                                        PopupMenuItem(
+                                          value: 2,
+                                          child: Row(
+                                            children: const [
+                                              Icon(Icons.chrome_reader_mode),
+                                              SizedBox(
+                                                width: 10,
+                                              ),
+                                              Text("About")
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  Tab(
-                                    text: "Comments",
-                                  ),
-                                ],
-                              ),
+                                )
+                              ]),
                             ),
                           ),
                         ),
@@ -294,6 +351,45 @@ class _YourResourcesState extends State<YourResources>
                               Padding(
                                 padding: const EdgeInsets.all(30.0),
                                 child: ListView(children: [
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 30.0),
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Chip(
+                                        label: Text('Cat',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .button),
+                                        backgroundColor: Colors.transparent,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
+                                            side: const BorderSide(
+                                                width: 2,
+                                                color: Colors.black26)),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 30.0),
+                                    child: Text('Created on',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .caption),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        right: 30.0, bottom: 20.0),
+                                    child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(timenow,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .overline)),
+                                  ),
                                   Text(
                                     "Description",
                                     style:
@@ -315,13 +411,6 @@ class _YourResourcesState extends State<YourResources>
                             ],
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Align(
-                            alignment: Alignment.center,
-                            child: Text('Take it or leave it',
-                                style: Theme.of(context).textTheme.caption)),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(
