@@ -1,11 +1,8 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
-import 'package:gimmic/assets/colors.dart';
-import 'package:gimmic/main.dart';
 
 class YourResources extends StatefulWidget {
   const YourResources({super.key});
@@ -131,7 +128,7 @@ class _YourResourcesState extends State<YourResources>
         color: Colors.grey.shade200,
         child: Padding(
           padding: const EdgeInsets.only(
-              top: 10.0, left: 48.0, right: 48.0, bottom: 10.0),
+              top: 10.0, left: 48.0, right: 24.0, bottom: 10.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -238,33 +235,53 @@ class _YourResourcesState extends State<YourResources>
               ),
               Expanded(
                 flex: 3,
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      top: 0.0, left: 48.0, right: 0.0, bottom: 10.0),
+                child: Card(
+                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                  elevation: 0,
+                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      DefaultTabController(
-                        initialIndex: 1,
-                        length: 2,
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: TabBar(
-                            isScrollable: true,
-                            labelColor: Colors.orange,
-                            unselectedLabelColor: Colors.black45,
-                            indicatorColor: Colors.orange.shade100,
-                            // labelPadding: const EdgeInsets.all(0),
-                            controller: _tabController,
-                            tabs: const <Widget>[
-                              Tab(
-                                text: "Hello Cat",
+                      Container(
+                        color: Colors.grey.shade100,
+                        child: DefaultTabController(
+                          initialIndex: 1,
+                          length: 2,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                top: 10.0,
+                                left: 20.0,
+                                right: 20.0,
+                                bottom: 0.0),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: TabBar(
+                                isScrollable: true,
+                                indicatorWeight: 3,
+                                labelColor: Colors.orange,
+                                unselectedLabelColor: Colors.black45,
+                                indicatorColor: Colors.orange.shade100,
+                                // labelPadding: const EdgeInsets.all(0),
+                                labelPadding: const EdgeInsets.only(
+                                    top: 0.0,
+                                    left: 10.0,
+                                    right: 10.0,
+                                    bottom: 5.0),
+                                controller: _tabController,
+                                tabs: const <Widget>[
+                                  Tab(
+                                    text: "Hello Cat",
+                                  ),
+                                  Tab(
+                                    text: "Comments",
+                                  ),
+                                ],
                               ),
-                              Tab(
-                                text: "Comments",
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
@@ -273,11 +290,26 @@ class _YourResourcesState extends State<YourResources>
                           height: MediaQuery.of(context).size.height / 5,
                           child: TabBarView(
                             controller: _tabController,
-                            children: const <Widget>[
-                              Center(
-                                child: Text("It's cloudy here"),
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.all(30.0),
+                                child: ListView(children: [
+                                  Text(
+                                    "Description",
+                                    style:
+                                        Theme.of(context).textTheme.headline6,
+                                  ),
+                                  const SizedBox(
+                                    height: 8,
+                                  ),
+                                  Text(
+                                    "A cat is a furry animal that has a long tail and sharp claws. Cats are often kept as pets. Cats are lions, tigers, and other wild animals in the same family.",
+                                    style:
+                                        Theme.of(context).textTheme.bodyText2,
+                                  ),
+                                ]),
                               ),
-                              Center(
+                              const Center(
                                 child: Text("It's rainy here"),
                               ),
                             ],
@@ -291,30 +323,34 @@ class _YourResourcesState extends State<YourResources>
                             child: Text('Take it or leave it',
                                 style: Theme.of(context).textTheme.caption)),
                       ),
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.file_download_outlined),
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.green.shade100),
-                          foregroundColor:
-                              MaterialStateProperty.resolveWith((states) {
-                            return states.contains(MaterialState.hovered)
-                                ? Colors.white
-                                : Colors.green;
-                          }),
-                          minimumSize:
-                              MaterialStateProperty.all(const Size(220, 50)),
-                          elevation: const MaterialStatePropertyAll(0),
-                          overlayColor: MaterialStateProperty.resolveWith(
-                            (states) {
-                              return states.contains(MaterialState.pressed)
-                                  ? Colors.green.shade700
-                                  : Colors.green.shade500;
-                            },
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            top: 0.0, left: 30.0, right: 30.0, bottom: 30.0),
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.file_download_outlined),
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                                Colors.green.shade100),
+                            foregroundColor:
+                                MaterialStateProperty.resolveWith((states) {
+                              return states.contains(MaterialState.hovered)
+                                  ? Colors.white
+                                  : Colors.green;
+                            }),
+                            minimumSize:
+                                MaterialStateProperty.all(const Size(220, 50)),
+                            elevation: const MaterialStatePropertyAll(0),
+                            overlayColor: MaterialStateProperty.resolveWith(
+                              (states) {
+                                return states.contains(MaterialState.pressed)
+                                    ? Colors.green.shade700
+                                    : Colors.green.shade500;
+                              },
+                            ),
                           ),
+                          onPressed: () {},
+                          label: const Text("Download"),
                         ),
-                        onPressed: () {},
-                        label: const Text("Download"),
                       ),
                     ],
                   ),
@@ -331,7 +367,7 @@ class _YourResourcesState extends State<YourResources>
     double offset = _pageController.position.pixels;
     DateTime dt = DateTime.now();
     await for (var delta in src) {
-      if (DateTime.now().difference(dt) > Duration(milliseconds: 200)) {
+      if (DateTime.now().difference(dt) > const Duration(milliseconds: 200)) {
         offset = _pageController.position.pixels;
       }
       dt = DateTime.now();
