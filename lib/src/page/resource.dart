@@ -125,7 +125,7 @@ class _YourResourcesState extends State<YourResources>
         backgroundColor: Colors.grey.shade200,
         surfaceTintColor: Colors.grey.shade200,
         elevation: 0.0,
-        title: (const Text('Hello')),
+        title: (const Text('Hello Cat')),
       ),
       body: Container(
         color: Colors.grey.shade200,
@@ -259,7 +259,7 @@ class _YourResourcesState extends State<YourResources>
                             controller: _tabController,
                             tabs: const <Widget>[
                               Tab(
-                                text: "Hello",
+                                text: "Hello Cat",
                               ),
                               Tab(
                                 text: "Comments",
