@@ -36,12 +36,14 @@ class _YourResourcesState extends State<YourResources>
     });
   }
 
+  // TODO: #1 use dispose when quit the viewer
   void dispose() {
     sink.close();
     _pageController.dispose();
     super.dispose();
   }
 
+// indicators of images
   List<Widget> indicators(imagesLength, currentIndex) {
     return List<Widget>.generate(imagesLength, (index) {
       return Container(
@@ -55,6 +57,7 @@ class _YourResourcesState extends State<YourResources>
     });
   }
 
+// thumbnails of images
   List<Widget> thumbnails(imagesLength, currentIndex) {
     return List<Widget>.generate(imagesLength, (index) {
       return AspectRatio(
@@ -63,6 +66,11 @@ class _YourResourcesState extends State<YourResources>
           padding: const EdgeInsets.all(8.0),
           child: InkWell(
             onTap: () {
+              if (currentIndex == index) {
+                showDialog(
+                    context: context,
+                    builder: (_) => imageDialog(context, index));
+              }
               _pageController.animateToPage(index,
                   duration: const Duration(milliseconds: 400),
                   curve: Curves.ease);
@@ -89,6 +97,25 @@ class _YourResourcesState extends State<YourResources>
         ),
       );
     });
+  }
+
+// interactive image dialog
+  Widget imageDialog(context, pagePosition) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      child: InteractiveViewer(
+        panEnabled: false,
+        minScale: 0.5,
+        maxScale: 4,
+        child: GestureDetector(
+          onTap: () => Navigator.pop(context, false), // passing false
+          child: Image(
+            image: AssetImage(images[pagePosition]),
+            fit: BoxFit.contain,
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -159,10 +186,20 @@ class _YourResourcesState extends State<YourResources>
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           12.0),
-                                                  child: Image(
-                                                    image: AssetImage(
-                                                        images[pagePosition]),
-                                                    fit: BoxFit.cover,
+                                                  child: GestureDetector(
+                                                    onTap: () async {
+                                                      await showDialog(
+                                                          context: context,
+                                                          builder: (_) =>
+                                                              imageDialog(
+                                                                  context,
+                                                                  pagePosition));
+                                                    },
+                                                    child: Image(
+                                                      image: AssetImage(
+                                                          images[pagePosition]),
+                                                      fit: BoxFit.cover,
+                                                    ),
                                                   ),
                                                 ));
                                           }),
@@ -217,7 +254,7 @@ class _YourResourcesState extends State<YourResources>
                             controller: _tabController,
                             tabs: const <Widget>[
                               Tab(
-                                text: "Descriptions",
+                                text: "Hello",
                               ),
                               Tab(
                                 text: "Comments",
@@ -249,18 +286,30 @@ class _YourResourcesState extends State<YourResources>
                             child: Text('Take it or leave it',
                                 style: Theme.of(context).textTheme.caption)),
                       ),
-                      ElevatedButton(
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.file_download_outlined),
                         style: ButtonStyle(
                           backgroundColor:
                               MaterialStateProperty.all(Colors.green.shade100),
                           foregroundColor:
-                              MaterialStateProperty.all(Colors.green),
-                          /* minimumSize: MaterialStateProperty.all(
-                                      const Size(220, 50)), */
+                              MaterialStateProperty.resolveWith((states) {
+                            return states.contains(MaterialState.hovered)
+                                ? Colors.white
+                                : Colors.green;
+                          }),
+                          minimumSize:
+                              MaterialStateProperty.all(const Size(220, 50)),
                           elevation: const MaterialStatePropertyAll(0),
+                          overlayColor: MaterialStateProperty.resolveWith(
+                            (states) {
+                              return states.contains(MaterialState.pressed)
+                                  ? Colors.green.shade700
+                                  : Colors.green.shade500;
+                            },
+                          ),
                         ),
                         onPressed: () {},
-                        child: const Text("Download"),
+                        label: const Text("Download"),
                       ),
                     ],
                   ),

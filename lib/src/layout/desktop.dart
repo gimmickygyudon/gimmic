@@ -16,7 +16,7 @@ class LayoutDesktop extends StatelessWidget {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.only(
-              top: 10.0, left: 48.0, right: 48.0, bottom: 10.0),
+              top: 0.0, left: 48.0, right: 48.0, bottom: 0.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
