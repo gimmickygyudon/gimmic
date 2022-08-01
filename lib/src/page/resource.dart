@@ -195,10 +195,15 @@ class _YourResourcesState extends State<YourResources>
                                                                   context,
                                                                   pagePosition));
                                                     },
-                                                    child: Image(
-                                                      image: AssetImage(
-                                                          images[pagePosition]),
-                                                      fit: BoxFit.cover,
+                                                    child: Tooltip(
+                                                      message:
+                                                          'Click to Fullscreen',
+                                                      child: Image(
+                                                        image: AssetImage(
+                                                            images[
+                                                                pagePosition]),
+                                                        fit: BoxFit.cover,
+                                                      ),
                                                     ),
                                                   ),
                                                 ));
