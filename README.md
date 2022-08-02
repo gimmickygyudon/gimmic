@@ -1,6 +1,7 @@
-# gimmic
+# Gimmic
 
-A new Flutter project.
+A new fresh Flutter project.
+https://gimmic-gyudon.web.app
 
 ## Getting Started
 
