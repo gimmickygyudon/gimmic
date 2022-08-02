@@ -5,18 +5,22 @@ import 'firebase_options.dart';
 import 'package:gimmic/assets/label.dart';
 import 'package:gimmic/src/homebase.dart';
 import 'package:gimmic/src/page/resource.dart';
+import 'package:gimmic/src/plugins/url_strategy.dart';
 
-void main() {
+/* void main() {
+  setUrlStrategy(PathUrlStrategy());
   runApp(const Gimmic());
-}
+} */
 
-/* Future<void> main() async {
+Future<void> main() async {
   await Firebase.initializeApp(
+    // linux isn't implemented yet with firebase platform
     // options: DefaultFirebaseOptions.currentPlatform,
     options: DefaultFirebaseOptions.web,
   );
+  usePathUrlStrategy();
   runApp(const Gimmic());
-} */
+}
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
   // Override behavior methods and getters like dragDevices
@@ -44,6 +48,7 @@ class Gimmic extends StatelessWidget {
         useMaterial3: true,
         primarySwatch: Colors.blue,
       ),
+      // we dont use home widgets on named routes
       // home: const HomeBase(title: StringResource.logoName),
     );
   }
