@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gimmic/assets/label.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class Navbar {
   static isMobile() {
@@ -59,11 +61,18 @@ class Navbar {
                 const SizedBox(
                   width: 12,
                 ),
-                ElevatedButton(
-                  style: const ButtonStyle()
+                ElevatedButton.icon(
+                  style: const ButtonStyle(alignment: Alignment.center)
                       .copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
-                  onPressed: () {},
-                  child: const Text(StringResource.aboutMenu),
+                  onPressed: () async {
+                    const url = 'https://github.com/gimmickygyudon/gimmic';
+                    if (await canLaunchUrlString(url)) launchUrlString(url);
+                  },
+                  icon: const Icon(
+                    FontAwesomeIcons.github,
+                    size: 18.0,
+                  ),
+                  label: const Text('Github'),
                 )
               ],
             ),
