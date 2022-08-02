@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gimmic/assets/label.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -65,8 +66,9 @@ class Navbar {
                   style: const ButtonStyle(alignment: Alignment.center)
                       .copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
                   onPressed: () async {
-                    const url = 'https://github.com/gimmickygyudon/gimmic';
-                    if (await canLaunchUrlString(url)) launchUrlString(url);
+                    final Uri url =
+                        Uri.parse('https://github.com/gimmickygyudon/gimmic/');
+                    if (await canLaunchUrl(url)) launchUrl(url);
                   },
                   icon: const Icon(
                     FontAwesomeIcons.github,
