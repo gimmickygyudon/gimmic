@@ -6,19 +6,13 @@
       "**/.*",
       "**/node_modules/**"
     ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ],
     "headers": [
       {
-        "source": "**/*.@(datagz|memgz|mem|data|jsgz)",
+        "source": "**/*.@(eot|otf|ttf|ttc|woff|font.css|js.gz|jsgz|gz|js)",
         "headers": [
           {
-            "key": "Content-Type",
-            "value": "application/octet-stream"
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
           }
         ]
       } 
