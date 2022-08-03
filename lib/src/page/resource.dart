@@ -73,8 +73,8 @@ class _YourResourcesState extends State<YourResources>
               _pageController.animateToPage(index,
                   duration: const Duration(milliseconds: 400),
                   curve: Curves.ease);
-            }, // Image tapped
-            splashColor: Colors.white10, // Splash color over image
+            },
+            // splashColor: Colors.white10, // Splash color over image
             child: Container(
               decoration: BoxDecoration(
                 color: const Color(0xff7c94b6),
@@ -195,6 +195,7 @@ class _YourResourcesState extends State<YourResources>
                                                                   pagePosition));
                                                     },
                                                     child: Tooltip(
+                                                      verticalOffset: 150,
                                                       message:
                                                           'Click to Fullscreen',
                                                       child: Image(
@@ -223,10 +224,63 @@ class _YourResourcesState extends State<YourResources>
                                       MediaQuery.of(context).size.height / 8,
                                   width: MediaQuery.of(context).size.width,
                                   child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: thumbnails(
-                                          images.length, activePage))),
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: thumbnails(
+                                            images.length, activePage),
+                                      ),
+                                      const SizedBox(width: 8.0),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 8.0),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: Colors.black54,
+                                                width: 2,
+                                              ),
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                      Radius.circular(12))),
+                                          child: InkWell(
+                                            splashColor: Colors.black26,
+                                            onTap: () {
+                                              Navigator.pushNamed(
+                                                  context, '/resource/view');
+                                            },
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 10.0,
+                                                  bottom: 10.0,
+                                                  left: 18.0,
+                                                  right: 18.0),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: const [
+                                                  Icon(Icons.view_in_ar_rounded,
+                                                      size: 42.0,
+                                                      color: Colors.black87),
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 6.0),
+                                                    child: Text('View 3D',
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w600)),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  )),
                             ),
                           ),
                         ],
@@ -267,7 +321,7 @@ class _YourResourcesState extends State<YourResources>
                                       borderSide: BorderSide(
                                           width: 3.0,
                                           color: Colors.orange.shade200),
-                                      insets: EdgeInsets.symmetric(
+                                      insets: const EdgeInsets.symmetric(
                                           horizontal: 20.0)),
                                   isScrollable: true,
                                   indicatorWeight: 3,
@@ -354,23 +408,48 @@ class _YourResourcesState extends State<YourResources>
                                   Padding(
                                     padding:
                                         const EdgeInsets.only(bottom: 30.0),
-                                    child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Chip(
-                                        label: Text('Cat',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .button),
-                                        backgroundColor: Colors.transparent,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            side: const BorderSide(
-                                                width: 2,
-                                                color: Colors.black26)),
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8),
-                                      ),
+                                    child: Row(
+                                      children: [
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Chip(
+                                            labelStyle: const TextStyle(
+                                                color: Colors.black54,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500),
+                                            label: const Text('Cat'),
+                                            backgroundColor: Colors.transparent,
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0),
+                                                side: const BorderSide(
+                                                    width: 1,
+                                                    color: Colors.black12)),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Chip(
+                                            labelStyle: const TextStyle(
+                                                color: Colors.black54,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500),
+                                            label: const Text('Animal'),
+                                            backgroundColor: Colors.transparent,
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0),
+                                                side: const BorderSide(
+                                                    width: 1,
+                                                    color: Colors.black12)),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                   Padding(
@@ -414,7 +493,7 @@ class _YourResourcesState extends State<YourResources>
                       ),
                       Padding(
                         padding: const EdgeInsets.only(
-                            top: 0.0, left: 30.0, right: 30.0, bottom: 30.0),
+                            top: 0.0, left: 30.0, right: 30.0, bottom: 20.0),
                         child: ElevatedButton.icon(
                           icon: const Icon(Icons.file_download_outlined),
                           style: ButtonStyle(

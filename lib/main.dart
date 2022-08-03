@@ -1,14 +1,17 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:gimmic/src/page/simple_screen.dart';
 import 'firebase_options.dart';
 import 'package:gimmic/assets/label.dart';
 import 'package:gimmic/src/homebase.dart';
 import 'package:gimmic/src/page/resource.dart';
 import 'package:gimmic/src/plugins/url_strategy.dart';
+// import 'package:gimmic/src/page/detail.dart';
 
-/* void main() {
-  setUrlStrategy(PathUrlStrategy());
+/* // default runApp (only for testing)
+void main() {
+  usePathUrlStrategy();
   runApp(const Gimmic());
 } */
 
@@ -43,13 +46,12 @@ class Gimmic extends StatelessWidget {
       routes: {
         '/': (context) => const HomeBase(title: StringResource.logoName),
         '/resource': (context) => const YourResources(),
+        '/resource/view': (context) => const SimpleScreen(),
       },
       theme: ThemeData(
         useMaterial3: true,
         primarySwatch: Colors.blue,
       ),
-      // we dont use home widgets on named routes
-      // home: const HomeBase(title: StringResource.logoName),
     );
   }
 }

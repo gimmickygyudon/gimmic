@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "/build/web/",
+    "public": "build/web/",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -11,6 +11,17 @@
         "source": "**",
         "destination": "/index.html"
       }
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(datagz|memgz|mem|data|jsgz)",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/octet-stream"
+          }
+        ]
+      } 
     ]
   }
 }
