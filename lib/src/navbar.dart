@@ -2,11 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gimmic/assets/label.dart';
 import 'package:url_launcher/url_launcher.dart';
-<<<<<<< HEAD
-import 'package:url_launcher/url_launcher_string.dart';
-=======
 import 'package:universal_html/html.dart' as html;
->>>>>>> dev
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class Navbar {
@@ -71,11 +67,6 @@ class Navbar {
                   style: const ButtonStyle(alignment: Alignment.center)
                       .copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
                   onPressed: () async {
-<<<<<<< HEAD
-                    final Uri url =
-                        Uri.parse('https://github.com/gimmickygyudon/gimmic/');
-                    if (await canLaunchUrl(url)) launchUrl(url);
-=======
                     String url = 'https://github.com/gimmickygyudon/gimmic/';
                     final Uri uri = Uri.parse(url);
                     if (kIsWeb) {
@@ -83,7 +74,6 @@ class Navbar {
                     } else if (await canLaunchUrl(uri)) {
                       launchUrl(uri);
                     }
->>>>>>> dev
                   },
                   icon: const Icon(
                     FontAwesomeIcons.github,
