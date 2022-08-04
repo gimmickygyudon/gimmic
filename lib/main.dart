@@ -47,7 +47,8 @@ class Gimmic extends StatelessWidget {
       routes: {
         '/': (context) => const HomeBase(title: StringResource.logoName),
         '/resource': (context) => const GridResource(),
-        '/resource/view': (context) => const Details(),
+        '/resource/detail': (context) => const Details(),
+        '/resource/detail/view': (context) => const UnityViewer(),
       },
       theme: ThemeData(
         useMaterial3: true,

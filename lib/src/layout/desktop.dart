@@ -61,7 +61,7 @@ class LayoutDesktop extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Hero(
-                            tag: 'catHero',
+                            tag: 'HeroHero',
                             child: Container(
                               height: 200.0,
                               width: 360.0,

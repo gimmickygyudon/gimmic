@@ -248,8 +248,8 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                           child: InkWell(
                                             splashColor: Colors.black26,
                                             onTap: () {
-                                              Navigator.pushNamed(
-                                                  context, '/resource/view');
+                                              Navigator.pushNamed(context,
+                                                  '/resource/detail/view');
                                             },
                                             child: Padding(
                                               padding: const EdgeInsets.only(
@@ -463,10 +463,14 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                         right: 30.0, bottom: 20.0),
                                     child: Align(
                                         alignment: Alignment.centerLeft,
-                                        child: Text(timenow,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .overline)),
+                                        child: Text(
+                                          timenow,
+                                          style: const TextStyle(
+                                            color: Colors.black54,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        )),
                                   ),
                                   Text(
                                     "Description",
