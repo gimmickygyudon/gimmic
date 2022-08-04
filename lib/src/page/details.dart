@@ -5,15 +5,14 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 
-class YourResources extends StatefulWidget {
-  const YourResources({super.key});
+class Details extends StatefulWidget {
+  const Details({super.key});
 
   @override
-  State<YourResources> createState() => _YourResourcesState();
+  State<Details> createState() => _DetailsState();
 }
 
-class _YourResourcesState extends State<YourResources>
-    with TickerProviderStateMixin {
+class _DetailsState extends State<Details> with TickerProviderStateMixin {
   List<String> images = ["images/hellocat.jpg", "images/hellocat1.jpg"];
   late PageController _pageController;
   late TabController _tabController;
@@ -35,7 +34,7 @@ class _YourResourcesState extends State<YourResources>
     });
   }
 
-  // TODO: #1 use dispose when quit the viewer
+  @override
   void dispose() {
     sink.close();
     _pageController.dispose();

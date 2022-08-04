@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_unity_widget/flutter_unity_widget.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
-class SimpleScreen extends StatefulWidget {
-  const SimpleScreen({super.key});
+class UnityViewer extends StatefulWidget {
+  const UnityViewer({super.key});
 
   @override
-  State<SimpleScreen> createState() => _SimpleScreenState();
+  State<UnityViewer> createState() => _UnityViewerState();
 }
 
-class _SimpleScreenState extends State<SimpleScreen> {
+class _UnityViewerState extends State<UnityViewer> {
   static final GlobalKey<ScaffoldState> _scaffoldKey =
       GlobalKey<ScaffoldState>();
 
@@ -32,7 +32,7 @@ class _SimpleScreenState extends State<SimpleScreen> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: const Text('Simple Screen'),
+        title: const Text('3D Viewer'),
       ),
       body: Card(
           margin: const EdgeInsets.all(0),
