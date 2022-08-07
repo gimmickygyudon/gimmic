@@ -1,14 +1,15 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:gimmic/src/page/unity_viewer.dart';
 import 'firebase_options.dart';
+
 import 'package:gimmic/assets/label.dart';
 import 'package:gimmic/src/homebase.dart';
-import 'package:gimmic/src/page/details.dart';
-import 'package:gimmic/src/plugins/url_strategy.dart';
 
-import 'package:gimmic/src/view/grid.dart';
+import 'package:gimmic/src/page/details.dart';
+import 'package:gimmic/src/page/resource.dart';
+import 'package:gimmic/src/page/unity_viewer.dart';
+import 'package:gimmic/src/plugins/url_strategy.dart';
 
 // default runApp (only for testing)
 void main() {
@@ -46,7 +47,7 @@ class Gimmic extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const HomeBase(title: StringResource.logoName),
-        '/resource': (context) => const GridResource(),
+        '/resource': (context) => const Resource(),
         '/resource/detail': (context) => const Details(),
         '/resource/detail/view': (context) => const UnityViewer(),
       },
