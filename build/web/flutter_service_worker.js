@@ -31,7 +31,7 @@ const RESOURCES = {
 "canvaskit/profiling/canvaskit.js": "38164e5a72bdad0faa4ce740c9b8e564",
 "index.html": "c411d876b5e3e01ec4d5a4ae85fd7217",
 "/": "0f062498149b27717361ee1da32966d1",
-"main.dart.js": "1287bf63df3e3ce60f4758106f5c52ba",
+"main.dart.js": "48f51870f2af03bd49d2574c10653c97",
 "UnityLibrary/StreamingAssets/UnityServicesProjectConfiguration.json": "b225a14f3d6d0971fcc8cd013b701f51",
 "UnityLibrary/Build/UnityLibrary.data": "ac4465d7797bc0a15c2d4b4e527aad2b",
 "UnityLibrary/Build/UnityLibrary.wasm": "15f909b6be0706a37bba66c171b1f97e",
