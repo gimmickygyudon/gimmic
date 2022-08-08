@@ -8,12 +8,14 @@ class GridResource extends StatefulWidget {
   final bool useVerticalLayout2x;
   final bool useVerticalLayout3x;
   final int gridRowCount;
-  GridResource(
+  final List<Map<String, dynamic>> foundResource;
+  const GridResource(
       {super.key,
       required this.useVerticalLayout,
       required this.gridRowCount,
       required this.useVerticalLayout2x,
-      required this.useVerticalLayout3x});
+      required this.useVerticalLayout3x,
+      required this.foundResource});
 
   @override
   State<GridResource> createState() => _GridResourceState();
@@ -30,12 +32,12 @@ List<String> images = [
   "images/hellocat1.jpg"
 ];
 
-Widget downloadButton(context, selectedIndex, index) {
+Widget downloadButton(context, selectedIndex, index, size) {
   return Tooltip(
     message: "Download 'Legends of Zelda'",
     child: ElevatedButton.icon(
       onPressed: () => Navigator.pushNamed(context, '/resource/detail'),
-      label: const Text("4.31 MB"),
+      label: Text(size),
       icon: const Icon(
         Icons.file_download_outlined,
         size: 22.0,
@@ -110,7 +112,7 @@ class _GridResourceState extends State<GridResource> {
             : const EdgeInsets.only(
                 bottom: 24.0, top: 6.0, left: 24.0, right: 24.0),
         child: GridView.builder(
-            itemCount: images.length,
+            itemCount: widget.foundResource.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 mainAxisExtent: widget.useVerticalLayout2x ? 400 : 320,
                 crossAxisCount: widget.gridRowCount,
@@ -176,7 +178,7 @@ class _GridResourceState extends State<GridResource> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      'Hello Cat',
+                                      widget.foundResource[index]["name"],
                                       style: TextStyle(
                                           color: Colors.black87,
                                           fontSize: widget.useVerticalLayout2x
@@ -198,7 +200,7 @@ class _GridResourceState extends State<GridResource> {
                             Padding(
                               padding: const EdgeInsets.only(left: 20.0),
                               child: Text(
-                                'Legends of Zelda',
+                                widget.foundResource[index]["subname"],
                                 style: TextStyle(
                                     color: Colors.black54,
                                     fontSize:
@@ -234,8 +236,8 @@ class _GridResourceState extends State<GridResource> {
                               padding: selectedIndex == index
                                   ? const EdgeInsets.all(0.0)
                                   : const EdgeInsets.only(right: 5.0),
-                              child:
-                                  downloadButton(context, selectedIndex, index),
+                              child: downloadButton(context, selectedIndex,
+                                  index, widget.foundResource[index]["size"]),
                             )
                           ],
                         ),

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:gimmic/src/view/grid.dart';
 import 'package:gimmic/src/view/list.dart';
@@ -11,8 +13,61 @@ class Resource extends StatefulWidget {
 }
 
 bool gridLayout = false;
+var _searchController = TextEditingController();
 
 class _ResourceState extends State<Resource> {
+// This holds a list of fiction users
+//// You can use data fetched from a database or a server as well
+  final List<Map<String, dynamic>> _allResource = [
+    {"id": 1, "name": "Andy", "subname": "Legends of Zelda", "size": "29.0 MB"},
+    {
+      "id": 2,
+      "name": "Aragon Malay",
+      "subname": "Cross Code",
+      "size": "40.2 MB"
+    },
+    {"id": 3, "name": "Cross", "subname": "Cross Code", "size": "5.5 MB"},
+    {"id": 4, "name": "Barbara", "subname": "Zenity", "size": "35.2 MB"},
+  ];
+
+  // This list holds the data for the list view
+  List<Map<String, dynamic>> _foundResource = [];
+  @override
+  void initState() {
+    // at the beginning, all users are shown
+    _foundResource = _allResource;
+    super.initState();
+  }
+
+  void _runFilter(String enteredKeyword) {
+    List<Map<String, dynamic>> results = [];
+    if (enteredKeyword.isEmpty) {
+      // if the search field is empty or only contains white-space, we'll display all users
+      results = _allResource;
+    } else {
+      final name = _allResource
+          .where((name) =>
+              name["name"].toLowerCase().contains(enteredKeyword.toLowerCase()))
+          .toList();
+
+      final subname = _allResource
+          .where((subname) => subname["subname"]
+              .toLowerCase()
+              .contains(enteredKeyword.toLowerCase()))
+          .toList();
+
+      results = name..addAll(subname);
+      results = results.toSet().toList();
+      // we use the toLowerCase() method to make it case-insensitive
+
+    }
+
+    // Refresh the UI
+    setState(() {
+      _foundResource = results;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
@@ -36,7 +91,7 @@ class _ResourceState extends State<Resource> {
                 children: <Widget>[
                   const Text('Resource'),
                   Visibility(
-                    visible: useVerticalLayout ? true : false,
+                    visible: useVerticalLayout ? false : false,
                     child: Flexible(
                       child: Padding(
                         padding: useVerticalLayout
@@ -45,6 +100,7 @@ class _ResourceState extends State<Resource> {
                             : const EdgeInsets.only(
                                 top: 5.0, left: 75.0, right: 75.0),
                         child: TextField(
+                          onChanged: (value) => _runFilter(value),
                           decoration: InputDecoration(
                             isDense: true,
                             filled: true,
@@ -104,30 +160,39 @@ class _ResourceState extends State<Resource> {
               color: Colors.grey.shade200,
               child: Column(children: [
                 Visibility(
-                  visible: useVerticalLayout ? false : true,
+                  visible: useVerticalLayout ? true : true,
                   child: Padding(
-                    padding: const EdgeInsets.only(
-                        top: 12.0, bottom: 12.0, left: 24.0, right: 24.0),
+                    padding: useVerticalLayout
+                        ? const EdgeInsets.only(
+                            top: 12.0, bottom: 12.0, left: 48.0, right: 48.0)
+                        : const EdgeInsets.only(
+                            top: 12.0, bottom: 12.0, left: 28.0, right: 28.0),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Flexible(
                           child: TextField(
+                            onChanged: (value) => _runFilter(value),
+                            controller: _searchController,
                             decoration: InputDecoration(
                               isDense: false,
                               filled: true,
                               fillColor: Colors.white,
                               prefixIcon: const Icon(Icons.search),
                               prefixIconConstraints:
-                                  const BoxConstraints(minWidth: 55.0),
-                              suffixIcon: IconButton(
-                                icon: const Icon(Icons.clear),
-                                onPressed: () {
-                                  /* Clear the search field */
-                                },
-                              ),
-                              suffixIconConstraints:
-                                  const BoxConstraints(minWidth: 55.0),
+                                  const BoxConstraints(minWidth: 50.0),
+                              suffixIcon: _foundResource.isNotEmpty
+                                  ? null
+                                  : IconButton(
+                                      icon: const Icon(Icons.clear),
+                                      onPressed: () {
+                                        /* Clear the search field */
+                                        _searchController.clear();
+                                        _runFilter(_searchController.text);
+                                      },
+                                    ),
+                              suffixIconConstraints: const BoxConstraints(
+                                  minWidth: 50.0, minHeight: 50.0),
                               hintText: 'Search...',
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 0.0, horizontal: 0.0),
@@ -173,18 +238,43 @@ class _ResourceState extends State<Resource> {
                     ),
                   ),
                 ),
-                gridLayout
-                    ? GridResource(
-                        useVerticalLayout: useVerticalLayout,
-                        useVerticalLayout2x: useVerticalLayout2x,
-                        useVerticalLayout3x: useVerticalLayout3x,
-                        gridRowCount: gridRowCount,
-                      )
-                    : useVerticalLayout3x
-                        ? useVerticalLayout2x
-                            ? const ListBigResource()
-                            : const ListBigResource()
-                        : const ListResource()
+                _foundResource.isNotEmpty
+                    ? gridLayout
+                        ? GridResource(
+                            useVerticalLayout: useVerticalLayout,
+                            useVerticalLayout2x: useVerticalLayout2x,
+                            useVerticalLayout3x: useVerticalLayout3x,
+                            gridRowCount: gridRowCount,
+                            foundResource: _foundResource,
+                          )
+                        : useVerticalLayout3x
+                            ? useVerticalLayout2x
+                                ? ListBigResource(
+                                    foundResource: _foundResource,
+                                  )
+                                : ListBigResource(
+                                    foundResource: _foundResource,
+                                  )
+                            : const ListResource()
+                    : Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Text(
+                                'No results found',
+                                style: TextStyle(
+                                    fontSize: 24, fontWeight: FontWeight.w300),
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(height: 10),
+                              Icon(
+                                Icons.more_horiz,
+                                size: 48,
+                                color: Colors.black54,
+                              )
+                            ]),
+                      ),
               ])));
     });
   }

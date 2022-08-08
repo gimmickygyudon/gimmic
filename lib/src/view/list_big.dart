@@ -1,10 +1,9 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class ListBigResource extends StatefulWidget {
-  const ListBigResource({super.key});
+  final List<Map<String, dynamic>> foundResource;
+  const ListBigResource({super.key, required this.foundResource});
 
   @override
   State<ListBigResource> createState() => _ListBigResourceState();
@@ -28,7 +27,7 @@ class _ListBigResourceState extends State<ListBigResource> {
         padding: const EdgeInsets.only(
             bottom: 24.0, top: 6.0, left: 24.0, right: 24.0),
         child: ListView.builder(
-            itemCount: images.length,
+            itemCount: widget.foundResource.length,
             itemBuilder: (context, index) {
               return ConstrainedBox(
                 constraints: const BoxConstraints(
@@ -40,6 +39,7 @@ class _ListBigResourceState extends State<ListBigResource> {
                   onHover: ((value) => setState(() => selectedIndex = index)),
                   onTap: () => Navigator.pushNamed(context, '/resource/detail'),
                   child: Card(
+                    key: ValueKey(widget.foundResource[index]["id"]),
                     elevation: (selectedIndex == index) ? 1 : 0,
                     surfaceTintColor: Colors.green,
                     color: Theme.of(context).colorScheme.surfaceVariant,
@@ -80,18 +80,21 @@ class _ListBigResourceState extends State<ListBigResource> {
                                     Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
-                                        children: const [
+                                        children: [
                                           Text(
-                                            'Hello Cat',
-                                            style: TextStyle(
+                                            widget.foundResource[index]["name"]
+                                                .toString(),
+                                            style: const TextStyle(
                                                 color: Colors.black87,
                                                 fontSize: 20,
                                                 fontWeight: FontWeight.w400,
                                                 letterSpacing: -1.0),
                                           ),
                                           Text(
-                                            'Legends of Zelda',
-                                            style: TextStyle(
+                                            widget.foundResource[index]
+                                                    ["subname"]
+                                                .toString(),
+                                            style: const TextStyle(
                                                 color: Colors.black54,
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w500,
@@ -133,7 +136,10 @@ class _ListBigResourceState extends State<ListBigResource> {
                                 child: ElevatedButton.icon(
                                   onPressed: () => Navigator.pushNamed(
                                       context, '/resource/detail'),
-                                  label: const Text("4.31 MB"),
+                                  label: Text(
+                                    widget.foundResource[index]["size"]
+                                        .toString(),
+                                  ),
                                   icon: const Icon(
                                     Icons.file_download_outlined,
                                     size: 22.0,
