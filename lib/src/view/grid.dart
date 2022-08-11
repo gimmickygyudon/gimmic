@@ -108,21 +108,22 @@ class _GridResourceState extends State<GridResource> {
       child: Padding(
         padding: widget.useVerticalLayout
             ? const EdgeInsets.only(
-                bottom: 42.0, top: 12.0, left: 42.0, right: 42.0)
+                bottom: 0.0, top: 12.0, left: 48.0, right: 48.0)
             : const EdgeInsets.only(
-                bottom: 24.0, top: 6.0, left: 24.0, right: 24.0),
+                bottom: 0.0, top: 6.0, left: 24.0, right: 24.0),
         child: GridView.builder(
             itemCount: widget.foundResource.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 mainAxisExtent: widget.useVerticalLayout2x ? 400 : 320,
                 crossAxisCount: widget.gridRowCount,
                 crossAxisSpacing: widget.useVerticalLayout ? 40.0 : 20.0,
-                mainAxisSpacing: 20.0),
+                mainAxisSpacing: 0.0),
             itemBuilder: (context, index) {
               return InkWell(
                 onHover: ((value) => setState(() => selectedIndex = index)),
                 onTap: () => Navigator.pushNamed(context, '/resource/detail'),
                 child: Card(
+                    margin: const EdgeInsets.only(bottom: 30.0),
                     clipBehavior: Clip.antiAliasWithSaveLayer,
                     elevation: (selectedIndex == index) ? 1 : 0,
                     surfaceTintColor: Colors.green,

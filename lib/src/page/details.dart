@@ -206,7 +206,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                               color: Colors.white,
                               borderRadius:
                                   BorderRadius.all(Radius.circular(20))),
-                          child: PopupMenuButton<int>(
+                          child: PopupMenuButton(
                             icon: const Icon(
                               Icons.more_vert,
                               color: Colors.black54,

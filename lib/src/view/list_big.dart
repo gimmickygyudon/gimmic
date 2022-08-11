@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:gimmic/src/page/resource.dart';
 import 'package:intl/intl.dart';
 
 class ListBigResource extends StatefulWidget {
   final List<Map<String, dynamic>> foundResource;
-  const ListBigResource({super.key, required this.foundResource});
+  final bool gridLayout;
+  final bool useVerticalLayout;
+  final bool hideDetailHorizontal;
+  const ListBigResource(
+      {super.key,
+      required this.foundResource,
+      required this.gridLayout,
+      required this.hideDetailHorizontal,
+      required this.useVerticalLayout});
 
   @override
   State<ListBigResource> createState() => _ListBigResourceState();
@@ -24,8 +33,11 @@ class _ListBigResourceState extends State<ListBigResource> {
   Widget build(BuildContext context) {
     return Flexible(
       child: Padding(
-        padding: const EdgeInsets.only(
-            bottom: 24.0, top: 6.0, left: 24.0, right: 24.0),
+        padding: widget.useVerticalLayout
+            ? const EdgeInsets.only(
+                bottom: 0.0, top: 6.0, left: 24.0, right: 24.0)
+            : const EdgeInsets.only(
+                bottom: 0.0, top: 6.0, left: 0.0, right: 0.0),
         child: ListView.builder(
             itemCount: widget.foundResource.length,
             itemBuilder: (context, index) {
@@ -39,6 +51,10 @@ class _ListBigResourceState extends State<ListBigResource> {
                   onHover: ((value) => setState(() => selectedIndex = index)),
                   onTap: () => Navigator.pushNamed(context, '/resource/detail'),
                   child: Card(
+                    margin: gridLayout
+                        ? const EdgeInsets.only(bottom: 10.0)
+                        : const EdgeInsets.only(
+                            bottom: 10.0, left: 25.0, right: 25.0),
                     key: ValueKey(widget.foundResource[index]["id"]),
                     elevation: (selectedIndex == index) ? 1 : 0,
                     surfaceTintColor: Colors.green,
@@ -104,19 +120,26 @@ class _ListBigResourceState extends State<ListBigResource> {
                                     Padding(
                                       padding:
                                           const EdgeInsets.only(bottom: 4.0),
-                                      child: Chip(
-                                          labelStyle: const TextStyle(
-                                              color: Colors.black54,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w500),
-                                          label: const Text('Animal'),
-                                          backgroundColor: Colors.grey.shade200,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 4.0, vertical: 0.0),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                          )),
+                                      child: Row(
+                                        children: [
+                                          Chip(
+                                              labelStyle: const TextStyle(
+                                                  color: Colors.black54,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w500),
+                                              label: const Text('Animal'),
+                                              backgroundColor:
+                                                  Colors.grey.shade200,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 4.0,
+                                                      vertical: 0.0),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0),
+                                              )),
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -130,7 +153,92 @@ class _ListBigResourceState extends State<ListBigResource> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              const Icon(Icons.more_vert),
+                              Row(
+                                children: [
+                                  Visibility(
+                                    visible: widget.hideDetailHorizontal
+                                        ? true
+                                        : false,
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 16.0),
+                                      child: Text(
+                                        timenow,
+                                        style: const TextStyle(
+                                          color: Colors.black54,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Visibility(
+                                    visible: widget.hideDetailHorizontal
+                                        ? true
+                                        : false,
+                                    child: Container(
+                                      margin: const EdgeInsets.only(right: 8.0),
+                                      decoration: BoxDecoration(
+                                          color: selectedIndex == index
+                                              ? Colors.white
+                                              : Colors.grey.shade100,
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
+                                      child: IconButton(
+                                          color: selectedIndex == index
+                                              ? Colors.black87
+                                              : Colors.black54,
+                                          onPressed: () {},
+                                          iconSize: 20.0,
+                                          icon: const Icon(
+                                              Icons.star_border_rounded)),
+                                    ),
+                                  ),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        color: selectedIndex == index
+                                            ? Colors.white
+                                            : Colors.grey.shade100,
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    child: PopupMenuButton(
+                                      icon: Icon(
+                                        Icons.more_vert,
+                                        color: selectedIndex == index
+                                            ? Colors.black87
+                                            : Colors.black54,
+                                      ),
+                                      iconSize: 20.0,
+                                      itemBuilder: (context) => [
+                                        PopupMenuItem(
+                                          value: 1,
+                                          child: Row(
+                                            children: const [
+                                              Icon(Icons.star),
+                                              SizedBox(
+                                                width: 10,
+                                              ),
+                                              Text("Get The App")
+                                            ],
+                                          ),
+                                        ),
+                                        PopupMenuItem(
+                                          value: 2,
+                                          child: Row(
+                                            children: const [
+                                              Icon(Icons.chrome_reader_mode),
+                                              SizedBox(
+                                                width: 10,
+                                              ),
+                                              Text("About")
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
                               Tooltip(
                                 message: "Download 'Legends of Zelda'",
                                 child: ElevatedButton.icon(

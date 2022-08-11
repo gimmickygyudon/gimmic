@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gimmic/src/layout/desktop.dart';
-import 'package:gimmic/src/layout/mobile.dart';
+import 'package:gimmic/src/page/homepage.dart';
 
 class HomeBase extends StatefulWidget {
   const HomeBase({super.key, required this.title});
@@ -18,7 +17,7 @@ class _HomeBaseState extends State<HomeBase> {
       if (constraints.maxWidth > 600) {
         return LayoutDesktop();
       } else {
-        return const LayoutMobile();
+        return LayoutDesktop();
       }
     });
   }

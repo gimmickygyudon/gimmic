@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:gimmic/src/view/grid.dart';
 import 'package:gimmic/src/view/list.dart';
@@ -12,7 +10,7 @@ class Resource extends StatefulWidget {
   State<Resource> createState() => _ResourceState();
 }
 
-bool gridLayout = false;
+bool gridLayout = true;
 var _searchController = TextEditingController();
 
 class _ResourceState extends State<Resource> {
@@ -74,6 +72,7 @@ class _ResourceState extends State<Resource> {
       bool useVerticalLayout = constraints.maxWidth > 1000;
       bool useVerticalLayout2x = constraints.maxWidth > 620;
       bool useVerticalLayout3x = constraints.maxWidth > 440;
+      bool hideDetailHorizontal = constraints.maxWidth > 550;
 
       int gridRowCount = 1;
       useVerticalLayout3x == true ? gridRowCount = 1 : null;
@@ -140,7 +139,7 @@ class _ResourceState extends State<Resource> {
                       children: [
                         Visibility(
                           visible: useVerticalLayout3x ? true : false,
-                          child: OutlinedButton.icon(
+                          child: TextButton.icon(
                             icon: const Icon(Icons.light_mode_rounded,
                                 size: 20.0),
                             onPressed: null,
@@ -166,7 +165,7 @@ class _ResourceState extends State<Resource> {
                         ? const EdgeInsets.only(
                             top: 12.0, bottom: 12.0, left: 48.0, right: 48.0)
                         : const EdgeInsets.only(
-                            top: 12.0, bottom: 12.0, left: 28.0, right: 28.0),
+                            top: 12.0, bottom: 12.0, left: 24.0, right: 24.0),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -181,7 +180,7 @@ class _ResourceState extends State<Resource> {
                               prefixIcon: const Icon(Icons.search),
                               prefixIconConstraints:
                                   const BoxConstraints(minWidth: 50.0),
-                              suffixIcon: _foundResource.isNotEmpty
+                              suffixIcon: _searchController.text.isEmpty
                                   ? null
                                   : IconButton(
                                       icon: const Icon(Icons.clear),
@@ -251,11 +250,17 @@ class _ResourceState extends State<Resource> {
                             ? useVerticalLayout2x
                                 ? ListBigResource(
                                     foundResource: _foundResource,
+                                    gridLayout: gridLayout,
+                                    useVerticalLayout: useVerticalLayout,
+                                    hideDetailHorizontal: hideDetailHorizontal,
                                   )
                                 : ListBigResource(
                                     foundResource: _foundResource,
+                                    gridLayout: gridLayout,
+                                    useVerticalLayout: useVerticalLayout,
+                                    hideDetailHorizontal: hideDetailHorizontal,
                                   )
-                            : const ListResource()
+                            : ListResource(foundResource: _foundResource)
                     : Padding(
                         padding: const EdgeInsets.all(20.0),
                         child: Column(
@@ -269,7 +274,7 @@ class _ResourceState extends State<Resource> {
                               ),
                               SizedBox(height: 10),
                               Icon(
-                                Icons.more_horiz,
+                                Icons.sentiment_very_dissatisfied,
                                 size: 48,
                                 color: Colors.black54,
                               )

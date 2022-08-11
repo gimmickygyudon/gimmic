@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class ListResource extends StatefulWidget {
-  const ListResource({super.key});
+  final List<Map<String, dynamic>> foundResource;
+  const ListResource({super.key, required this.foundResource});
 
   @override
   State<ListResource> createState() => _ListResourceState();
@@ -53,17 +54,17 @@ class _ListResourceState extends State<ListResource> {
                               fit: BoxFit.fitHeight),
                         ),
                       ),
-                      title: const Text(
-                        'Hello Cat',
-                        style: TextStyle(
+                      title: Text(
+                        widget.foundResource[index]["name"].toString(),
+                        style: const TextStyle(
                             color: Colors.black87,
                             fontSize: 18,
                             fontWeight: FontWeight.w400,
                             letterSpacing: -1.0),
                       ),
-                      subtitle: const Text(
-                        'Legends of Zelda',
-                        style: TextStyle(
+                      subtitle: Text(
+                        widget.foundResource[index]["subname"].toString(),
+                        style: const TextStyle(
                             color: Colors.black54,
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
