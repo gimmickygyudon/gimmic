@@ -7,12 +7,14 @@ class ListBigResource extends StatefulWidget {
   final bool gridLayout;
   final bool useVerticalLayout;
   final bool hideDetailHorizontal;
+  final ScrollController scrollViewController;
   const ListBigResource(
       {super.key,
       required this.foundResource,
       required this.gridLayout,
       required this.hideDetailHorizontal,
-      required this.useVerticalLayout});
+      required this.useVerticalLayout,
+      required this.scrollViewController});
 
   @override
   State<ListBigResource> createState() => _ListBigResourceState();
@@ -39,6 +41,7 @@ class _ListBigResourceState extends State<ListBigResource> {
             : const EdgeInsets.only(
                 bottom: 0.0, top: 6.0, left: 0.0, right: 0.0),
         child: ListView.builder(
+            controller: widget.scrollViewController,
             itemCount: widget.foundResource.length,
             itemBuilder: (context, index) {
               return ConstrainedBox(

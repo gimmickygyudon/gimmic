@@ -8,6 +8,7 @@ class GridResource extends StatefulWidget {
   final bool useVerticalLayout2x;
   final bool useVerticalLayout3x;
   final int gridRowCount;
+  final ScrollController scrollViewController;
   final List<Map<String, dynamic>> foundResource;
   const GridResource(
       {super.key,
@@ -15,7 +16,8 @@ class GridResource extends StatefulWidget {
       required this.gridRowCount,
       required this.useVerticalLayout2x,
       required this.useVerticalLayout3x,
-      required this.foundResource});
+      required this.foundResource,
+      required this.scrollViewController});
 
   @override
   State<GridResource> createState() => _GridResourceState();
@@ -112,6 +114,7 @@ class _GridResourceState extends State<GridResource> {
             : const EdgeInsets.only(
                 bottom: 0.0, top: 6.0, left: 24.0, right: 24.0),
         child: GridView.builder(
+            controller: widget.scrollViewController,
             itemCount: widget.foundResource.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 mainAxisExtent: widget.useVerticalLayout2x ? 400 : 320,

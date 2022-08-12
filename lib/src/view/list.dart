@@ -25,7 +25,7 @@ class _ListResourceState extends State<ListResource> {
     return Flexible(
       child: Padding(
         padding: const EdgeInsets.only(
-            bottom: 24.0, top: 6.0, left: 24.0, right: 24.0),
+            bottom: 24.0, top: 6.0, left: 18.0, right: 18.0),
         child: ListView.builder(
             itemCount: images.length,
             itemBuilder: (context, index) {

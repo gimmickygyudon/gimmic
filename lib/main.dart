@@ -16,16 +16,15 @@ void main() {
   usePathUrlStrategy();
   runApp(const Gimmic());
 }
-
-/* Future<void> main() async {
+/* 
+Future<void> main() async {
   await Firebase.initializeApp(
     // linux isn't implemented yet with firebase platform
     // options: DefaultFirebaseOptions.currentPlatform,
     options: DefaultFirebaseOptions.web,
   );
   usePathUrlStrategy();
-  runApp(const Gimmic());
-} */
+  runApp(const Gimmic()) */
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
   // Override behavior methods and getters like dragDevices
@@ -36,19 +35,6 @@ class MyCustomScrollBehavior extends MaterialScrollBehavior {
         // etc.
       };
 }
-
-MaterialColor white = MaterialColor(Colors.white.value, const <int, Color>{
-  50: Colors.white,
-  100: Colors.white,
-  200: Colors.white,
-  300: Colors.white,
-  400: Colors.white,
-  500: Colors.white,
-  600: Colors.white,
-  700: Colors.white,
-  800: Colors.white,
-  900: Colors.white,
-});
 
 class Gimmic extends StatelessWidget {
   const Gimmic({super.key});
