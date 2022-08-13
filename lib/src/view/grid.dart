@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class GridResource extends StatefulWidget {
@@ -39,7 +40,10 @@ Widget downloadButton(context, selectedIndex, index, size) {
     message: "Download 'Legends of Zelda'",
     child: ElevatedButton.icon(
       onPressed: () => Navigator.pushNamed(context, '/resource/detail'),
-      label: Text(size),
+      label: Text(size,
+          style: GoogleFonts.roboto(
+            fontWeight: FontWeight.w700,
+          )),
       icon: const Icon(
         Icons.file_download_outlined,
         size: 22.0,
@@ -110,7 +114,7 @@ class _GridResourceState extends State<GridResource> {
       child: Padding(
         padding: widget.useVerticalLayout
             ? const EdgeInsets.only(
-                bottom: 0.0, top: 12.0, left: 48.0, right: 48.0)
+                bottom: 0.0, top: 6.0, left: 48.0, right: 48.0)
             : const EdgeInsets.only(
                 bottom: 0.0, top: 6.0, left: 24.0, right: 24.0),
         child: GridView.builder(
@@ -191,25 +195,23 @@ class _GridResourceState extends State<GridResource> {
                                           fontWeight: FontWeight.w400,
                                           letterSpacing: -1.0),
                                     ),
-                                    Text(
-                                      timenow,
-                                      style: const TextStyle(
-                                        color: Colors.black45,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    )
+                                    Text(timenow,
+                                        style: GoogleFonts.roboto(
+                                          color: Colors.black45,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                        ))
                                   ],
                                 )),
                             Padding(
                               padding: const EdgeInsets.only(left: 20.0),
                               child: Text(
                                 widget.foundResource[index]["subname"],
-                                style: TextStyle(
+                                style: GoogleFonts.roboto(
                                     color: Colors.black54,
                                     fontSize:
                                         widget.useVerticalLayout2x ? 14 : 12,
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w500,
                                     letterSpacing: 0),
                               ),
                             ),
@@ -224,10 +226,10 @@ class _GridResourceState extends State<GridResource> {
                             Padding(
                               padding: const EdgeInsets.only(left: 5.0),
                               child: Chip(
-                                  labelStyle: const TextStyle(
-                                      color: Colors.black54,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600),
+                                  labelStyle: GoogleFonts.roboto(
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 12.0,
+                                      color: Colors.black54),
                                   label: const Text('Animal'),
                                   backgroundColor: Colors.grey.shade200,
                                   padding: const EdgeInsets.symmetric(

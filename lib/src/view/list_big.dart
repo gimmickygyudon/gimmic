@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gimmic/src/page/resource.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class ListBigResource extends StatefulWidget {
@@ -107,13 +108,13 @@ class _ListBigResourceState extends State<ListBigResource> {
                                                 color: Colors.black87,
                                                 fontSize: 20,
                                                 fontWeight: FontWeight.w400,
-                                                letterSpacing: -1.0),
+                                                letterSpacing: -0.5),
                                           ),
                                           Text(
                                             widget.foundResource[index]
                                                     ["subname"]
                                                 .toString(),
-                                            style: const TextStyle(
+                                            style: GoogleFonts.roboto(
                                                 color: Colors.black54,
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w500,
@@ -126,10 +127,10 @@ class _ListBigResourceState extends State<ListBigResource> {
                                       child: Row(
                                         children: [
                                           Chip(
-                                              labelStyle: const TextStyle(
-                                                  color: Colors.black54,
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.w500),
+                                              labelStyle: GoogleFonts.roboto(
+                                                  fontWeight: FontWeight.w900,
+                                                  fontSize: 10.0,
+                                                  color: Colors.black54),
                                               label: const Text('Animal'),
                                               backgroundColor:
                                                   Colors.grey.shade200,
@@ -167,10 +168,10 @@ class _ListBigResourceState extends State<ListBigResource> {
                                           const EdgeInsets.only(right: 16.0),
                                       child: Text(
                                         timenow,
-                                        style: const TextStyle(
-                                          color: Colors.black54,
+                                        style: GoogleFonts.roboto(
+                                          color: Colors.black45,
                                           fontSize: 12,
-                                          fontWeight: FontWeight.w600,
+                                          fontWeight: FontWeight.w700,
                                         ),
                                       ),
                                     ),
@@ -250,6 +251,9 @@ class _ListBigResourceState extends State<ListBigResource> {
                                   label: Text(
                                     widget.foundResource[index]["size"]
                                         .toString(),
+                                    style: GoogleFonts.roboto(
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                   icon: const Icon(
                                     Icons.file_download_outlined,

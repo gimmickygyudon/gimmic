@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class ListResource extends StatefulWidget {
@@ -56,7 +57,7 @@ class _ListResourceState extends State<ListResource> {
                       ),
                       title: Text(
                         widget.foundResource[index]["name"].toString(),
-                        style: const TextStyle(
+                        style: GoogleFonts.roboto(
                             color: Colors.black87,
                             fontSize: 18,
                             fontWeight: FontWeight.w400,
@@ -64,11 +65,11 @@ class _ListResourceState extends State<ListResource> {
                       ),
                       subtitle: Text(
                         widget.foundResource[index]["subname"].toString(),
-                        style: const TextStyle(
+                        style: GoogleFonts.roboto(
                             color: Colors.black54,
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            letterSpacing: 0),
+                            letterSpacing: 0.0),
                       ),
                       trailing: const Icon(Icons.more_vert),
                     )),

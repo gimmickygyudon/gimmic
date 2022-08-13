@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gimmic/assets/colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:universal_html/html.dart' as html;
@@ -29,12 +30,9 @@ class LayoutDesktop extends StatelessWidget {
             return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Gimmicky Gyudon',
-                    style: TextStyle(
-                        color: Colors.grey.shade700,
-                        fontWeight: FontWeight.w300),
-                  ),
+                  Text('Gimmicky Gyudon',
+                      style: GoogleFonts.roboto(
+                          fontWeight: FontWeight.w300, color: Colors.black87)),
                 ]);
           }),
         ),
@@ -53,7 +51,12 @@ class LayoutDesktop extends StatelessWidget {
                       TextButton.icon(
                         icon: const Icon(Icons.light_mode_rounded, size: 20.0),
                         onPressed: null,
-                        label: const Text('Light Mode'),
+                        label: Text(
+                          'Light Mode',
+                          style: GoogleFonts.roboto(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
                       const IconButton(
                         icon: Icon(Icons.settings_outlined),
@@ -148,9 +151,10 @@ class LayoutDesktop extends StatelessWidget {
                                     size: 18.0,
                                     color: Colors.black54,
                                   ),
-                                  label: const Text(
-                                      'Clone this Project at Github',
-                                      style: TextStyle(color: Colors.black54)),
+                                  label: Text('Clone this Project at Github',
+                                      style: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black54)),
                                 ),
                                 Material(
                                   type: MaterialType.circle,
@@ -274,8 +278,10 @@ class LayoutDesktop extends StatelessWidget {
                                                     Navigator.pushNamed(
                                                         context, '/resource');
                                                   },
-                                                  child:
-                                                      const Text("Get Started"),
+                                                  child: Text("Get Started",
+                                                      style: GoogleFonts.roboto(
+                                                          fontWeight:
+                                                              FontWeight.w600)),
                                                 ),
                                               ],
                                             ),
@@ -295,10 +301,11 @@ class LayoutDesktop extends StatelessWidget {
                                                       children: [
                                                         Text(
                                                           'Hello Cat',
-                                                          style: TextStyle(
-                                                            fontSize: 30,
+                                                          style: GoogleFonts
+                                                              .roboto(
+                                                            fontSize: 32.0,
                                                             fontWeight:
-                                                                FontWeight.w500,
+                                                                FontWeight.w600,
                                                             foreground: Paint()
                                                               ..shader =
                                                                   linearGradient,
@@ -313,14 +320,13 @@ class LayoutDesktop extends StatelessWidget {
                                                                   top: 8.0),
                                                           child: Text(
                                                             timecard,
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .grey
-                                                                    .shade300,
-                                                                fontSize: 14,
+                                                            style: GoogleFonts.roboto(
                                                                 fontWeight:
                                                                     FontWeight
-                                                                        .w300),
+                                                                        .w300,
+                                                                color: Colors
+                                                                    .grey
+                                                                    .shade300),
                                                           ),
                                                         ),
                                                       ],
@@ -358,16 +364,16 @@ class LayoutDesktop extends StatelessWidget {
                                                 const SizedBox(
                                                   height: 8.0,
                                                 ),
-                                                const Text(
+                                                Text(
                                                   maxLines: 2,
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                   "Welcome, You made it here! let's enjoy our time together",
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 24,
+                                                  style: GoogleFonts.roboto(
+                                                      fontSize: 24.0,
                                                       fontWeight:
-                                                          FontWeight.w300),
+                                                          FontWeight.w300,
+                                                      color: Colors.white),
                                                 ),
                                               ],
                                             ),
@@ -386,35 +392,54 @@ class LayoutDesktop extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: TextField(
-                    onChanged: (value) => {},
-                    decoration: InputDecoration(
-                      isDense: false,
-                      filled: true,
-                      fillColor: Colors.white,
-                      prefixIcon: const Icon(Icons.search),
-                      prefixIconConstraints:
-                          const BoxConstraints(minWidth: 55.0),
-                      /* suffixIcon: IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          /* Clear the search field */
-                        },
-                      ), */
-                      suffixIconConstraints:
-                          const BoxConstraints(minWidth: 55.0),
-                      hintText: 'Search...',
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 0.0, horizontal: 0.0),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.transparent),
-                        borderRadius: BorderRadius.circular(25.7),
+                  child: Column(
+                    children: [
+                      TextField(
+                        onChanged: (value) => {},
+                        style: GoogleFonts.roboto(fontWeight: FontWeight.w500),
+                        decoration: InputDecoration(
+                          isDense: false,
+                          filled: true,
+                          fillColor: Colors.white,
+                          prefixIcon: const Icon(Icons.search),
+                          prefixIconConstraints:
+                              const BoxConstraints(minWidth: 55.0),
+                          /* suffixIcon: IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              /* Clear the search field */
+                            },
+                          ), */
+                          suffixIconConstraints:
+                              const BoxConstraints(minWidth: 55.0),
+                          hintText: 'Search...',
+                          hintStyle: GoogleFonts.roboto(
+                            fontWeight: FontWeight.w500,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 0.0, horizontal: 0.0),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Colors.transparent),
+                            borderRadius: BorderRadius.circular(25.7),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                const BorderSide(color: Colors.transparent),
+                            borderRadius: BorderRadius.circular(25.7),
+                          ),
+                        ),
                       ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Colors.transparent),
-                        borderRadius: BorderRadius.circular(25.7),
+                      Padding(
+                        padding: const EdgeInsets.all(32.0),
+                        child: Text(
+                          "It's bit rainy here...",
+                          style: GoogleFonts.roboto(
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black54),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ],

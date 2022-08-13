@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'firebase_options.dart';
 
 import 'package:gimmic/assets/label.dart';
@@ -16,15 +17,16 @@ void main() {
   usePathUrlStrategy();
   runApp(const Gimmic());
 }
-/* 
-Future<void> main() async {
+
+/* Future<void> main() async {
   await Firebase.initializeApp(
     // linux isn't implemented yet with firebase platform
     // options: DefaultFirebaseOptions.currentPlatform,
     options: DefaultFirebaseOptions.web,
   );
   usePathUrlStrategy();
-  runApp(const Gimmic()) */
+  runApp(const Gimmic());
+} */
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
   // Override behavior methods and getters like dragDevices

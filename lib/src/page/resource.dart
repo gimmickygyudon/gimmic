@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:gimmic/src/view/grid.dart';
 import 'package:gimmic/src/view/list.dart';
 import 'package:gimmic/src/view/list_big.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Resource extends StatefulWidget {
   const Resource({super.key});
@@ -180,7 +181,11 @@ class _ResourceState extends State<Resource> {
                             icon: const Icon(Icons.light_mode_rounded,
                                 size: 20.0),
                             onPressed: null,
-                            label: const Text('Light Mode'),
+                            label: Text(
+                              'Light Mode',
+                              style: GoogleFonts.roboto(
+                                  fontWeight: FontWeight.w500),
+                            ),
                           ),
                         ),
                         const IconButton(
@@ -215,6 +220,8 @@ class _ResourceState extends State<Resource> {
                               onChanged: (value) => _runFilter(value),
                               controller: _searchController,
                               autofocus: true,
+                              style: GoogleFonts.roboto(
+                                  fontWeight: FontWeight.w500),
                               decoration: InputDecoration(
                                 isDense: false,
                                 filled: true,
@@ -222,6 +229,9 @@ class _ResourceState extends State<Resource> {
                                 prefixIcon: const Icon(Icons.search),
                                 prefixIconConstraints:
                                     const BoxConstraints(minWidth: 55.0),
+                                suffixStyle: GoogleFonts.roboto(
+                                  fontWeight: FontWeight.w500,
+                                ),
                                 suffixText: useVerticalLayout3x
                                     ? _searchController.text.isEmpty
                                         ? null
@@ -240,6 +250,8 @@ class _ResourceState extends State<Resource> {
                                 suffixIconConstraints: const BoxConstraints(
                                     minWidth: 50.0, minHeight: 50.0),
                                 hintText: 'Search...',
+                                hintStyle: GoogleFonts.roboto(
+                                    fontWeight: FontWeight.w500),
                                 contentPadding: const EdgeInsets.symmetric(
                                     vertical: 0.0, horizontal: 0.0),
                                 focusedBorder: OutlineInputBorder(
@@ -287,10 +299,16 @@ class _ResourceState extends State<Resource> {
                 ),
                 Padding(
                   padding: useVerticalLayout
-                      ? const EdgeInsets.symmetric(
-                          vertical: 8.0, horizontal: 48.0)
-                      : const EdgeInsets.symmetric(
-                          vertical: 8.0, horizontal: 24.0),
+                      ? _showAppbar
+                          ? const EdgeInsets.symmetric(
+                              vertical: 8.0, horizontal: 48.0)
+                          : const EdgeInsets.symmetric(
+                              vertical: 0.0, horizontal: 48.0)
+                      : _showAppbar
+                          ? const EdgeInsets.symmetric(
+                              vertical: 8.0, horizontal: 24.0)
+                          : const EdgeInsets.symmetric(
+                              vertical: 0.0, horizontal: 24.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -299,6 +317,10 @@ class _ResourceState extends State<Resource> {
                         children: [
                           DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
+                              style: GoogleFonts.roboto(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16.0,
+                                  color: Colors.black87),
                               value: tagResults,
                               elevation: 1,
                               borderRadius: BorderRadius.circular(4.0),
@@ -333,26 +355,38 @@ class _ResourceState extends State<Resource> {
                           isDense: true,
                           elevation: 1,
                           decoration: InputDecoration(
-                            contentPadding: useVerticalLayout3x
-                                ? null
-                                : const EdgeInsets.all(12.0),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                  color: Colors.white, width: 2),
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                            border: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                  color: Colors.white, width: 2),
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                            filled: true,
-                            fillColor: Colors.white,
-                            isDense: true,
-                            labelText: useVerticalLayout3x ? null : 'Sort By',
-                            prefixText:
-                                useVerticalLayout3x ? 'Sort By: ' : null,
-                          ),
+                              contentPadding: useVerticalLayout3x
+                                  ? _showAppbar
+                                      ? null
+                                      : const EdgeInsets.all(12.0)
+                                  : const EdgeInsets.all(12.0),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                    color: Colors.white, width: 2),
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              border: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                    color: Colors.white, width: 2),
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
+                              isDense: true,
+                              labelText: useVerticalLayout3x ? null : 'Sort By',
+                              labelStyle: GoogleFonts.roboto(
+                                fontWeight: FontWeight.w500,
+                              ),
+                              prefixText:
+                                  useVerticalLayout3x ? 'Sort By: ' : null,
+                              prefixStyle: GoogleFonts.roboto(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16.0,
+                                  color: Colors.grey.shade600)),
+                          style: GoogleFonts.roboto(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16.0,
+                              color: Colors.black87),
                           borderRadius: BorderRadius.circular(4.0),
                           dropdownColor: Colors.white,
                           value: sortbyValue,
@@ -377,8 +411,10 @@ class _ResourceState extends State<Resource> {
                   visible: _showAppbar ? true : false,
                   child: Padding(
                     padding: useVerticalLayout
-                        ? const EdgeInsets.symmetric(horizontal: 48.0)
-                        : const EdgeInsets.symmetric(horizontal: 24.0),
+                        ? const EdgeInsets.symmetric(
+                            horizontal: 48.0, vertical: 3.0)
+                        : const EdgeInsets.symmetric(
+                            horizontal: 24.0, vertical: 3.0),
                     child: const Divider(
                       thickness: 1,
                       indent: 0,
@@ -395,7 +431,10 @@ class _ResourceState extends State<Resource> {
                           horizontal: 24.0, vertical: 8.0),
                       child: Text(
                           'About ${_foundResource.toList().length} Results',
-                          style: const TextStyle(fontSize: 14.0)),
+                          style: GoogleFonts.roboto(
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.w400,
+                          )),
                     ),
                   ),
                 ),
@@ -428,22 +467,24 @@ class _ResourceState extends State<Resource> {
                             : ListResource(foundResource: _foundResource)
                     : Padding(
                         padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Text(
-                                'No results found',
-                                style: TextStyle(
-                                    fontSize: 24, fontWeight: FontWeight.w300),
-                                textAlign: TextAlign.center,
-                              ),
-                              SizedBox(height: 10),
-                              Icon(
-                                Icons.sentiment_very_dissatisfied,
-                                size: 48,
-                                color: Colors.black54,
-                              )
-                            ]),
+                        child:
+                            Column(mainAxisSize: MainAxisSize.min, children: [
+                          Text(
+                            'No results found',
+                            style: GoogleFonts.roboto(
+                              color: Colors.black87,
+                              fontSize: 24.0,
+                              fontWeight: FontWeight.w300,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 10),
+                          const Icon(
+                            Icons.sentiment_very_dissatisfied,
+                            size: 48,
+                            color: Colors.black54,
+                          )
+                        ]),
                       ),
               ])));
     });
