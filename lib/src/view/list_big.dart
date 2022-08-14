@@ -5,14 +5,14 @@ import 'package:intl/intl.dart';
 
 class ListBigResource extends StatefulWidget {
   final List<Map<String, dynamic>> foundResource;
-  final bool gridLayout;
+  final bool layouts;
   final bool useVerticalLayout;
   final bool hideDetailHorizontal;
   final ScrollController scrollViewController;
   const ListBigResource(
       {super.key,
       required this.foundResource,
-      required this.gridLayout,
+      required this.layouts,
       required this.hideDetailHorizontal,
       required this.useVerticalLayout,
       required this.scrollViewController});
@@ -55,7 +55,7 @@ class _ListBigResourceState extends State<ListBigResource> {
                   onHover: ((value) => setState(() => selectedIndex = index)),
                   onTap: () => Navigator.pushNamed(context, '/resource/detail'),
                   child: Card(
-                    margin: gridLayout
+                    margin: widget.layouts
                         ? const EdgeInsets.only(bottom: 10.0)
                         : const EdgeInsets.only(
                             bottom: 10.0, left: 25.0, right: 25.0),

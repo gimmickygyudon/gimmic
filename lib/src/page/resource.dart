@@ -12,7 +12,6 @@ class Resource extends StatefulWidget {
   State<Resource> createState() => _ResourceState();
 }
 
-bool gridLayout = true;
 var _searchController = TextEditingController();
 
 class _ResourceState extends State<Resource> {
@@ -100,14 +99,16 @@ class _ResourceState extends State<Resource> {
   }
 
   String sortbyValue = 'Name';
-  String tagResults = 'All Tags';
+  String tagResults = 'All Categories';
+
+  final List<bool> _layouts = [true, false];
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       bool useVerticalLayout = constraints.maxWidth > 1000;
       bool useVerticalLayout2x = constraints.maxWidth > 620;
-      bool useVerticalLayout3x = constraints.maxWidth > 440;
+      bool useVerticalLayout3x = constraints.maxWidth > 460;
       bool hideDetailHorizontal = constraints.maxWidth > 550;
 
       int gridRowCount = 1;
@@ -267,31 +268,6 @@ class _ResourceState extends State<Resource> {
                               ),
                             ),
                           ),
-                          Tooltip(
-                            message: gridLayout ? 'Grid Mode' : 'List Mode',
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Container(
-                                height: 50.0,
-                                width: 50.0,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(24.0),
-                                  color: Colors.amber.shade100,
-                                ),
-                                child: IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        gridLayout
-                                            ? gridLayout = false
-                                            : gridLayout = true;
-                                      });
-                                    },
-                                    icon: gridLayout
-                                        ? const Icon(Icons.grid_view_outlined)
-                                        : const Icon(Icons.view_list_outlined)),
-                              ),
-                            ),
-                          )
                         ],
                       ),
                     ),
@@ -314,23 +290,50 @@ class _ResourceState extends State<Resource> {
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
+                          SizedBox(
+                            width: 175.0,
+                            child: DropdownButtonFormField(
+                              isDense: true,
+                              decoration: InputDecoration(
+                                  contentPadding: const EdgeInsets.only(
+                                      top: 8.0,
+                                      bottom: 8.0,
+                                      right: 4.0,
+                                      left: 0.0),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: const BorderSide(
+                                        color: Colors.transparent, width: 2),
+                                    borderRadius: BorderRadius.circular(6.0),
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderSide: const BorderSide(
+                                        color: Colors.transparent, width: 2),
+                                    borderRadius: BorderRadius.circular(6.0),
+                                  ),
+                                  filled: false,
+                                  fillColor: Colors.white,
+                                  isDense: true,
+                                  prefixIcon: const Icon(
+                                    Icons.category_outlined,
+                                    size: 20.0,
+                                    color: Colors.black87,
+                                  )),
                               style: GoogleFonts.roboto(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 16.0,
                                   color: Colors.black87),
                               value: tagResults,
                               elevation: 1,
-                              borderRadius: BorderRadius.circular(4.0),
+                              borderRadius: BorderRadius.circular(8.0),
                               onChanged: (String? newValue) {
                                 setState(() {
                                   tagResults = newValue!;
                                 });
                               },
                               items: <String>[
-                                'All Tags',
+                                'All Categories',
                                 'Animal',
                                 'Sci-fi'
                               ].map<DropdownMenuItem<String>>((String value) {
@@ -343,66 +346,102 @@ class _ResourceState extends State<Resource> {
                           ),
                           const SizedBox(width: 10.0),
                           Visibility(
-                            visible: useVerticalLayout3x ? true : false,
+                            visible: useVerticalLayout2x ? true : false,
                             child: Text(
                                 'About ${_foundResource.toList().length} Results'),
                           )
                         ],
                       ),
-                      SizedBox(
-                        width: useVerticalLayout3x ? 175.0 : 100.0,
-                        child: DropdownButtonFormField(
-                          isDense: true,
-                          elevation: 1,
-                          decoration: InputDecoration(
-                              contentPadding: useVerticalLayout3x
-                                  ? _showAppbar
-                                      ? null
-                                      : const EdgeInsets.all(12.0)
-                                  : const EdgeInsets.all(12.0),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                    color: Colors.white, width: 2),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              border: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                    color: Colors.white, width: 2),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              filled: true,
-                              fillColor: Colors.white,
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: useVerticalLayout3x ? 145.0 : 100.0,
+                            child: DropdownButtonFormField(
                               isDense: true,
-                              labelText: useVerticalLayout3x ? null : 'Sort By',
-                              labelStyle: GoogleFonts.roboto(
-                                fontWeight: FontWeight.w500,
-                              ),
-                              prefixText:
-                                  useVerticalLayout3x ? 'Sort By: ' : null,
-                              prefixStyle: GoogleFonts.roboto(
+                              elevation: 1,
+                              decoration: InputDecoration(
+                                  contentPadding: const EdgeInsets.only(
+                                      top: 8.0,
+                                      bottom: 8.0,
+                                      right: 4.0,
+                                      left: 12.0),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: const BorderSide(
+                                        color: Colors.transparent, width: 2),
+                                    borderRadius: BorderRadius.circular(6.0),
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderSide: const BorderSide(
+                                        color: Colors.transparent, width: 2),
+                                    borderRadius: BorderRadius.circular(6.0),
+                                  ),
+                                  filled: false,
+                                  fillColor: Colors.white,
+                                  isDense: true,
+                                  labelText:
+                                      useVerticalLayout3x ? null : 'Sort By',
+                                  labelStyle: GoogleFonts.roboto(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  prefixText:
+                                      useVerticalLayout3x ? 'Sort By: ' : null,
+                                  prefixStyle: GoogleFonts.roboto(
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.grey.shade600)),
+                              style: GoogleFonts.roboto(
                                   fontWeight: FontWeight.w500,
-                                  fontSize: 16.0,
-                                  color: Colors.grey.shade600)),
-                          style: GoogleFonts.roboto(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16.0,
-                              color: Colors.black87),
-                          borderRadius: BorderRadius.circular(4.0),
-                          dropdownColor: Colors.white,
-                          value: sortbyValue,
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              sortbyValue = newValue!;
-                            });
-                          },
-                          items: <String>['Name', 'Upload', 'Size']
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                        ),
+                                  color: Colors.black87),
+                              borderRadius: BorderRadius.circular(8.0),
+                              dropdownColor: Colors.white,
+                              value: sortbyValue,
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  sortbyValue = newValue!;
+                                });
+                              },
+                              items: <String>[
+                                'Name',
+                                'Upload',
+                                'Size'
+                              ].map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                          const SizedBox(width: 10.0),
+                          ToggleButtons(
+                            color: Colors.black54,
+                            fillColor: Colors.transparent,
+                            constraints: const BoxConstraints(
+                                minWidth: 32.0, minHeight: 32.0),
+                            borderRadius: BorderRadius.circular(4.0),
+                            onPressed: (int index) {
+                              setState(() {
+                                for (int buttonIndex = 0;
+                                    buttonIndex < _layouts.length;
+                                    buttonIndex++) {
+                                  if (buttonIndex == index) {
+                                    _layouts[buttonIndex] = true;
+                                  } else {
+                                    _layouts[buttonIndex] = false;
+                                  }
+                                }
+                              });
+                            },
+                            isSelected: _layouts,
+                            children: const <Widget>[
+                              Tooltip(
+                                  message: 'Grid Mode',
+                                  child: Icon(Icons.view_module_outlined)),
+                              Tooltip(
+                                  message: 'List Mode',
+                                  child: Icon(Icons.view_list_outlined)),
+                            ],
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -411,19 +450,20 @@ class _ResourceState extends State<Resource> {
                   visible: _showAppbar ? true : false,
                   child: Padding(
                     padding: useVerticalLayout
-                        ? const EdgeInsets.symmetric(
-                            horizontal: 48.0, vertical: 3.0)
-                        : const EdgeInsets.symmetric(
-                            horizontal: 24.0, vertical: 3.0),
+                        ? const EdgeInsets.only(
+                            left: 48.0, right: 48.0, bottom: 12.0)
+                        : const EdgeInsets.only(
+                            left: 24.0, right: 24.0, bottom: 6.0),
                     child: const Divider(
-                      thickness: 1,
+                      color: Colors.black,
+                      thickness: 0.1,
                       indent: 0,
                       endIndent: 0,
                     ),
                   ),
                 ),
                 Visibility(
-                  visible: useVerticalLayout3x ? false : true,
+                  visible: useVerticalLayout2x ? false : true,
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(
@@ -439,7 +479,7 @@ class _ResourceState extends State<Resource> {
                   ),
                 ),
                 _foundResource.isNotEmpty
-                    ? gridLayout
+                    ? _layouts[0]
                         ? GridResource(
                             useVerticalLayout: useVerticalLayout,
                             useVerticalLayout2x: useVerticalLayout2x,
@@ -452,14 +492,14 @@ class _ResourceState extends State<Resource> {
                             ? useVerticalLayout2x
                                 ? ListBigResource(
                                     foundResource: _foundResource,
-                                    gridLayout: gridLayout,
+                                    layouts: _layouts[0],
                                     useVerticalLayout: useVerticalLayout,
                                     hideDetailHorizontal: hideDetailHorizontal,
                                     scrollViewController: _scrollViewController,
                                   )
                                 : ListBigResource(
                                     foundResource: _foundResource,
-                                    gridLayout: gridLayout,
+                                    layouts: _layouts[0],
                                     useVerticalLayout: useVerticalLayout,
                                     hideDetailHorizontal: hideDetailHorizontal,
                                     scrollViewController: _scrollViewController,
