@@ -60,6 +60,8 @@ class _CardBigState extends State<CardBig> {
                   colors: <Color>[
                     Colors.black.withAlpha(0),
                     Colors.black12,
+                    Colors.black12,
+                    Colors.black87,
                     Colors.black87
                   ],
                 ),
@@ -73,18 +75,24 @@ class _CardBigState extends State<CardBig> {
                     alignment: MainAxisAlignment.spaceBetween,
                     buttonPadding: EdgeInsets.zero,
                     children: [
-                      Visibility(
-                        visible: widget.useVHideDetails ? false : true,
-                        child: Row(
-                          children: [
-                            IconButton(
-                                onPressed: () {},
-                                icon: Icon(
-                                  size: 24.0,
-                                  Icons.image_outlined,
-                                  color: Colors.grey.shade200,
-                                )),
-                            IconButton(
+                      Row(
+                        children: [
+                          Visibility(
+                            visible: widget.useVHideDetails ? false : true,
+                            child: Tooltip(
+                              message: 'Quick View',
+                              child: IconButton(
+                                  onPressed: () {},
+                                  icon: Icon(
+                                    size: 24.0,
+                                    Icons.image_outlined,
+                                    color: Colors.grey.shade200,
+                                  )),
+                            ),
+                          ),
+                          Visibility(
+                            visible: widget.useVHideDetails ? false : true,
+                            child: IconButton(
                                 padding: EdgeInsets.zero,
                                 onPressed: () {},
                                 icon: Icon(
@@ -92,8 +100,22 @@ class _CardBigState extends State<CardBig> {
                                   Icons.more_vert_rounded,
                                   color: Colors.grey.shade300,
                                 )),
-                          ],
-                        ),
+                          ),
+                          Visibility(
+                            visible: widget.useVHideDetails ? true : false,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 6.0),
+                              child: Text(
+                                'Updated · $timecard',
+                                style: GoogleFonts.roboto(
+                                    fontSize:
+                                        widget.useVHideDetails ? 14.0 : 12.0,
+                                    fontWeight: FontWeight.w300,
+                                    color: Colors.grey.shade300),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       ElevatedButton(
                         style: ButtonStyle(
@@ -129,8 +151,8 @@ class _CardBigState extends State<CardBig> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Hello Cat',
-                                style: GoogleFonts.roboto(
+                                'Resource',
+                                style: GoogleFonts.poppins(
                                   fontSize:
                                       widget.useVHideDetails ? 32.0 : 28.0,
                                   fontWeight: FontWeight.w600,
@@ -138,16 +160,20 @@ class _CardBigState extends State<CardBig> {
                                   letterSpacing: -0.5,
                                 ),
                               ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 14.0, top: 8.0),
-                                child: Text(
-                                  timecard,
-                                  style: GoogleFonts.roboto(
-                                      fontSize:
-                                          widget.useVHideDetails ? 14.0 : 12.0,
-                                      fontWeight: FontWeight.w300,
-                                      color: Colors.grey.shade300),
+                              Visibility(
+                                visible: widget.useVHideDetails ? false : true,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 14.0, top: 8.0),
+                                  child: Text(
+                                    'Updated · $timecard',
+                                    style: GoogleFonts.roboto(
+                                        fontSize: widget.useVHideDetails
+                                            ? 14.0
+                                            : 12.0,
+                                        fontWeight: FontWeight.w300,
+                                        color: Colors.grey.shade300),
+                                  ),
                                 ),
                               ),
                             ],
@@ -156,13 +182,16 @@ class _CardBigState extends State<CardBig> {
                             visible: widget.useVHideDetails ? true : false,
                             child:
                                 Row(mainAxisSize: MainAxisSize.min, children: [
-                              IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(
-                                    size: 24.0,
-                                    Icons.image_outlined,
-                                    color: Colors.grey.shade200,
-                                  )),
+                              Tooltip(
+                                message: 'Quick View',
+                                child: IconButton(
+                                    onPressed: () {},
+                                    icon: Icon(
+                                      size: 24.0,
+                                      Icons.image_outlined,
+                                      color: Colors.grey.shade200,
+                                    )),
+                              ),
                               IconButton(
                                   padding: EdgeInsets.zero,
                                   onPressed: () {},

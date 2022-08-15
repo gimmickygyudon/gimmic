@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:gimmic/assets/colors.dart';
+import 'package:gimmic/assets/widgets/button.dart';
 import 'package:gimmic/assets/widgets/card.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:universal_html/html.dart' as html;
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LayoutDesktop extends StatelessWidget {
   LayoutDesktop({super.key});
@@ -34,12 +31,12 @@ class LayoutDesktop extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Gimmicky Gyudon',
-                          style: GoogleFonts.roboto(
+                          style: GoogleFonts.raleway(
                               fontSize: 20.0,
                               fontWeight: FontWeight.w300,
                               color: Colors.black87)),
                       const SizedBox(width: 8.0),
-                      Text('ver. 1.01a',
+                      Text('ver. 1.01',
                           style: GoogleFonts.roboto(
                               fontSize: 12.0,
                               fontWeight: FontWeight.w600,
@@ -161,62 +158,12 @@ class LayoutDesktop extends StatelessWidget {
                                                           FontWeight.w500,
                                                     )),
                                               )
-                                            : usePhoneLayout
-                                                ? Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            right: 10.0),
-                                                    child: ElevatedButton.icon(
-                                                      style: ButtonStyle(
-                                                              alignment: Alignment
-                                                                  .center,
-                                                              backgroundColor:
-                                                                  MaterialStateProperty
-                                                                      .resolveWith(
-                                                                          ((states) {
-                                                                return states.contains(
-                                                                        MaterialState
-                                                                            .hovered)
-                                                                    ? Colors
-                                                                        .green
-                                                                        .shade200
-                                                                    : Colors.red
-                                                                        .shade100;
-                                                              })))
-                                                          .copyWith(
-                                                              elevation:
-                                                                  ButtonStyleButton
-                                                                      .allOrNull(
-                                                                          0.0)),
-                                                      onPressed: () async {
-                                                        String url =
-                                                            'https://github.com/gimmickygyudon/gimmic/';
-                                                        final Uri uri =
-                                                            Uri.parse(url);
-                                                        if (kIsWeb) {
-                                                          html.window.open(
-                                                              url, '_blank');
-                                                        } else if (await canLaunchUrl(
-                                                            uri)) {
-                                                          launchUrl(uri);
-                                                        }
-                                                      },
-                                                      icon: const Icon(
-                                                        FontAwesomeIcons.github,
-                                                        size: 18.0,
-                                                        color: Colors.black54,
-                                                      ),
-                                                      label: Text('Github',
-                                                          style: GoogleFonts
-                                                              .roboto(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  color: Colors
-                                                                      .black54)),
-                                                    ),
-                                                  )
-                                                : null,
+                                            : Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 10.0),
+                                                child: ButtonLinks(
+                                                  bgcolor: Colors.red.shade100,
+                                                )),
                                         suffixStyle: GoogleFonts.roboto(
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -228,9 +175,9 @@ class LayoutDesktop extends StatelessWidget {
                                             ? null
                                             : 'How are you today?',
                                         contentPadding: EdgeInsets.zero,
-                                        suffixIconConstraints:
-                                            const BoxConstraints(
-                                                minWidth: 100.0),
+                                        suffixIconConstraints: BoxConstraints(
+                                            minWidth:
+                                                useVHideDetails ? 150.0 : 40.0),
                                         focusedBorder: OutlineInputBorder(
                                           borderSide: const BorderSide(
                                               color: Colors.blue, width: 2),
@@ -282,62 +229,22 @@ class LayoutDesktop extends StatelessWidget {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      ElevatedButton.icon(
-                                        style: ButtonStyle(
-                                                alignment: Alignment.center,
-                                                backgroundColor:
-                                                    MaterialStateProperty
-                                                        .resolveWith(((states) {
-                                                  return states.contains(
-                                                          MaterialState.hovered)
-                                                      ? Colors.white38
-                                                      : Colors.white70;
-                                                })))
-                                            .copyWith(
-                                                elevation:
-                                                    ButtonStyleButton.allOrNull(
-                                                        0.0)),
-                                        onPressed: () async {
-                                          String url =
-                                              'https://github.com/gimmickygyudon/gimmic/';
-                                          final Uri uri = Uri.parse(url);
-                                          if (kIsWeb) {
-                                            html.window.open(url, '_blank');
-                                          } else if (await canLaunchUrl(uri)) {
-                                            launchUrl(uri);
-                                          }
-                                        },
-                                        icon: const Icon(
-                                          FontAwesomeIcons.github,
-                                          size: 18.0,
-                                          color: Colors.black54,
-                                        ),
-                                        label: Text(
-                                            'Clone this Project at Github',
-                                            style: GoogleFonts.roboto(
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.black54)),
-                                      ),
-                                      Material(
-                                        type: MaterialType.circle,
-                                        color: Colors.white70,
-                                        child: IconButton(
-                                            padding: EdgeInsets.zero,
-                                            onPressed: () async {
-                                              String url =
-                                                  'https://github.com/gimmickygyudon/gimmic/';
-                                              final Uri uri = Uri.parse(url);
-                                              if (kIsWeb) {
-                                                html.window.open(url, '_blank');
-                                              } else if (await canLaunchUrl(
-                                                  uri)) {
-                                                launchUrl(uri);
-                                              }
-                                            },
-                                            icon: const Icon(
-                                              Icons.chevron_right_rounded,
-                                              color: Colors.black54,
-                                            )),
+                                      buttonGithub(),
+                                      Row(
+                                        children: [
+                                          ButtonLinks(bgcolor: Colors.white),
+                                          /* const SizedBox(width: 6.0),
+                                          Material(
+                                              color: Colors.redAccent.shade100,
+                                              type: MaterialType.circle,
+                                              child: const Padding(
+                                                padding: EdgeInsets.all(4.0),
+                                                child: Icon(
+                                                    Icons
+                                                        .notifications_off_outlined,
+                                                    color: Colors.white),
+                                              )), */
+                                        ],
                                       )
                                     ],
                                   ),

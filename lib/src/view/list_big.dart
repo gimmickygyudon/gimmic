@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gimmic/src/page/resource.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
