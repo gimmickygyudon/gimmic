@@ -23,18 +23,22 @@ const RESOURCES = {
 "assets/images/hellocat.jpg": "1dbeef686b8863f7cb0dcb2f3f1a20ee",
 "assets/images/hellocat1.jpg": "81100c67a9373d6e508352e3fbf9ce3d",
 "assets/fonts/MaterialIcons-Regular.otf": "95db9098c58fd6db106f1116bae85a0b",
-"assets/NOTICES": "878ff78b4402f2f1bf7474b9c1c950a4",
+"assets/NOTICES": "8f4604b3170b2b612fd3065ae96b13a9",
 "assets/FontManifest.json": "5a32d4310a6f5d9a6b651e75ba0d7372",
 "canvaskit/canvaskit.wasm": "bf50631470eb967688cca13ee181af62",
 "canvaskit/canvaskit.js": "2bc454a691c631b07a9307ac4ca47797",
 "canvaskit/profiling/canvaskit.wasm": "95a45378b69e77af5ed2bc72b2209b94",
 "canvaskit/profiling/canvaskit.js": "38164e5a72bdad0faa4ce740c9b8e564",
-"index.html": "c411d876b5e3e01ec4d5a4ae85fd7217",
+"index.html": "867badff31113300fbe58ee58649ea14",
 "/": "0f062498149b27717361ee1da32966d1",
+<<<<<<< HEAD
 <<<<<<< HEAD
 "main.dart.js": "1287bf63df3e3ce60f4758106f5c52ba",
 =======
 "main.dart.js": "48f51870f2af03bd49d2574c10653c97",
+>>>>>>> dev
+=======
+"main.dart.js": "28805a11ac065a358592ea4451ff2d03",
 >>>>>>> dev
 "UnityLibrary/StreamingAssets/UnityServicesProjectConfiguration.json": "b225a14f3d6d0971fcc8cd013b701f51",
 "UnityLibrary/Build/UnityLibrary.data": "ac4465d7797bc0a15c2d4b4e527aad2b",

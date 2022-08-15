@@ -92,12 +92,12 @@ class _UnityViewerState extends State<UnityViewer> {
   }
 
   void onUnityMessage(message) {
-    print('Received message from unity: ${message.toString()}');
+    // print('Received message from unity: ${message.toString()}');
   }
 
   void onUnitySceneLoaded(scene) {
-    print('Received scene loaded from unity: ${scene.name}');
-    print('Received scene loaded from unity buildIndex: ${scene.buildIndex}');
+    // print('Received scene loaded from unity: ${scene.name}');
+    // print('Received scene loaded from unity buildIndex: ${scene.buildIndex}');
   }
 
   // Callback that connects the created controller to the unity controller

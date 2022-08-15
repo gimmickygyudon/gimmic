@@ -5,12 +5,21 @@ import 'firebase_options.dart';
 
 import 'package:gimmic/assets/label.dart';
 import 'package:gimmic/src/homebase.dart';
+<<<<<<< HEAD
 
 import 'package:gimmic/src/page/details.dart';
 import 'package:gimmic/src/page/resource.dart';
 import 'package:gimmic/src/page/unity_viewer.dart';
 import 'package:gimmic/src/plugins/url_strategy.dart';
 
+=======
+
+import 'package:gimmic/src/page/details.dart';
+import 'package:gimmic/src/page/resource.dart';
+import 'package:gimmic/src/page/unity_viewer.dart';
+import 'package:gimmic/src/plugins/url_strategy.dart';
+
+>>>>>>> dev
 // default runApp (only for testing)
 /* void main() {
   usePathUrlStrategy();
@@ -43,6 +52,7 @@ class Gimmic extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: StringResource.logoName,
       initialRoute: '/',
       routes: {
