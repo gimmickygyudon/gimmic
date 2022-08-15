@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
-import 'package:gimmic/src/view/grid.dart';
-import 'package:gimmic/src/view/list.dart';
-import 'package:gimmic/src/view/list_big.dart';
-=======
 import 'package:flutter/rendering.dart';
 import 'package:gimmic/src/view/grid.dart';
 import 'package:gimmic/src/view/list.dart';
 import 'package:gimmic/src/view/list_big.dart';
 import 'package:google_fonts/google_fonts.dart';
->>>>>>> dev
 
 class Resource extends StatefulWidget {
   const Resource({super.key});
@@ -18,11 +12,6 @@ class Resource extends StatefulWidget {
   State<Resource> createState() => _ResourceState();
 }
 
-<<<<<<< HEAD
-bool gridLayout = false;
-
-class _ResourceState extends State<Resource> {
-=======
 var _searchController = TextEditingController();
 
 class _ResourceState extends State<Resource> {
@@ -114,18 +103,13 @@ class _ResourceState extends State<Resource> {
 
   final List<bool> _layouts = [true, false];
 
->>>>>>> dev
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       bool useVerticalLayout = constraints.maxWidth > 1000;
       bool useVerticalLayout2x = constraints.maxWidth > 620;
-<<<<<<< HEAD
-      bool useVerticalLayout3x = constraints.maxWidth > 440;
-=======
       bool useVerticalLayout3x = constraints.maxWidth > 460;
       bool hideDetailHorizontal = constraints.maxWidth > 550;
->>>>>>> dev
 
       int gridRowCount = 1;
       useVerticalLayout3x == true ? gridRowCount = 1 : null;
@@ -140,19 +124,12 @@ class _ResourceState extends State<Resource> {
               surfaceTintColor: Colors.grey.shade200,
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-<<<<<<< HEAD
-                children: <Widget>[
-                  const Text('Resource'),
-                  Visibility(
-                    visible: useVerticalLayout ? true : false,
-=======
                 children: [
                   const Text('Resource'),
                   // TODO: need improvement for this search bar
                   // undecorated search box - currently hidden.
                   Visibility(
                     visible: useVerticalLayout ? false : false,
->>>>>>> dev
                     child: Flexible(
                       child: Padding(
                         padding: useVerticalLayout
@@ -161,10 +138,7 @@ class _ResourceState extends State<Resource> {
                             : const EdgeInsets.only(
                                 top: 5.0, left: 75.0, right: 75.0),
                         child: TextField(
-<<<<<<< HEAD
-=======
                           onChanged: (value) => _runFilter(value),
->>>>>>> dev
                           decoration: InputDecoration(
                             isDense: true,
                             filled: true,
@@ -204,13 +178,6 @@ class _ResourceState extends State<Resource> {
                       children: [
                         Visibility(
                           visible: useVerticalLayout3x ? true : false,
-<<<<<<< HEAD
-                          child: OutlinedButton.icon(
-                            icon: const Icon(Icons.light_mode_rounded,
-                                size: 20.0),
-                            onPressed: null,
-                            label: const Text('Light Mode'),
-=======
                           child: TextButton.icon(
                             icon: const Icon(Icons.light_mode_rounded,
                                 size: 20.0),
@@ -220,7 +187,6 @@ class _ResourceState extends State<Resource> {
                               style: GoogleFonts.roboto(
                                   fontWeight: FontWeight.w500),
                             ),
->>>>>>> dev
                           ),
                         ),
                         const IconButton(
@@ -235,74 +201,6 @@ class _ResourceState extends State<Resource> {
           body: Container(
               color: Colors.grey.shade200,
               child: Column(children: [
-<<<<<<< HEAD
-                Visibility(
-                  visible: useVerticalLayout ? false : true,
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        top: 12.0, bottom: 12.0, left: 24.0, right: 24.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Flexible(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              isDense: false,
-                              filled: true,
-                              fillColor: Colors.white,
-                              prefixIcon: const Icon(Icons.search),
-                              prefixIconConstraints:
-                                  const BoxConstraints(minWidth: 55.0),
-                              suffixIcon: IconButton(
-                                icon: const Icon(Icons.clear),
-                                onPressed: () {
-                                  /* Clear the search field */
-                                },
-                              ),
-                              suffixIconConstraints:
-                                  const BoxConstraints(minWidth: 55.0),
-                              hintText: 'Search...',
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 0.0, horizontal: 0.0),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    const BorderSide(color: Colors.white),
-                                borderRadius: BorderRadius.circular(25.7),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    const BorderSide(color: Colors.white),
-                                borderRadius: BorderRadius.circular(25.7),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Tooltip(
-                          message: gridLayout ? 'Grid Mode' : 'List Mode',
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 8.0),
-                            child: Container(
-                              height: 50.0,
-                              width: 50.0,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(24.0),
-                                color: Colors.amber.shade100,
-                              ),
-                              child: IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      gridLayout
-                                          ? gridLayout = false
-                                          : gridLayout = true;
-                                    });
-                                  },
-                                  icon: gridLayout
-                                      ? const Icon(Icons.grid_view_outlined)
-                                      : const Icon(Icons.view_list_outlined)),
-                            ),
-                          ),
-                        )
-=======
                 AnimatedContainer(
                   curve: Curves.fastOutSlowIn,
                   duration: const Duration(milliseconds: 200),
@@ -645,25 +543,10 @@ class _ResourceState extends State<Resource> {
                             ),
                           ),
                         ),
->>>>>>> dev
                       ],
                     ),
                   ),
                 ),
-<<<<<<< HEAD
-                gridLayout
-                    ? GridResource(
-                        useVerticalLayout: useVerticalLayout,
-                        useVerticalLayout2x: useVerticalLayout2x,
-                        useVerticalLayout3x: useVerticalLayout3x,
-                        gridRowCount: gridRowCount,
-                      )
-                    : useVerticalLayout3x
-                        ? useVerticalLayout2x
-                            ? const ListBigResource()
-                            : const ListBigResource()
-                        : const ListResource()
-=======
                 _foundResource.isNotEmpty
                     ? _layouts[0]
                         ? GridResource(
@@ -712,7 +595,6 @@ class _ResourceState extends State<Resource> {
                           )
                         ]),
                       ),
->>>>>>> dev
               ])));
     });
   }

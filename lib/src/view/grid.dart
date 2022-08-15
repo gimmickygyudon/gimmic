@@ -9,24 +9,16 @@ class GridResource extends StatefulWidget {
   final bool useVerticalLayout2x;
   final bool useVerticalLayout3x;
   final int gridRowCount;
-<<<<<<< HEAD
-  GridResource(
-=======
   final ScrollController scrollViewController;
   final List<Map<String, dynamic>> foundResource;
   const GridResource(
->>>>>>> dev
       {super.key,
       required this.useVerticalLayout,
       required this.gridRowCount,
       required this.useVerticalLayout2x,
-<<<<<<< HEAD
-      required this.useVerticalLayout3x});
-=======
       required this.useVerticalLayout3x,
       required this.foundResource,
       required this.scrollViewController});
->>>>>>> dev
 
   @override
   State<GridResource> createState() => _GridResourceState();
@@ -43,11 +35,7 @@ List<String> images = [
   "images/hellocat1.jpg"
 ];
 
-<<<<<<< HEAD
-Widget downloadButton(context, selectedIndex, index) {
-=======
 Widget downloadButton(context, selectedIndex, index, size) {
->>>>>>> dev
   return Tooltip(
     message: "Download 'Legends of Zelda'",
     child: ElevatedButton.icon(
@@ -126,38 +114,23 @@ class _GridResourceState extends State<GridResource> {
       child: Padding(
         padding: widget.useVerticalLayout
             ? const EdgeInsets.only(
-<<<<<<< HEAD
-                bottom: 42.0, top: 12.0, left: 42.0, right: 42.0)
-            : const EdgeInsets.only(
-                bottom: 24.0, top: 6.0, left: 24.0, right: 24.0),
-        child: GridView.builder(
-            itemCount: images.length,
-=======
                 bottom: 0.0, top: 6.0, left: 48.0, right: 48.0)
             : const EdgeInsets.only(
                 bottom: 0.0, top: 6.0, left: 24.0, right: 24.0),
         child: GridView.builder(
             controller: widget.scrollViewController,
             itemCount: widget.foundResource.length,
->>>>>>> dev
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 mainAxisExtent: widget.useVerticalLayout2x ? 400 : 320,
                 crossAxisCount: widget.gridRowCount,
                 crossAxisSpacing: widget.useVerticalLayout ? 40.0 : 20.0,
-<<<<<<< HEAD
-                mainAxisSpacing: 20.0),
-=======
                 mainAxisSpacing: 0.0),
->>>>>>> dev
             itemBuilder: (context, index) {
               return InkWell(
                 onHover: ((value) => setState(() => selectedIndex = index)),
                 onTap: () => Navigator.pushNamed(context, '/resource/detail'),
                 child: Card(
-<<<<<<< HEAD
-=======
                     margin: const EdgeInsets.only(bottom: 30.0),
->>>>>>> dev
                     clipBehavior: Clip.antiAliasWithSaveLayer,
                     elevation: (selectedIndex == index) ? 1 : 0,
                     surfaceTintColor: Colors.green,
@@ -213,11 +186,7 @@ class _GridResourceState extends State<GridResource> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-<<<<<<< HEAD
-                                      'Hello Cat',
-=======
                                       widget.foundResource[index]["name"],
->>>>>>> dev
                                       style: TextStyle(
                                           color: Colors.black87,
                                           fontSize: widget.useVerticalLayout2x
@@ -226,43 +195,23 @@ class _GridResourceState extends State<GridResource> {
                                           fontWeight: FontWeight.w400,
                                           letterSpacing: -1.0),
                                     ),
-<<<<<<< HEAD
-                                    Text(
-                                      timenow,
-                                      style: const TextStyle(
-                                        color: Colors.black45,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    )
-=======
                                     Text(timenow,
                                         style: GoogleFonts.roboto(
                                           color: Colors.black45,
                                           fontSize: 12,
                                           fontWeight: FontWeight.w700,
                                         ))
->>>>>>> dev
                                   ],
                                 )),
                             Padding(
                               padding: const EdgeInsets.only(left: 20.0),
                               child: Text(
-<<<<<<< HEAD
-                                'Legends of Zelda',
-                                style: TextStyle(
-                                    color: Colors.black54,
-                                    fontSize:
-                                        widget.useVerticalLayout2x ? 14 : 12,
-                                    fontWeight: FontWeight.w600,
-=======
                                 widget.foundResource[index]["subname"],
                                 style: GoogleFonts.roboto(
                                     color: Colors.black54,
                                     fontSize:
                                         widget.useVerticalLayout2x ? 14 : 12,
                                     fontWeight: FontWeight.w500,
->>>>>>> dev
                                     letterSpacing: 0),
                               ),
                             ),
@@ -277,17 +226,10 @@ class _GridResourceState extends State<GridResource> {
                             Padding(
                               padding: const EdgeInsets.only(left: 5.0),
                               child: Chip(
-<<<<<<< HEAD
-                                  labelStyle: const TextStyle(
-                                      color: Colors.black54,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600),
-=======
                                   labelStyle: GoogleFonts.roboto(
                                       fontWeight: FontWeight.w900,
                                       fontSize: 12.0,
                                       color: Colors.black54),
->>>>>>> dev
                                   label: const Text('Animal'),
                                   backgroundColor: Colors.grey.shade200,
                                   padding: const EdgeInsets.symmetric(
@@ -300,13 +242,8 @@ class _GridResourceState extends State<GridResource> {
                               padding: selectedIndex == index
                                   ? const EdgeInsets.all(0.0)
                                   : const EdgeInsets.only(right: 5.0),
-<<<<<<< HEAD
-                              child:
-                                  downloadButton(context, selectedIndex, index),
-=======
                               child: downloadButton(context, selectedIndex,
                                   index, widget.foundResource[index]["size"]),
->>>>>>> dev
                             )
                           ],
                         ),

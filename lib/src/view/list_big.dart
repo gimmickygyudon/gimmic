@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-import 'dart:math';
-
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
-class ListBigResource extends StatefulWidget {
-  const ListBigResource({super.key});
-=======
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -24,7 +15,6 @@ class ListBigResource extends StatefulWidget {
       required this.hideDetailHorizontal,
       required this.useVerticalLayout,
       required this.scrollViewController});
->>>>>>> dev
 
   @override
   State<ListBigResource> createState() => _ListBigResourceState();
@@ -45,12 +35,6 @@ class _ListBigResourceState extends State<ListBigResource> {
   Widget build(BuildContext context) {
     return Flexible(
       child: Padding(
-<<<<<<< HEAD
-        padding: const EdgeInsets.only(
-            bottom: 24.0, top: 6.0, left: 24.0, right: 24.0),
-        child: ListView.builder(
-            itemCount: images.length,
-=======
         padding: widget.useVerticalLayout
             ? const EdgeInsets.only(
                 bottom: 0.0, top: 6.0, left: 24.0, right: 24.0)
@@ -59,7 +43,6 @@ class _ListBigResourceState extends State<ListBigResource> {
         child: ListView.builder(
             controller: widget.scrollViewController,
             itemCount: widget.foundResource.length,
->>>>>>> dev
             itemBuilder: (context, index) {
               return ConstrainedBox(
                 constraints: const BoxConstraints(
@@ -71,14 +54,11 @@ class _ListBigResourceState extends State<ListBigResource> {
                   onHover: ((value) => setState(() => selectedIndex = index)),
                   onTap: () => Navigator.pushNamed(context, '/resource/detail'),
                   child: Card(
-<<<<<<< HEAD
-=======
                     margin: widget.layouts
                         ? const EdgeInsets.only(bottom: 10.0)
                         : const EdgeInsets.only(
                             bottom: 10.0, left: 25.0, right: 25.0),
                     key: ValueKey(widget.foundResource[index]["id"]),
->>>>>>> dev
                     elevation: (selectedIndex == index) ? 1 : 0,
                     surfaceTintColor: Colors.green,
                     color: Theme.of(context).colorScheme.surfaceVariant,
@@ -119,20 +99,6 @@ class _ListBigResourceState extends State<ListBigResource> {
                                     Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
-<<<<<<< HEAD
-                                        children: const [
-                                          Text(
-                                            'Hello Cat',
-                                            style: TextStyle(
-                                                color: Colors.black87,
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w400,
-                                                letterSpacing: -1.0),
-                                          ),
-                                          Text(
-                                            'Legends of Zelda',
-                                            style: TextStyle(
-=======
                                         children: [
                                           Text(
                                             widget.foundResource[index]["name"]
@@ -148,7 +114,6 @@ class _ListBigResourceState extends State<ListBigResource> {
                                                     ["subname"]
                                                 .toString(),
                                             style: GoogleFonts.roboto(
->>>>>>> dev
                                                 color: Colors.black54,
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w500,
@@ -158,21 +123,6 @@ class _ListBigResourceState extends State<ListBigResource> {
                                     Padding(
                                       padding:
                                           const EdgeInsets.only(bottom: 4.0),
-<<<<<<< HEAD
-                                      child: Chip(
-                                          labelStyle: const TextStyle(
-                                              color: Colors.black54,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w500),
-                                          label: const Text('Animal'),
-                                          backgroundColor: Colors.grey.shade200,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 4.0, vertical: 0.0),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                          )),
-=======
                                       child: Row(
                                         children: [
                                           Chip(
@@ -193,7 +143,6 @@ class _ListBigResourceState extends State<ListBigResource> {
                                               )),
                                         ],
                                       ),
->>>>>>> dev
                                     ),
                                   ],
                                 ),
@@ -207,9 +156,6 @@ class _ListBigResourceState extends State<ListBigResource> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-<<<<<<< HEAD
-                              const Icon(Icons.more_vert),
-=======
                               Row(
                                 children: [
                                   Visibility(
@@ -296,15 +242,11 @@ class _ListBigResourceState extends State<ListBigResource> {
                                   )
                                 ],
                               ),
->>>>>>> dev
                               Tooltip(
                                 message: "Download 'Legends of Zelda'",
                                 child: ElevatedButton.icon(
                                   onPressed: () => Navigator.pushNamed(
                                       context, '/resource/detail'),
-<<<<<<< HEAD
-                                  label: const Text("4.31 MB"),
-=======
                                   label: Text(
                                     widget.foundResource[index]["size"]
                                         .toString(),
@@ -312,7 +254,6 @@ class _ListBigResourceState extends State<ListBigResource> {
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
->>>>>>> dev
                                   icon: const Icon(
                                     Icons.file_download_outlined,
                                     size: 22.0,
