@@ -111,7 +111,9 @@ class _GridResourceState extends State<GridResource> {
   @override
   Widget build(BuildContext context) {
     return Flexible(
-      child: Padding(
+      child: AnimatedPadding(
+        curve: Curves.easeIn,
+        duration: const Duration(milliseconds: 600),
         padding: widget.useVerticalLayout
             ? const EdgeInsets.only(
                 bottom: 0.0, top: 6.0, left: 48.0, right: 48.0)
@@ -121,7 +123,7 @@ class _GridResourceState extends State<GridResource> {
             controller: widget.scrollViewController,
             itemCount: widget.foundResource.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                mainAxisExtent: widget.useVerticalLayout2x ? 400 : 320,
+                mainAxisExtent: widget.useVerticalLayout2x ? 420 : 400,
                 crossAxisCount: widget.gridRowCount,
                 crossAxisSpacing: widget.useVerticalLayout ? 40.0 : 20.0,
                 mainAxisSpacing: 0.0),
@@ -151,7 +153,7 @@ class _GridResourceState extends State<GridResource> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          flex: 2,
+                          flex: 3,
                           child: Container(
                             foregroundDecoration: BoxDecoration(
                                 gradient: LinearGradient(

@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
+import 'package:gimmic/assets/widgets/button.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class Details extends StatefulWidget {
@@ -25,7 +27,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(viewportFraction: 1.0, initialPage: 1);
+    _pageController = PageController(viewportFraction: 1, initialPage: 1);
     _tabController = TabController(length: 2, vsync: this);
 
     throttle(sink.stream).listen((offset) {
@@ -41,8 +43,12 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  tabController(index) {
+    _tabController.animateTo(index);
+  }
+
 // indicators of images
-  List<Widget> indicators(imagesLength, currentIndex) {
+  List<Widget> imageIndicators(imagesLength, currentIndex) {
     return List<Widget>.generate(imagesLength, (index) {
       return Container(
         margin: const EdgeInsets.all(3),
@@ -56,12 +62,12 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
   }
 
 // thumbnails of images
-  List<Widget> thumbnails(imagesLength, currentIndex) {
+  List<Widget> imageThumbnails(imagesLength, currentIndex) {
     return List<Widget>.generate(imagesLength, (index) {
       return AspectRatio(
         aspectRatio: 1 / 1,
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8),
           child: InkWell(
             onTap: () {
               if (currentIndex == index) {
@@ -97,24 +103,63 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
     });
   }
 
-  Widget mainImage(context, pagePosition) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12.0),
-      child: GestureDetector(
-        onTap: () async {
-          await showDialog(
-              context: context,
-              builder: (_) => imageDialog(context, pagePosition));
-        },
-        child: Tooltip(
-          verticalOffset: 150,
-          message: 'Click to Fullscreen',
-          child: Image(
-            image: AssetImage(images[pagePosition]),
-            fit: BoxFit.cover,
-          ),
+// main images
+  Widget imageMain(context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          flex: 3,
+          child: Hero(
+              tag: 'catHero',
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height / 8,
+                width: MediaQuery.of(context).size.width / 2,
+                child: Listener(
+                  onPointerSignal: _handlePointerSignal,
+                  child: _IgnorePointerSignal(
+                    child: PageView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: images.length,
+                        pageSnapping: true,
+                        controller: _pageController,
+                        // avoiding custom scroll animation
+                        /* scrollBehavior:
+                                                              MyCustomScrollBehavior(), */
+                        onPageChanged: (page) {
+                          setState(() {
+                            activePage = page;
+                          });
+                        },
+                        itemBuilder: (context, pagePosition) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: GestureDetector(
+                                onTap: () async {
+                                  await showDialog(
+                                      context: context,
+                                      builder: (_) =>
+                                          imageDialog(context, pagePosition));
+                                },
+                                child: Tooltip(
+                                  verticalOffset: 150,
+                                  message: 'Click to Fullscreen',
+                                  child: Image(
+                                    image: AssetImage(images[pagePosition]),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                  ),
+                ),
+              )),
         ),
-      ),
+      ],
     );
   }
 
@@ -140,14 +185,14 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
   Widget detailCard(context, useSmallLayout, useVerticalLayout) {
     return Padding(
       padding: useVerticalLayout
-          ? const EdgeInsets.only(bottom: 0.0)
-          : const EdgeInsets.only(bottom: 10.0),
+          ? const EdgeInsets.only(bottom: 0)
+          : const EdgeInsets.only(bottom: 12),
       child: Card(
         clipBehavior: Clip.antiAliasWithSaveLayer,
         elevation: 0,
         color: Theme.of(context).colorScheme.surfaceVariant,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -160,58 +205,85 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                 length: 2,
                 child: Padding(
                   padding: const EdgeInsets.only(
-                      top: 10.0, left: 20.0, right: 20.0, bottom: 0.0),
+                      top: 10, left: 15, right: 15, bottom: 0),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Stack(children: [
                       TabBar(
-                        indicator: UnderlineTabIndicator(
-                            borderSide: BorderSide(
-                                width: 3.0, color: Colors.orange.shade200),
-                            insets:
-                                const EdgeInsets.symmetric(horizontal: 20.0)),
-                        isScrollable: true,
-                        indicatorWeight: 3,
-                        labelColor: Colors.orange,
-                        unselectedLabelColor: Colors.black45,
-                        indicatorColor: Colors.orange.shade100,
-                        // labelPadding: const EdgeInsets.all(0),
-                        labelPadding: const EdgeInsets.only(
-                            top: 0.0, left: 15.0, right: 15.0, bottom: 5.0),
-                        controller: _tabController,
-                        tabs: useSmallLayout
-                            ? const <Widget>[
-                                Tab(
-                                  text: "Hello Cat",
-                                ),
-                                Tab(
-                                  text: "Comments",
-                                ),
-                              ]
-                            : const <Widget>[
-                                Tab(
-                                  icon: Icon(Icons.view_in_ar),
-                                ),
-                                Tab(
-                                  icon: Icon(Icons.comment_rounded),
-                                ),
-                              ],
-                      ),
+                          indicator: UnderlineTabIndicator(
+                              borderSide: BorderSide(
+                                  width: 2, color: Colors.orange.shade400),
+                              insets:
+                                  const EdgeInsets.only(left: 20, right: 15)),
+                          isScrollable: true,
+                          indicatorWeight: 3,
+                          labelColor: Colors.orange,
+                          unselectedLabelColor: Colors.black45,
+                          // labelPadding: const EdgeInsets.all(0),
+                          labelPadding: const EdgeInsets.only(
+                              top: 0, left: 15, right: 10, bottom: 5),
+                          controller: _tabController,
+                          labelStyle: GoogleFonts.roboto(
+                              fontWeight: FontWeight.w500, fontSize: 16),
+                          onTap: (e) {
+                            setState(() {
+                              tabController(_tabController.index);
+                            });
+                          },
+                          tabs: <Widget>[
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 1000),
+                              child: _tabController.index == 0
+                                  ? Tab(
+                                      child: detailCardTab(
+                                          0,
+                                          Icons.view_in_ar_rounded,
+                                          "Hello Cat"),
+                                    )
+                                  : useSmallLayout
+                                      ? Tab(
+                                          child: detailCardTab(
+                                              0,
+                                              Icons.view_in_ar_rounded,
+                                              "Hello Cat"),
+                                        )
+                                      : Tab(
+                                          child: detailCardTabIcon(
+                                              0, Icons.view_in_ar)),
+                            ),
+                            _tabController.index == 1
+                                ? Tab(
+                                    child: detailCardTab(
+                                        1, Icons.comment_outlined, "Comments"),
+                                  )
+                                : useSmallLayout
+                                    ? Tab(
+                                        child: detailCardTab(1,
+                                            Icons.comment_outlined, "Comments"),
+                                      )
+                                    : Tab(
+                                        child: detailCardTabIcon(
+                                            1, Icons.comment_outlined))
+                          ]),
                       Align(
                         alignment: Alignment.centerRight,
                         child: Container(
                           margin: const EdgeInsets.only(
-                              top: 6.0, left: 6.0, right: 0.0, bottom: 6.0),
+                              top: 6, left: 6, right: 0, bottom: 6),
                           decoration: const BoxDecoration(
                               color: Colors.white,
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(20))),
+                                  BorderRadius.all(Radius.circular(18))),
                           child: PopupMenuButton(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                side: const BorderSide(
+                                    width: 1, color: Colors.black12)),
                             icon: const Icon(
                               Icons.more_vert,
                               color: Colors.black54,
                             ),
-                            iconSize: 20.0,
+                            iconSize: 20,
                             itemBuilder: (context) => [
                               PopupMenuItem(
                                 value: 1,
@@ -253,68 +325,67 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                   controller: _tabController,
                   children: <Widget>[
                     Padding(
-                      padding: const EdgeInsets.all(30.0),
+                      padding: const EdgeInsets.all(30),
                       child: ListView(children: [
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 30.0),
+                          padding: const EdgeInsets.only(bottom: 30),
                           child: Row(
                             children: [
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: Chip(
-                                  labelStyle: const TextStyle(
-                                      color: Colors.black54,
+                                  labelStyle: GoogleFonts.roboto(
+                                      fontWeight: FontWeight.w700,
                                       fontSize: 12,
-                                      fontWeight: FontWeight.w500),
+                                      color: Colors.black54),
                                   label: const Text('Cat'),
                                   backgroundColor: Colors.transparent,
                                   shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderRadius: BorderRadius.circular(8),
                                       side: const BorderSide(
                                           width: 1, color: Colors.black12)),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 8),
                                 ),
                               ),
                               const SizedBox(width: 6),
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: Chip(
-                                  labelStyle: const TextStyle(
-                                      color: Colors.black54,
+                                  labelStyle: GoogleFonts.roboto(
+                                      fontWeight: FontWeight.w700,
                                       fontSize: 12,
-                                      fontWeight: FontWeight.w500),
+                                      color: Colors.black54),
                                   label: const Text('Animal'),
                                   backgroundColor: Colors.transparent,
                                   shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderRadius: BorderRadius.circular(8),
                                       side: const BorderSide(
                                           width: 1, color: Colors.black12)),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 8),
                                 ),
                               ),
                             ],
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(right: 30.0),
+                          padding: const EdgeInsets.only(right: 30),
                           child: Text('Created on',
-                              style: Theme.of(context).textTheme.caption),
+                              style: GoogleFonts.roboto(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.black54)),
                         ),
                         Padding(
-                          padding:
-                              const EdgeInsets.only(right: 30.0, bottom: 20.0),
+                          padding: const EdgeInsets.only(right: 30, bottom: 20),
                           child: Align(
                               alignment: Alignment.centerLeft,
-                              child: Text(
-                                timenow,
-                                style: const TextStyle(
-                                  color: Colors.black54,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              )),
+                              child: Text(timenow,
+                                  style: GoogleFonts.roboto(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.black54))),
                         ),
                         Text(
                           "Description",
@@ -338,7 +409,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
             ),
             Padding(
               padding: const EdgeInsets.only(
-                  top: 0.0, left: 30.0, right: 30.0, bottom: 20.0),
+                  top: 0, left: 30, right: 30, bottom: 20),
               child: ElevatedButton.icon(
                 icon: const Icon(Icons.file_download_outlined),
                 style: ButtonStyle(
@@ -369,227 +440,180 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
     );
   }
 
+  Widget detailCardTabIcon(index, icons) {
+    return IconButton(
+      onPressed: () {
+        setState(() {
+          _tabController.animateTo(index);
+        });
+      },
+      padding: const EdgeInsets.all(14),
+      style: ButtonStyle(
+          shape: MaterialStatePropertyAll(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+          backgroundColor: MaterialStateProperty.all(Colors.grey.shade200),
+          foregroundColor: MaterialStateProperty.resolveWith((states) {
+            return states.contains(MaterialState.hovered)
+                ? Colors.black
+                : Colors.grey.shade700;
+          })),
+      icon: Icon(icons, size: 20),
+      color: _tabController.index == index ? Colors.white : Colors.black87,
+    );
+  }
+
+  Widget detailCardTab(index, icons, String labels) {
+    return ElevatedButton.icon(
+      style: _tabController.index == index
+          ? ButtonStyle(
+              shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8))),
+              backgroundColor: MaterialStateProperty.all(Colors.orange),
+              elevation: MaterialStateProperty.all(0))
+          : ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(Colors.grey.shade200),
+              elevation: MaterialStateProperty.all(0)),
+      onPressed: () {
+        setState(() {
+          _tabController.animateTo(index);
+        });
+      },
+      icon: Icon(
+        icons,
+        size: 18,
+        color: _tabController.index == index ? Colors.white : Colors.black87,
+      ),
+      label: Text(labels,
+          style: GoogleFonts.roboto(
+              fontWeight: _tabController.index == index
+                  ? FontWeight.w400
+                  : FontWeight.w500,
+              color: _tabController.index == index
+                  ? Colors.white
+                  : Colors.black87)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       bool useVerticalLayout = constraints.maxWidth > 800;
-      bool useSmallLayout = constraints.maxWidth > 900;
+      bool useSmallLayout = constraints.maxWidth > 1100;
       bool useHorizontalShrink = constraints.maxHeight > 600;
       return Scaffold(
           appBar: AppBar(
-            backgroundColor: Colors.grey.shade200,
-            surfaceTintColor: Colors.grey.shade200,
-            elevation: 0.0,
-            title: (const Text('Hello Cat')),
-          ),
-          body: SafeArea(
-            child: Container(
-              color: Colors.grey.shade200,
-              child: Padding(
-                padding: useVerticalLayout
-                    ? const EdgeInsets.only(
-                        top: 10.0, left: 48.0, right: 24.0, bottom: 10.0)
-                    : const EdgeInsets.only(
-                        top: 5.0, left: 12.0, right: 12.0, bottom: 0.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 5,
-                      child: CustomScrollView(
-                          physics: useVerticalLayout
-                              ? const NeverScrollableScrollPhysics()
-                              : null,
-                          slivers: [
-                            SliverFillRemaining(
-                              hasScrollBody: false,
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                    minHeight: constraints.maxHeight - 100.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Flexible(
-                                      flex: 4,
-                                      child: Card(
-                                        clipBehavior:
-                                            Clip.antiAliasWithSaveLayer,
-                                        elevation: 0,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .surfaceVariant,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12.0),
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.stretch,
-                                          children: [
-                                            Expanded(
-                                              flex: 3,
-                                              child: Hero(
-                                                  tag: 'catHero',
-                                                  child: SizedBox(
-                                                    height:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .height /
-                                                            8,
-                                                    width:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width /
-                                                            2,
-                                                    child: Listener(
-                                                      onPointerSignal:
-                                                          _handlePointerSignal,
-                                                      child:
-                                                          _IgnorePointerSignal(
-                                                        child: PageView.builder(
-                                                            scrollDirection:
-                                                                Axis.horizontal,
-                                                            itemCount:
-                                                                images.length,
-                                                            pageSnapping: true,
-                                                            controller:
-                                                                _pageController,
-                                                            // avoiding custom scroll animation
-                                                            /* scrollBehavior:
-                                                                  MyCustomScrollBehavior(), */
-                                                            onPageChanged:
-                                                                (page) {
-                                                              setState(() {
-                                                                activePage =
-                                                                    page;
-                                                              });
-                                                            },
-                                                            itemBuilder: (context,
-                                                                pagePosition) {
-                                                              return mainImage(
-                                                                  context,
-                                                                  pagePosition);
-                                                            }),
-                                                      ),
-                                                    ),
-                                                  )),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+              backgroundColor: Colors.grey.shade200,
+              surfaceTintColor: Colors.grey.shade200,
+              elevation: 0,
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Resource'),
+                  // TODO: need improvement for this search bar
+                  // undecorated search box - currently hidden.
+
+                  Padding(
+                    padding: const EdgeInsets.only(top: 5),
+                    child: Row(
+                      children: [
+                        AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 400),
+                            child: useHorizontalShrink
+                                ? TextButton.icon(
+                                    icon: const Icon(Icons.light_mode_rounded,
+                                        size: 20),
+                                    onPressed: null,
+                                    label: Text(
+                                      'Light Mode',
+                                      style: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.w500),
                                     ),
-                                    Expanded(
-                                      flex: 1,
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 0.0,
-                                            left: 0.0,
-                                            right: 0.0,
-                                            bottom: 0.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: thumbnails(
-                                                  images.length, activePage),
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: AspectRatio(
-                                                aspectRatio: 1 / 1,
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                        color: Colors.black54,
-                                                        width: 2,
-                                                      ),
-                                                      borderRadius:
-                                                          const BorderRadius
-                                                                  .all(
-                                                              Radius.circular(
-                                                                  12))),
-                                                  child: InkWell(
-                                                    splashColor: Colors.black26,
-                                                    onTap: () {
-                                                      Navigator.pushNamed(
-                                                          context,
-                                                          '/resource/detail/view');
-                                                    },
-                                                    child: FittedBox(
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(18.0),
-                                                        child: Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            const Icon(
-                                                                Icons
-                                                                    .view_in_ar_rounded,
-                                                                size: 34.0,
-                                                                color: Colors
-                                                                    .black87),
-                                                            Visibility(
-                                                              visible:
-                                                                  useHorizontalShrink
-                                                                      ? true
-                                                                      : false,
-                                                              child:
-                                                                  const Padding(
-                                                                padding: EdgeInsets
-                                                                    .only(
-                                                                        top:
-                                                                            6.0),
-                                                                child: Text(
-                                                                    'View 3D',
-                                                                    style: TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight.w600)),
-                                                              ),
-                                                            )
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    Visibility(
-                                      visible: useVerticalLayout ? false : true,
-                                      child: Flexible(
-                                          flex: 6,
-                                          child: detailCard(
-                                              context,
-                                              useSmallLayout,
-                                              useVerticalLayout)),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            )
-                          ]),
+                                  )
+                                : null),
+                        const IconButton(
+                          icon: Icon(Icons.settings_outlined),
+                          onPressed: null,
+                        ),
+                      ],
                     ),
-                    Visibility(
-                      visible: useVerticalLayout ? true : false,
-                      child: Expanded(
-                          flex: 3,
-                          child: detailCard(
-                              context, useSmallLayout, useVerticalLayout)),
-                    )
-                  ],
-                ),
+                  ),
+                ],
+              )),
+          body: Container(
+            color: Colors.grey.shade200,
+            child: AnimatedPadding(
+              curve: Curves.fastOutSlowIn,
+              duration: const Duration(milliseconds: 600),
+              padding: useVerticalLayout
+                  ? const EdgeInsets.only(
+                      top: 0, left: 24, right: 24, bottom: 12)
+                  : const EdgeInsets.only(
+                      top: 0, left: 12, right: 12, bottom: 0),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 5,
+                    child: CustomScrollView(
+                        physics: useVerticalLayout
+                            ? const NeverScrollableScrollPhysics()
+                            : null,
+                        slivers: [
+                          SliverFillRemaining(
+                            hasScrollBody: false,
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                  minHeight: constraints.maxHeight - 100),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Flexible(flex: 4, child: imageMain(context)),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: imageThumbnails(
+                                              images.length, activePage),
+                                        ),
+                                        buttonBigView3D(
+                                            context, useHorizontalShrink)
+                                      ],
+                                    ),
+                                  ),
+                                  AnimatedSize(
+                                      curve: Curves.fastOutSlowIn,
+                                      duration:
+                                          const Duration(milliseconds: 400),
+                                      child: SizedBox(
+                                          height:
+                                              useVerticalLayout ? null : 16)),
+                                  Visibility(
+                                    visible: useVerticalLayout ? false : true,
+                                    child: Flexible(
+                                        flex: 6,
+                                        child: detailCard(context,
+                                            useSmallLayout, useVerticalLayout)),
+                                  )
+                                ],
+                              ),
+                            ),
+                          )
+                        ]),
+                  ),
+                  Visibility(
+                    visible: useVerticalLayout ? true : false,
+                    child: Expanded(
+                        flex: 3,
+                        child: detailCard(
+                            context, useSmallLayout, useVerticalLayout)),
+                  )
+                ],
               ),
             ),
           ));

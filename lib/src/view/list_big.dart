@@ -34,7 +34,9 @@ class _ListBigResourceState extends State<ListBigResource> {
   @override
   Widget build(BuildContext context) {
     return Flexible(
-      child: Padding(
+      child: AnimatedPadding(
+        curve: Curves.fastOutSlowIn,
+        duration: const Duration(milliseconds: 600),
         padding: widget.useVerticalLayout
             ? const EdgeInsets.only(
                 bottom: 0.0, top: 6.0, left: 24.0, right: 24.0)

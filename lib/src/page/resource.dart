@@ -22,15 +22,34 @@ class _ResourceState extends State<Resource> {
   // This holds a list of fiction users
   //// You can use data fetched from a database or a server as well
   final List<Map<String, dynamic>> _allResource = [
-    {"id": 1, "name": "Andy", "subname": "Legends of Zelda", "size": "29.0 MB"},
+    {
+      "id": 1,
+      "hero": "catHero",
+      "name": "Andy",
+      "subname": "Legends of Zelda",
+      "size": "29.0 MB"
+    },
     {
       "id": 2,
+      "hero": "dogHero",
       "name": "Aragon Malay",
       "subname": "Cross Code",
       "size": "40.2 MB"
     },
-    {"id": 3, "name": "Cross", "subname": "Cross Code", "size": "5.5 MB"},
-    {"id": 4, "name": "Barbara", "subname": "Zenity", "size": "35.2 MB"},
+    {
+      "id": 3,
+      "hero": "lizardHero",
+      "name": "Cross",
+      "subname": "Cross Code",
+      "size": "5.5 MB"
+    },
+    {
+      "id": 4,
+      "hero": "monkeyHero",
+      "name": "Barbara",
+      "subname": "Zenity",
+      "size": "35.2 MB"
+    },
   ];
 
   List<Map<String, dynamic>> _foundResource =
@@ -128,67 +147,25 @@ class _ResourceState extends State<Resource> {
                   const Text('Resource'),
                   // TODO: need improvement for this search bar
                   // undecorated search box - currently hidden.
-                  Visibility(
-                    visible: useVerticalLayout ? false : false,
-                    child: Flexible(
-                      child: Padding(
-                        padding: useVerticalLayout
-                            ? const EdgeInsets.only(
-                                top: 5.0, left: 150.0, right: 150.0)
-                            : const EdgeInsets.only(
-                                top: 5.0, left: 75.0, right: 75.0),
-                        child: TextField(
-                          onChanged: (value) => _runFilter(value),
-                          decoration: InputDecoration(
-                            isDense: true,
-                            filled: true,
-                            fillColor: Colors.white,
-                            prefixIcon: const Icon(Icons.search),
-                            prefixIconConstraints:
-                                const BoxConstraints(minWidth: 55.0),
-                            suffixIcon: IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: () {
-                                /* Clear the search field */
-                              },
-                            ),
-                            suffixIconConstraints:
-                                const BoxConstraints(minWidth: 55.0),
-                            hintText: 'Search...',
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 0.0, horizontal: 0.0),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide:
-                                  const BorderSide(color: Colors.transparent),
-                              borderRadius: BorderRadius.circular(25.7),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide:
-                                  const BorderSide(color: Colors.transparent),
-                              borderRadius: BorderRadius.circular(25.7),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+
                   Padding(
-                    padding: const EdgeInsets.only(top: 5.0),
+                    padding: const EdgeInsets.only(top: 5),
                     child: Row(
                       children: [
-                        Visibility(
-                          visible: useVerticalLayout3x ? true : false,
-                          child: TextButton.icon(
-                            icon: const Icon(Icons.light_mode_rounded,
-                                size: 20.0),
-                            onPressed: null,
-                            label: Text(
-                              'Light Mode',
-                              style: GoogleFonts.roboto(
-                                  fontWeight: FontWeight.w500),
-                            ),
-                          ),
-                        ),
+                        AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 400),
+                            child: useVerticalLayout3x
+                                ? TextButton.icon(
+                                    icon: const Icon(Icons.light_mode_rounded,
+                                        size: 20),
+                                    onPressed: null,
+                                    label: Text(
+                                      'Light Mode',
+                                      style: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  )
+                                : null),
                         const IconButton(
                           icon: Icon(Icons.settings_outlined),
                           onPressed: null,
@@ -204,15 +181,17 @@ class _ResourceState extends State<Resource> {
                 AnimatedContainer(
                   curve: Curves.fastOutSlowIn,
                   duration: const Duration(milliseconds: 200),
-                  height: _showAppbar ? 70.0 : 0.0,
+                  height: _showAppbar ? 70 : 0,
                   child: Visibility(
                     visible: _showAppbar ? true : false,
-                    child: Padding(
+                    child: AnimatedPadding(
+                      curve: Curves.fastOutSlowIn,
+                      duration: const Duration(milliseconds: 600),
                       padding: useVerticalLayout
                           ? const EdgeInsets.only(
-                              top: 12.0, bottom: 12.0, left: 48.0, right: 48.0)
+                              top: 12, bottom: 12, left: 48, right: 48)
                           : const EdgeInsets.only(
-                              top: 12.0, bottom: 12.0, left: 24.0, right: 24.0),
+                              top: 12, bottom: 12, left: 24, right: 24),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -229,7 +208,7 @@ class _ResourceState extends State<Resource> {
                                 fillColor: Colors.white,
                                 prefixIcon: const Icon(Icons.search),
                                 prefixIconConstraints:
-                                    const BoxConstraints(minWidth: 55.0),
+                                    const BoxConstraints(minWidth: 55),
                                 suffixStyle: GoogleFonts.roboto(
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -249,12 +228,12 @@ class _ResourceState extends State<Resource> {
                                         },
                                       ),
                                 suffixIconConstraints: const BoxConstraints(
-                                    minWidth: 50.0, minHeight: 50.0),
+                                    minWidth: 50, minHeight: 50),
                                 hintText: 'Search...',
                                 hintStyle: GoogleFonts.roboto(
                                     fontWeight: FontWeight.w500),
                                 contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 0.0, horizontal: 0.0),
+                                    vertical: 0, horizontal: 0),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(
                                       color: Colors.blue, width: 2),
@@ -273,18 +252,20 @@ class _ResourceState extends State<Resource> {
                     ),
                   ),
                 ),
-                Padding(
+                AnimatedPadding(
+                  curve: Curves.fastOutSlowIn,
+                  duration: const Duration(milliseconds: 600),
                   padding: useVerticalLayout
                       ? _showAppbar
                           ? const EdgeInsets.symmetric(
-                              vertical: 8.0, horizontal: 48.0)
+                              vertical: 8, horizontal: 48)
                           : const EdgeInsets.symmetric(
-                              vertical: 0.0, horizontal: 48.0)
+                              vertical: 0, horizontal: 48)
                       : _showAppbar
                           ? const EdgeInsets.symmetric(
-                              vertical: 8.0, horizontal: 24.0)
+                              vertical: 8, horizontal: 24)
                           : const EdgeInsets.symmetric(
-                              vertical: 0.0, horizontal: 24.0),
+                              vertical: 0, horizontal: 24),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -293,40 +274,37 @@ class _ResourceState extends State<Resource> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           SizedBox(
-                            width: 175.0,
+                            width: 175,
                             child: DropdownButtonFormField(
                               isDense: true,
                               decoration: InputDecoration(
                                   contentPadding: const EdgeInsets.only(
-                                      top: 8.0,
-                                      bottom: 8.0,
-                                      right: 4.0,
-                                      left: 0.0),
+                                      top: 8, bottom: 8, right: 4, left: 0),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: const BorderSide(
                                         color: Colors.transparent, width: 2),
-                                    borderRadius: BorderRadius.circular(6.0),
+                                    borderRadius: BorderRadius.circular(6),
                                   ),
                                   border: OutlineInputBorder(
                                     borderSide: const BorderSide(
                                         color: Colors.transparent, width: 2),
-                                    borderRadius: BorderRadius.circular(6.0),
+                                    borderRadius: BorderRadius.circular(6),
                                   ),
                                   filled: false,
                                   fillColor: Colors.white,
                                   isDense: true,
                                   prefixIcon: const Icon(
                                     Icons.category_outlined,
-                                    size: 20.0,
+                                    size: 20,
                                     color: Colors.black87,
                                   )),
                               style: GoogleFonts.roboto(
                                   fontWeight: FontWeight.w500,
-                                  fontSize: 16.0,
+                                  fontSize: 16,
                                   color: Colors.black87),
                               value: tagResults,
                               elevation: 1,
-                              borderRadius: BorderRadius.circular(8.0),
+                              borderRadius: BorderRadius.circular(8),
                               onChanged: (String? newValue) {
                                 setState(() {
                                   tagResults = newValue!;
@@ -344,84 +322,99 @@ class _ResourceState extends State<Resource> {
                               }).toList(),
                             ),
                           ),
-                          const SizedBox(width: 10.0),
-                          Visibility(
-                            visible: useVerticalLayout2x ? true : false,
-                            child: Text(
-                                'About ${_foundResource.toList().length} Results'),
-                          )
+                          const SizedBox(width: 10),
+                          AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 200),
+                              child: useVerticalLayout2x
+                                  ? Text(
+                                      'About ${_foundResource.toList().length} Results')
+                                  : null)
                         ],
                       ),
                       Row(
                         children: [
-                          Visibility(
-                            visible: useVerticalLayout3x ? true : false,
-                            child: SizedBox(
-                              width: useVerticalLayout2x ? 145.0 : 100.0,
-                              child: DropdownButtonFormField(
-                                isDense: true,
-                                elevation: 1,
-                                decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.only(
-                                        top: 8.0,
-                                        bottom: 8.0,
-                                        right: 4.0,
-                                        left: 12.0),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: const BorderSide(
-                                          color: Colors.transparent, width: 2),
-                                      borderRadius: BorderRadius.circular(6.0),
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderSide: const BorderSide(
-                                          color: Colors.transparent, width: 2),
-                                      borderRadius: BorderRadius.circular(6.0),
-                                    ),
-                                    filled: false,
-                                    fillColor: Colors.white,
-                                    isDense: true,
-                                    labelText:
-                                        useVerticalLayout2x ? null : 'Sort By',
-                                    labelStyle: GoogleFonts.roboto(
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                    prefixText: useVerticalLayout2x
-                                        ? 'Sort By: '
-                                        : null,
-                                    prefixStyle: GoogleFonts.roboto(
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.grey.shade600)),
-                                style: GoogleFonts.roboto(
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black87),
-                                borderRadius: BorderRadius.circular(8.0),
-                                dropdownColor: Colors.white,
-                                value: sortbyValue,
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    sortbyValue = newValue!;
-                                  });
-                                },
-                                items: <String>[
-                                  'Name',
-                                  'Upload',
-                                  'Size'
-                                ].map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10.0),
+                          AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 200),
+                              child: useVerticalLayout3x
+                                  ? AnimatedSize(
+                                      curve: Curves.ease,
+                                      duration:
+                                          const Duration(milliseconds: 600),
+                                      child: SizedBox(
+                                        width: useVerticalLayout2x ? 145 : 100,
+                                        child: DropdownButtonFormField(
+                                          isDense: true,
+                                          elevation: 1,
+                                          decoration: InputDecoration(
+                                              contentPadding:
+                                                  const EdgeInsets.only(
+                                                      top: 8,
+                                                      bottom: 8,
+                                                      right: 4,
+                                                      left: 12),
+                                              enabledBorder: OutlineInputBorder(
+                                                borderSide: const BorderSide(
+                                                    color: Colors.transparent,
+                                                    width: 2),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              border: OutlineInputBorder(
+                                                borderSide: const BorderSide(
+                                                    color: Colors.transparent,
+                                                    width: 2),
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                              ),
+                                              filled: false,
+                                              fillColor: Colors.white,
+                                              isDense: true,
+                                              labelText: useVerticalLayout2x
+                                                  ? null
+                                                  : 'Sort By',
+                                              labelStyle: GoogleFonts.roboto(
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                              prefixText: useVerticalLayout2x
+                                                  ? 'Sort By: '
+                                                  : null,
+                                              prefixStyle: GoogleFonts.roboto(
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.grey.shade600)),
+                                          style: GoogleFonts.roboto(
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.black87),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          dropdownColor: Colors.white,
+                                          value: sortbyValue,
+                                          onChanged: (String? newValue) {
+                                            setState(() {
+                                              sortbyValue = newValue!;
+                                            });
+                                          },
+                                          items: <String>[
+                                            'Name',
+                                            'Upload',
+                                            'Size'
+                                          ].map<DropdownMenuItem<String>>(
+                                              (String value) {
+                                            return DropdownMenuItem<String>(
+                                              value: value,
+                                              child: Text(value),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ),
+                                    )
+                                  : null),
+                          const SizedBox(width: 10),
                           ToggleButtons(
                             color: Colors.black54,
                             fillColor: Colors.transparent,
                             constraints: const BoxConstraints(
-                                minWidth: 32.0, minHeight: 32.0),
-                            borderRadius: BorderRadius.circular(4.0),
+                                minWidth: 32, minHeight: 32),
+                            borderRadius: BorderRadius.circular(4),
                             onPressed: (int index) {
                               setState(() {
                                 for (int buttonIndex = 0;
@@ -452,12 +445,12 @@ class _ResourceState extends State<Resource> {
                 ),
                 Visibility(
                   visible: _showAppbar ? true : false,
-                  child: Padding(
+                  child: AnimatedPadding(
+                    curve: Curves.fastOutSlowIn,
+                    duration: const Duration(milliseconds: 600),
                     padding: useVerticalLayout
-                        ? const EdgeInsets.only(
-                            left: 48.0, right: 48.0, bottom: 12.0)
-                        : const EdgeInsets.only(
-                            left: 24.0, right: 24.0, bottom: 6.0),
+                        ? const EdgeInsets.only(left: 48, right: 48, bottom: 12)
+                        : const EdgeInsets.only(left: 24, right: 24, bottom: 6),
                     child: const Divider(
                       color: Colors.black,
                       thickness: 0.1,
@@ -466,82 +459,86 @@ class _ResourceState extends State<Resource> {
                     ),
                   ),
                 ),
-                Visibility(
-                  visible: useVerticalLayout2x ? false : true,
+                AnimatedContainer(
+                  height: useVerticalLayout2x ? 0 : 42,
+                  curve: Curves.ease,
+                  duration: const Duration(milliseconds: 400),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24.0, vertical: 8.0),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                              'About ${_foundResource.toList().length} Results',
-                              style: GoogleFonts.roboto(
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.w400,
-                              )),
-                        ),
-                        Visibility(
-                          visible: useVerticalLayout3x ? false : true,
-                          child: SizedBox(
-                            width: useVerticalLayout3x ? 145.0 : 100.0,
-                            child: DropdownButtonFormField(
-                              isDense: true,
-                              elevation: 1,
-                              decoration: InputDecoration(
-                                  contentPadding: const EdgeInsets.only(
-                                      top: 8.0,
-                                      bottom: 8.0,
-                                      right: 4.0,
-                                      left: 12.0),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                        color: Colors.transparent, width: 2),
-                                    borderRadius: BorderRadius.circular(6.0),
+                        Text('About ${_foundResource.toList().length} Results',
+                            style: GoogleFonts.roboto(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                            )),
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 400),
+                          child: useVerticalLayout3x
+                              ? null
+                              : SizedBox(
+                                  width: useVerticalLayout3x ? 145 : 100,
+                                  child: DropdownButtonFormField(
+                                    isDense: true,
+                                    elevation: 1,
+                                    decoration: InputDecoration(
+                                        contentPadding: const EdgeInsets.only(
+                                            top: 8,
+                                            bottom: 8,
+                                            right: 4,
+                                            left: 12),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: const BorderSide(
+                                              color: Colors.transparent,
+                                              width: 2),
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                        ),
+                                        border: OutlineInputBorder(
+                                          borderSide: const BorderSide(
+                                              color: Colors.transparent,
+                                              width: 2),
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                        ),
+                                        filled: false,
+                                        fillColor: Colors.white,
+                                        isDense: true,
+                                        labelText: useVerticalLayout3x
+                                            ? null
+                                            : 'Sort By',
+                                        labelStyle: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        prefixText: useVerticalLayout3x
+                                            ? 'Sort By: '
+                                            : null,
+                                        prefixStyle: GoogleFonts.roboto(
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.grey.shade600)),
+                                    style: GoogleFonts.roboto(
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black87),
+                                    borderRadius: BorderRadius.circular(8),
+                                    dropdownColor: Colors.white,
+                                    value: sortbyValue,
+                                    onChanged: (String? newValue) {
+                                      setState(() {
+                                        sortbyValue = newValue!;
+                                      });
+                                    },
+                                    items: <String>['Name', 'Upload', 'Size']
+                                        .map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(value),
+                                      );
+                                    }).toList(),
                                   ),
-                                  border: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                        color: Colors.transparent, width: 2),
-                                    borderRadius: BorderRadius.circular(6.0),
-                                  ),
-                                  filled: false,
-                                  fillColor: Colors.white,
-                                  isDense: true,
-                                  labelText:
-                                      useVerticalLayout3x ? null : 'Sort By',
-                                  labelStyle: GoogleFonts.roboto(
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  prefixText:
-                                      useVerticalLayout3x ? 'Sort By: ' : null,
-                                  prefixStyle: GoogleFonts.roboto(
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.grey.shade600)),
-                              style: GoogleFonts.roboto(
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black87),
-                              borderRadius: BorderRadius.circular(8.0),
-                              dropdownColor: Colors.white,
-                              value: sortbyValue,
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  sortbyValue = newValue!;
-                                });
-                              },
-                              items: <String>[
-                                'Name',
-                                'Upload',
-                                'Size'
-                              ].map<DropdownMenuItem<String>>((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
-                            ),
-                          ),
+                                ),
                         ),
                       ],
                     ),
@@ -575,14 +572,14 @@ class _ResourceState extends State<Resource> {
                                   )
                             : ListResource(foundResource: _foundResource)
                     : Padding(
-                        padding: const EdgeInsets.all(20.0),
+                        padding: const EdgeInsets.all(20),
                         child:
                             Column(mainAxisSize: MainAxisSize.min, children: [
                           Text(
                             'No results found',
                             style: GoogleFonts.roboto(
                               color: Colors.black87,
-                              fontSize: 24.0,
+                              fontSize: 24,
                               fontWeight: FontWeight.w300,
                             ),
                             textAlign: TextAlign.center,

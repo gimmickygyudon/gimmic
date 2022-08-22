@@ -5,6 +5,47 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:universal_html/html.dart' as html;
 
+Widget buttonBigView3D(context, useHorizontalShrink) {
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: AspectRatio(
+      aspectRatio: 1 / 1,
+      child: Container(
+        decoration: BoxDecoration(
+            color: Colors.grey.shade900,
+            borderRadius: const BorderRadius.all(Radius.circular(12))),
+        child: InkWell(
+          onTap: () {
+            Navigator.pushNamed(context, '/resource/detail/view');
+          },
+          child: FittedBox(
+            child: Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.view_in_ar_rounded,
+                      size: 34.0, color: Colors.white),
+                  Visibility(
+                    visible: useHorizontalShrink ? true : false,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 6.0),
+                      child: Text('View 3D',
+                          style: GoogleFonts.roboto(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w400)),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
 class ButtonLinks extends StatelessWidget {
   ButtonLinks({super.key, required this.bgcolor});
 
