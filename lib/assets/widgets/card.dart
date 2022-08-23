@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gimmic/assets/widgets/button.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -160,28 +161,12 @@ class _CardBigState extends State<CardBig> {
                                 ? CrossFadeState.showSecond
                                 : CrossFadeState.showFirst,
                             duration: const Duration(milliseconds: 400),
-                            firstChild: Row(
-                              children: [
-                                Tooltip(
-                                  message: 'Quick View',
-                                  child: IconButton(
-                                      onPressed: () {},
-                                      icon: const Icon(
-                                        size: 24,
-                                        Icons.image_outlined,
-                                        color: Colors.black87,
-                                      )),
-                                ),
-                                IconButton(
-                                    padding: EdgeInsets.zero,
-                                    onPressed: () {},
-                                    icon: const Icon(
-                                      size: 24,
-                                      Icons.more_vert_rounded,
-                                      color: Colors.black87,
-                                    )),
-                              ],
-                            ),
+                            firstChild: iconImageDialog(
+                                context,
+                                widget.useVHideDetails
+                                    ? "images/hellocat1.jpg"
+                                    : "images/hellocat.jpg",
+                                Colors.grey.shade700),
                             secondChild: Padding(
                               padding: const EdgeInsets.only(left: 6),
                               child: Text(
@@ -261,28 +246,12 @@ class _CardBigState extends State<CardBig> {
                           AnimatedSwitcher(
                               duration: const Duration(milliseconds: 200),
                               child: widget.useVHideDetails
-                                  ? Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                          Tooltip(
-                                            message: 'Quick View',
-                                            child: IconButton(
-                                                onPressed: () {},
-                                                icon: Icon(
-                                                  size: 24,
-                                                  Icons.image_outlined,
-                                                  color: Colors.grey.shade200,
-                                                )),
-                                          ),
-                                          IconButton(
-                                              padding: EdgeInsets.zero,
-                                              onPressed: () {},
-                                              icon: Icon(
-                                                size: 24,
-                                                Icons.more_vert_rounded,
-                                                color: Colors.grey.shade100,
-                                              ))
-                                        ])
+                                  ? iconImageDialog(
+                                      context,
+                                      widget.useVHideDetails
+                                          ? "images/hellocat1.jpg"
+                                          : "images/hellocat.jpg",
+                                      Colors.grey.shade200)
                                   : null),
                         ],
                       ),

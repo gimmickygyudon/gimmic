@@ -38,28 +38,26 @@ class _ListBigResourceState extends State<ListBigResource> {
         curve: Curves.fastOutSlowIn,
         duration: const Duration(milliseconds: 600),
         padding: widget.useVerticalLayout
-            ? const EdgeInsets.only(
-                bottom: 0.0, top: 6.0, left: 24.0, right: 24.0)
-            : const EdgeInsets.only(
-                bottom: 0.0, top: 6.0, left: 0.0, right: 0.0),
+            ? const EdgeInsets.only(bottom: 0, top: 6, left: 24, right: 24)
+            : const EdgeInsets.only(bottom: 0, top: 6, left: 0, right: 0),
         child: ListView.builder(
             controller: widget.scrollViewController,
             itemCount: widget.foundResource.length,
             itemBuilder: (context, index) {
               return ConstrainedBox(
                 constraints: const BoxConstraints(
-                    minHeight: 100.0,
-                    maxHeight: 150.0,
-                    minWidth: 250.0,
+                    minHeight: 100,
+                    maxHeight: 150,
+                    minWidth: 250,
                     maxWidth: double.infinity),
                 child: InkWell(
                   onHover: ((value) => setState(() => selectedIndex = index)),
                   onTap: () => Navigator.pushNamed(context, '/resource/detail'),
                   child: Card(
                     margin: widget.layouts
-                        ? const EdgeInsets.only(bottom: 10.0)
+                        ? const EdgeInsets.only(bottom: 10)
                         : const EdgeInsets.only(
-                            bottom: 10.0, left: 25.0, right: 25.0),
+                            bottom: 10, left: 25, right: 25),
                     key: ValueKey(widget.foundResource[index]["id"]),
                     elevation: (selectedIndex == index) ? 1 : 0,
                     surfaceTintColor: Colors.green,
@@ -68,7 +66,7 @@ class _ListBigResourceState extends State<ListBigResource> {
                         ? RoundedRectangleBorder(
                             side:
                                 const BorderSide(color: Colors.green, width: 2),
-                            borderRadius: BorderRadius.circular(12.0),
+                            borderRadius: BorderRadius.circular(12),
                           )
                         : null,
                     child: Row(
@@ -80,11 +78,11 @@ class _ListBigResourceState extends State<ListBigResource> {
                           child: Row(
                             children: [
                               Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(8),
                                 child: AspectRatio(
                                   aspectRatio: 1 / 1,
                                   child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(12.0),
+                                    borderRadius: BorderRadius.circular(12),
                                     child: Image(
                                         image: AssetImage(images[index]),
                                         fit: BoxFit.fitHeight),
@@ -92,7 +90,7 @@ class _ListBigResourceState extends State<ListBigResource> {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.all(8),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment:
@@ -123,25 +121,24 @@ class _ListBigResourceState extends State<ListBigResource> {
                                           ),
                                         ]),
                                     Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 4.0),
+                                      padding: const EdgeInsets.only(bottom: 4),
                                       child: Row(
                                         children: [
                                           Chip(
                                               labelStyle: GoogleFonts.roboto(
                                                   fontWeight: FontWeight.w900,
-                                                  fontSize: 10.0,
+                                                  fontSize: 10,
                                                   color: Colors.black54),
                                               label: const Text('Animal'),
                                               backgroundColor:
                                                   Colors.grey.shade200,
                                               padding:
                                                   const EdgeInsets.symmetric(
-                                                      horizontal: 4.0,
-                                                      vertical: 0.0),
+                                                      horizontal: 4,
+                                                      vertical: 0),
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(8.0),
+                                                    BorderRadius.circular(8),
                                               )),
                                         ],
                                       ),
@@ -153,7 +150,7 @@ class _ListBigResourceState extends State<ListBigResource> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(8),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.end,
@@ -165,8 +162,7 @@ class _ListBigResourceState extends State<ListBigResource> {
                                         ? true
                                         : false,
                                     child: Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 16.0),
+                                      padding: const EdgeInsets.only(right: 16),
                                       child: Text(
                                         timenow,
                                         style: GoogleFonts.roboto(
@@ -182,7 +178,7 @@ class _ListBigResourceState extends State<ListBigResource> {
                                         ? true
                                         : false,
                                     child: Container(
-                                      margin: const EdgeInsets.only(right: 8.0),
+                                      margin: const EdgeInsets.only(right: 8),
                                       decoration: BoxDecoration(
                                           color: selectedIndex == index
                                               ? Colors.white
@@ -194,7 +190,7 @@ class _ListBigResourceState extends State<ListBigResource> {
                                               ? Colors.black87
                                               : Colors.black54,
                                           onPressed: () {},
-                                          iconSize: 20.0,
+                                          iconSize: 20,
                                           icon: const Icon(
                                               Icons.star_border_rounded)),
                                     ),
@@ -213,7 +209,7 @@ class _ListBigResourceState extends State<ListBigResource> {
                                             ? Colors.black87
                                             : Colors.black54,
                                       ),
-                                      iconSize: 20.0,
+                                      iconSize: 20,
                                       itemBuilder: (context) => [
                                         PopupMenuItem(
                                           value: 1,
@@ -258,13 +254,13 @@ class _ListBigResourceState extends State<ListBigResource> {
                                   ),
                                   icon: const Icon(
                                     Icons.file_download_outlined,
-                                    size: 22.0,
+                                    size: 22,
                                   ),
                                   style: ButtonStyle(
                                     padding: selectedIndex == index
                                         ? null
                                         : const MaterialStatePropertyAll(
-                                            EdgeInsets.only(right: 8.0)),
+                                            EdgeInsets.only(right: 8)),
                                     backgroundColor: MaterialStateProperty.all(
                                         selectedIndex == index
                                             ? Colors.green

@@ -38,7 +38,7 @@ class _UnityViewerState extends State<UnityViewer> {
           margin: const EdgeInsets.all(0),
           clipBehavior: Clip.antiAlias,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
+            borderRadius: BorderRadius.circular(20),
           ),
           child: Stack(
             children: [

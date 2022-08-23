@@ -287,8 +287,7 @@ class LayoutDesktop extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
                                   Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 12.0),
+                                    padding: const EdgeInsets.only(bottom: 12),
                                     child: CardBig(
                                         rowConstraints: rowConstraints,
                                         useVHideDetails: useVHideDetails),

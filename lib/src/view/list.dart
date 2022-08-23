@@ -25,8 +25,7 @@ class _ListResourceState extends State<ListResource> {
   Widget build(BuildContext context) {
     return Flexible(
       child: Padding(
-        padding: const EdgeInsets.only(
-            bottom: 24.0, top: 6.0, left: 18.0, right: 18.0),
+        padding: const EdgeInsets.only(bottom: 24, top: 6, left: 18, right: 18),
         child: ListView.builder(
             itemCount: images.length,
             itemBuilder: (context, index) {
@@ -41,15 +40,15 @@ class _ListResourceState extends State<ListResource> {
                         ? RoundedRectangleBorder(
                             side:
                                 const BorderSide(color: Colors.green, width: 2),
-                            borderRadius: BorderRadius.circular(12.0),
+                            borderRadius: BorderRadius.circular(12),
                           )
                         : null,
                     child: ListTile(
-                      horizontalTitleGap: 20.0,
+                      horizontalTitleGap: 20,
                       leading: AspectRatio(
                         aspectRatio: 1 / 1,
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12.0),
+                          borderRadius: BorderRadius.circular(12),
                           child: Image(
                               image: AssetImage(images[index]),
                               fit: BoxFit.fitHeight),
@@ -61,7 +60,7 @@ class _ListResourceState extends State<ListResource> {
                             color: Colors.black87,
                             fontSize: 18,
                             fontWeight: FontWeight.w400,
-                            letterSpacing: -1.0),
+                            letterSpacing: -1),
                       ),
                       subtitle: Text(
                         widget.foundResource[index]["subname"].toString(),
@@ -69,7 +68,7 @@ class _ListResourceState extends State<ListResource> {
                             color: Colors.black54,
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            letterSpacing: 0.0),
+                            letterSpacing: 0),
                       ),
                       trailing: const Icon(Icons.more_vert),
                     )),

@@ -7,6 +7,8 @@ import 'package:gimmic/assets/widgets/button.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../../assets/widgets/dialog.dart';
+
 class Details extends StatefulWidget {
   const Details({super.key});
 
@@ -69,11 +71,11 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: InkWell(
-            onTap: () {
+            onTap: () async {
               if (currentIndex == index) {
-                showDialog(
+                await showDialog(
                     context: context,
-                    builder: (_) => imageDialog(context, index));
+                    builder: (_) => imageDialog(context, images, index));
               }
               _pageController.animateToPage(index,
                   duration: const Duration(milliseconds: 400),
@@ -140,8 +142,8 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                 onTap: () async {
                                   await showDialog(
                                       context: context,
-                                      builder: (_) =>
-                                          imageDialog(context, pagePosition));
+                                      builder: (_) => imageDialog(
+                                          context, images, pagePosition));
                                 },
                                 child: Tooltip(
                                   verticalOffset: 150,
@@ -160,25 +162,6 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
               )),
         ),
       ],
-    );
-  }
-
-// interactive image dialog
-  Widget imageDialog(context, pagePosition) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: InteractiveViewer(
-        panEnabled: false,
-        minScale: 0.5,
-        maxScale: 4,
-        child: GestureDetector(
-          onTap: () => Navigator.pop(context, false), // passing false
-          child: Image(
-            image: AssetImage(images[pagePosition]),
-            fit: BoxFit.contain,
-          ),
-        ),
-      ),
     );
   }
 
