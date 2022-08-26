@@ -39,7 +39,7 @@ Widget downloadButton(context, selectedIndex, index, size) {
   return Tooltip(
     message: "Download 'Legends of Zelda'",
     child: ElevatedButton.icon(
-      onPressed: () => Navigator.pushNamed(context, '/resource/detail'),
+      onPressed: () {},
       label: Text(size,
           style: GoogleFonts.roboto(
             fontWeight: FontWeight.w700,
@@ -82,7 +82,7 @@ Widget downloadButtonIcon(context) {
   return Visibility(
     visible: context ? true : false,
     child: IconButton(
-      onPressed: () => Navigator.pushNamed(context, '/resource/detail'),
+      onPressed: () {},
       icon: const Icon(
         Icons.file_download_outlined,
         size: 22,
@@ -121,134 +121,155 @@ class _GridResourceState extends State<GridResource> {
             controller: widget.scrollViewController,
             itemCount: widget.foundResource.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                mainAxisExtent: widget.useVerticalLayout2x ? 420 : 400,
+                mainAxisExtent: widget.useVerticalLayout
+                    ? MediaQuery.of(context).size.width / 2.9
+                    : 400,
                 crossAxisCount: widget.gridRowCount,
                 crossAxisSpacing: widget.useVerticalLayout ? 40 : 20,
                 mainAxisSpacing: 0),
             itemBuilder: (context, index) {
-              return InkWell(
-                onHover: ((value) => setState(() => selectedIndex = index)),
-                onTap: () => Navigator.pushNamed(context, '/resource/detail'),
-                child: Card(
-                    margin: const EdgeInsets.only(bottom: 30),
-                    clipBehavior: Clip.antiAliasWithSaveLayer,
-                    elevation: (selectedIndex == index) ? 1 : 0,
-                    surfaceTintColor: Colors.green,
-                    color: Theme.of(context).colorScheme.surfaceVariant,
-                    shape: (selectedIndex == index)
-                        ? RoundedRectangleBorder(
-                            side:
-                                const BorderSide(color: Colors.green, width: 3),
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 30.0),
+                child: InkWell(
+                  onHover: ((value) => setState(() => selectedIndex = index)),
+                  onTap: () async => await Navigator.pushNamed(
+                      context, '/resource/detail',
+                      arguments: {
+                        'hero': widget.foundResource[index]["hero"],
+                        'index': widget.foundResource[index]["index"]
+                      }),
+                  child: Hero(
+                    tag: widget.foundResource[index]["hero"] +
+                        widget.foundResource[index]["index"].toString(),
+                    child: Card(
+                        clipBehavior: Clip.antiAliasWithSaveLayer,
+                        elevation: (selectedIndex == index) ? 10 : 0,
+                        shadowColor: Colors.black,
+                        color: Colors.transparent,
+                        shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
-                          )
-                        : RoundedRectangleBorder(
-                            side: const BorderSide(
-                                color: Colors.white38, width: 3),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          flex: 3,
-                          child: Container(
-                            foregroundDecoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    stops: selectedIndex == index
-                                        ? [0.3, 0.95, 1.0]
-                                        : [0.3, 0.9, 1.0],
-                                    colors: const [
-                                  Colors.transparent,
-                                  Colors.white38,
-                                  Colors.white
-                                ])),
-                            child: ClipRRect(
-                              borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(12),
-                                  topRight: Radius.circular(12)),
-                              child: Image(
-                                  image: AssetImage(images[index]),
-                                  fit: BoxFit.cover),
-                            ),
-                          ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Padding(
-                                padding: const EdgeInsets.only(
-                                    top: 6, left: 20, right: 20),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      widget.foundResource[index]["name"],
-                                      style: TextStyle(
-                                          color: Colors.black87,
-                                          fontSize: widget.useVerticalLayout2x
-                                              ? 24
-                                              : 18,
-                                          fontWeight: FontWeight.w400,
-                                          letterSpacing: -1),
-                                    ),
-                                    Text(timenow,
-                                        style: GoogleFonts.roboto(
-                                          color: Colors.black45,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w700,
-                                        ))
-                                  ],
-                                )),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 20),
-                              child: Text(
-                                widget.foundResource[index]["subname"],
-                                style: GoogleFonts.roboto(
-                                    color: Colors.black54,
-                                    fontSize:
-                                        widget.useVerticalLayout2x ? 14 : 12,
-                                    fontWeight: FontWeight.w500,
-                                    letterSpacing: 0),
+                            side: BorderSide(
+                                width: 3,
+                                color: (selectedIndex == index)
+                                    ? Colors.green
+                                    : Colors.transparent)),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 400),
+                          color: (selectedIndex == index)
+                              ? Colors.lightGreen.shade50
+                              : Colors.white,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: AnimatedContainer(
+                                  curve: Curves.fastOutSlowIn,
+                                  duration: const Duration(milliseconds: 300),
+                                  foregroundDecoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          stops: selectedIndex == index
+                                              ? [0.3, 0.95, 1.0]
+                                              : [0.3, 0.9, 1.0],
+                                          colors: [
+                                        Colors.transparent,
+                                        Colors.white38,
+                                        selectedIndex == index
+                                            ? Colors.green.shade50
+                                            : Colors.white
+                                      ])),
+                                  child: Image(
+                                      image: AssetImage(images[index]),
+                                      fit: BoxFit.cover),
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        ButtonBar(
-                          alignment: MainAxisAlignment.spaceBetween,
-                          buttonPadding: const EdgeInsets.only(
-                              top: 20, left: 10, right: 20, bottom: 20),
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 5),
-                              child: Chip(
-                                  labelStyle: GoogleFonts.roboto(
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 12,
-                                      color: Colors.black54),
-                                  label: const Text('Animal'),
-                                  backgroundColor: Colors.grey.shade200,
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 8),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  )),
-                            ),
-                            Padding(
-                              padding: selectedIndex == index
-                                  ? const EdgeInsets.all(0)
-                                  : const EdgeInsets.only(right: 5),
-                              child: downloadButton(context, selectedIndex,
-                                  index, widget.foundResource[index]["size"]),
-                            )
-                          ],
-                        ),
-                      ],
-                    )),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 6, left: 20, right: 20),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            widget.foundResource[index]["name"],
+                                            style: TextStyle(
+                                                color: Colors.black87,
+                                                fontSize:
+                                                    widget.useVerticalLayout2x
+                                                        ? 24
+                                                        : 18,
+                                                fontWeight: FontWeight.w400,
+                                                letterSpacing: -1),
+                                          ),
+                                          Text(timenow,
+                                              style: GoogleFonts.roboto(
+                                                color: Colors.black45,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                              ))
+                                        ],
+                                      )),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 20),
+                                    child: Text(
+                                      widget.foundResource[index]["subname"],
+                                      style: GoogleFonts.roboto(
+                                          color: Colors.black54,
+                                          fontSize: widget.useVerticalLayout2x
+                                              ? 14
+                                              : 12,
+                                          fontWeight: FontWeight.w500,
+                                          letterSpacing: 0),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              ButtonBar(
+                                alignment: MainAxisAlignment.spaceBetween,
+                                buttonPadding: const EdgeInsets.only(
+                                    top: 20, left: 10, right: 20, bottom: 20),
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 5),
+                                    child: Chip(
+                                        labelStyle: GoogleFonts.roboto(
+                                            color: Colors.black54,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 12),
+                                        label: const Text('Animal'),
+                                        side: BorderSide.none,
+                                        backgroundColor: Colors.white38,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        )),
+                                  ),
+                                  Padding(
+                                    padding: selectedIndex == index
+                                        ? const EdgeInsets.all(0)
+                                        : const EdgeInsets.only(right: 5),
+                                    child: downloadButton(
+                                        context,
+                                        selectedIndex,
+                                        index,
+                                        widget.foundResource[index]["size"]),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                        )),
+                  ),
+                ),
               );
             }),
       ),

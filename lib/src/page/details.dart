@@ -10,7 +10,8 @@ import 'package:intl/intl.dart';
 import '../../assets/widgets/dialog.dart';
 
 class Details extends StatefulWidget {
-  const Details({super.key});
+  const Details({super.key, required this.arguments});
+  final Map<dynamic, dynamic> arguments;
 
   @override
   State<Details> createState() => _DetailsState();
@@ -24,12 +25,13 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
   final String timenow = DateFormat("EEEEE, MMMM dd").format(DateTime.now());
   final ScrollController controller = ScrollController();
   final sink = StreamController<double>();
-  int activePage = 1;
+  late int activePage = widget.arguments['index'];
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(viewportFraction: 1, initialPage: 1);
+    _pageController = PageController(
+        viewportFraction: 1, initialPage: widget.arguments['index']);
     _tabController = TabController(length: 2, vsync: this);
 
     throttle(sink.stream).listen((offset) {
@@ -64,39 +66,57 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
   }
 
 // thumbnails of images
-  List<Widget> imageThumbnails(imagesLength, currentIndex) {
+  int hoveredThumbnail = -1;
+  List<Widget> imageThumbnails(imagesLength, arguments, currentIndex) {
     return List<Widget>.generate(imagesLength, (index) {
       return AspectRatio(
         aspectRatio: 1 / 1,
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: InkWell(
-            onTap: () async {
-              if (currentIndex == index) {
-                await showDialog(
-                    context: context,
-                    builder: (_) => imageDialog(context, images, index));
-              }
-              _pageController.animateToPage(index,
-                  duration: const Duration(milliseconds: 400),
-                  curve: Curves.ease);
-            },
-            // splashColor: Colors.white10, // Splash color over image
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xff7c94b6),
-                image: DecorationImage(
-                  image: AssetImage(images[index]),
-                  fit: BoxFit.cover,
+        child: AnimatedPadding(
+          curve: Curves.easeOut,
+          duration: const Duration(milliseconds: 200),
+          padding: hoveredThumbnail == index
+              ? const EdgeInsets.all(4)
+              : const EdgeInsets.all(6),
+          child: MouseRegion(
+            onEnter: (value) => setState(() => hoveredThumbnail = index),
+            onExit: (value) => setState(() => hoveredThumbnail = -1),
+            child: InkWell(
+              onTap: () async {
+                if (currentIndex == index) {
+                  await imageDialogHero(context, images, arguments, index);
+                }
+                _pageController.animateToPage(index,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.ease);
+              },
+              // splashColor: Colors.white10, // Splash color over image
+              child: Card(
+                shadowColor: Colors.black,
+                clipBehavior: Clip.antiAlias,
+                semanticContainer: true,
+                elevation: hoveredThumbnail == index ? 2 : 0,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 100),
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage(images[index]),
+                      fit: BoxFit.cover,
+                    ),
+                    border: Border(
+                        bottom: BorderSide(
+                            // color: Colors.blue,
+                            color: currentIndex == index
+                                ? hoveredThumbnail == index
+                                    ? Colors.blue
+                                    : Colors.blue.shade400
+                                : hoveredThumbnail == index
+                                    ? Colors.orange.shade400
+                                    : Colors.transparent,
+                            width: 3)),
+                  ),
                 ),
-                border: Border.all(
-                  // color: Colors.blue,
-                  color: currentIndex == index
-                      ? Colors.orange
-                      : Colors.transparent,
-                  width: 4,
-                ),
-                borderRadius: BorderRadius.circular(12),
               ),
             ),
           ),
@@ -106,60 +126,60 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
   }
 
 // main images
-  Widget imageMain(context) {
+  Widget imageMain(context, arguments) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
           flex: 3,
-          child: Hero(
-              tag: 'catHero',
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height / 8,
-                width: MediaQuery.of(context).size.width / 2,
-                child: Listener(
-                  onPointerSignal: _handlePointerSignal,
-                  child: _IgnorePointerSignal(
-                    child: PageView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: images.length,
-                        pageSnapping: true,
-                        controller: _pageController,
-                        // avoiding custom scroll animation
-                        /* scrollBehavior:
-                                                              MyCustomScrollBehavior(), */
-                        onPageChanged: (page) {
-                          setState(() {
-                            activePage = page;
-                          });
-                        },
-                        itemBuilder: (context, pagePosition) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: GestureDetector(
-                                onTap: () async {
-                                  await showDialog(
-                                      context: context,
-                                      builder: (_) => imageDialog(
-                                          context, images, pagePosition));
-                                },
-                                child: Tooltip(
-                                  verticalOffset: 150,
-                                  message: 'Click to Fullscreen',
-                                  child: Image(
-                                    image: AssetImage(images[pagePosition]),
-                                    fit: BoxFit.cover,
-                                  ),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height / 8,
+            width: MediaQuery.of(context).size.width / 2,
+            child: Listener(
+              onPointerSignal: _handlePointerSignal,
+              child: _IgnorePointerSignal(
+                child: PageView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: images.length,
+                    pageSnapping: true,
+                    controller: _pageController,
+                    // avoiding custom scroll animation
+                    /* scrollBehavior:
+                                                          MyCustomScrollBehavior(), */
+                    onPageChanged: (page) {
+                      setState(() {
+                        activePage = page;
+                      });
+                    },
+                    itemBuilder: (context, pagePosition) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: GestureDetector(
+                            onTap: () async {
+                              await imageDialogHero(
+                                  context, images, arguments, pagePosition);
+                            },
+                            child: Tooltip(
+                              verticalOffset: 150,
+                              message: 'Click to Fullscreen',
+                              child: Hero(
+                                tag:
+                                    arguments['hero'] + pagePosition.toString(),
+                                child: Image(
+                                  image: AssetImage(images[pagePosition]),
+                                  fit: BoxFit.cover,
                                 ),
                               ),
                             ),
-                          );
-                        }),
-                  ),
-                ),
-              )),
+                          ),
+                        ),
+                      );
+                    }),
+              ),
+            ),
+          ),
         ),
       ],
     );
@@ -309,79 +329,91 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                   children: <Widget>[
                     Padding(
                       padding: const EdgeInsets.all(30),
-                      child: ListView(children: [
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 30),
-                          child: Row(
-                            children: [
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Chip(
-                                  labelStyle: GoogleFonts.roboto(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 12,
-                                      color: Colors.black54),
-                                  label: const Text('Cat'),
-                                  backgroundColor: Colors.transparent,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                      side: const BorderSide(
-                                          width: 1, color: Colors.black12)),
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 8),
-                                ),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 30),
+                              child: Row(
+                                children: [
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Chip(
+                                      labelStyle: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 12,
+                                          color: Colors.black54),
+                                      label: const Text('Cat'),
+                                      backgroundColor: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          side: const BorderSide(
+                                              width: 1, color: Colors.black12)),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Chip(
+                                      labelStyle: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 12,
+                                          color: Colors.black54),
+                                      label: const Text('Animal'),
+                                      backgroundColor: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          side: const BorderSide(
+                                              width: 1, color: Colors.black12)),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: 6),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Chip(
-                                  labelStyle: GoogleFonts.roboto(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 12,
-                                      color: Colors.black54),
-                                  label: const Text('Animal'),
-                                  backgroundColor: Colors.transparent,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                      side: const BorderSide(
-                                          width: 1, color: Colors.black12)),
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 8),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 30),
-                          child: Text('Created on',
-                              style: GoogleFonts.roboto(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black54)),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 30, bottom: 20),
-                          child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(timenow,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 30),
+                              child: Text('Created on',
                                   style: GoogleFonts.roboto(
                                       fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.black54))),
-                        ),
-                        Text(
-                          "Description",
-                          style: Theme.of(context).textTheme.headline6,
-                        ),
-                        const SizedBox(
-                          height: 8,
-                        ),
-                        Text(
-                          "A cat is a furry animal that has a long tail and sharp claws. Cats are often kept as pets. Cats are lions, tigers, and other wild animals in the same family.",
-                          style: Theme.of(context).textTheme.bodyText2,
-                        ),
-                      ]),
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.black54)),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(right: 30, bottom: 20),
+                              child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(timenow,
+                                      style: GoogleFonts.roboto(
+                                          fontSize: 12,
+                                          letterSpacing: 0.5,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.black54))),
+                            ),
+                            Text(
+                              "Description",
+                              style: GoogleFonts.roboto(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87),
+                            ),
+                            const SizedBox(
+                              height: 8,
+                            ),
+                            Text(
+                              "A cat is a furry animal that has a long tail and sharp claws. Cats are often kept as pets. Cats are lions, tigers, and other wild animals in the same family.",
+                              style: GoogleFonts.roboto(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.black87),
+                            ),
+                          ]),
                     ),
                     const Center(
                       child: Text("It's rainy here"),
@@ -450,7 +482,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
       style: _tabController.index == index
           ? ButtonStyle(
               shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8))),
+                  borderRadius: BorderRadius.circular(12))),
               backgroundColor: MaterialStateProperty.all(Colors.orange),
               elevation: MaterialStateProperty.all(0))
           : ButtonStyle(
@@ -551,7 +583,10 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Flexible(flex: 4, child: imageMain(context)),
+                                  Flexible(
+                                      flex: 4,
+                                      child:
+                                          imageMain(context, widget.arguments)),
                                   Expanded(
                                     flex: 1,
                                     child: Row(
@@ -562,7 +597,9 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: imageThumbnails(
-                                              images.length, activePage),
+                                              images.length,
+                                              widget.arguments,
+                                              activePage),
                                         ),
                                         buttonBigView3D(
                                             context, useHorizontalShrink)

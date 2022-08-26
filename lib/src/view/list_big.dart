@@ -52,7 +52,11 @@ class _ListBigResourceState extends State<ListBigResource> {
                     maxWidth: double.infinity),
                 child: InkWell(
                   onHover: ((value) => setState(() => selectedIndex = index)),
-                  onTap: () => Navigator.pushNamed(context, '/resource/detail'),
+                  onTap: () => Navigator.pushNamed(context, '/resource/detail',
+                      arguments: {
+                        'hero': widget.foundResource[index]["hero"],
+                        'index': widget.foundResource[index]["index"]
+                      }),
                   child: Card(
                     margin: widget.layouts
                         ? const EdgeInsets.only(bottom: 10)
@@ -83,9 +87,14 @@ class _ListBigResourceState extends State<ListBigResource> {
                                   aspectRatio: 1 / 1,
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
-                                    child: Image(
-                                        image: AssetImage(images[index]),
-                                        fit: BoxFit.fitHeight),
+                                    child: Hero(
+                                      tag: widget.foundResource[index]["hero"] +
+                                          widget.foundResource[index]["index"]
+                                              .toString(),
+                                      child: Image(
+                                          image: AssetImage(images[index]),
+                                          fit: BoxFit.fitHeight),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -243,8 +252,7 @@ class _ListBigResourceState extends State<ListBigResource> {
                               Tooltip(
                                 message: "Download 'Legends of Zelda'",
                                 child: ElevatedButton.icon(
-                                  onPressed: () => Navigator.pushNamed(
-                                      context, '/resource/detail'),
+                                  onPressed: () {},
                                   label: Text(
                                     widget.foundResource[index]["size"]
                                         .toString(),

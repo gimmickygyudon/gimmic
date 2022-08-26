@@ -9,35 +9,39 @@ import 'package:universal_html/html.dart' as html;
 Widget buttonBigView3D(context, useHorizontalShrink) {
   return Padding(
     padding: const EdgeInsets.all(8),
-    child: AspectRatio(
-      aspectRatio: 1 / 1,
-      child: Container(
-        decoration: BoxDecoration(
-            color: Colors.grey.shade900,
-            borderRadius: const BorderRadius.all(Radius.circular(12))),
-        child: InkWell(
-          onTap: () {
-            Navigator.pushNamed(context, '/resource/detail/view');
-          },
-          child: FittedBox(
-            child: Padding(
-              padding: const EdgeInsets.all(18),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.view_in_ar_rounded,
-                      size: 34, color: Colors.white),
-                  Visibility(
-                    visible: useHorizontalShrink ? true : false,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 6),
-                      child: Text('View 3D',
-                          style: GoogleFonts.roboto(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w400)),
-                    ),
-                  )
-                ],
+    child: Tooltip(
+      message: 'Coming Soon',
+      child: AspectRatio(
+        aspectRatio: 1 / 1,
+        child: Container(
+          decoration: BoxDecoration(
+              color: Colors.transparent,
+              border: Border.all(color: Colors.transparent, width: 2),
+              borderRadius: const BorderRadius.all(Radius.circular(20))),
+          child: InkWell(
+            onTap: () {
+              Navigator.pushNamed(context, '/resource/detail/view');
+            },
+            child: FittedBox(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.view_in_ar_rounded,
+                        size: 34, color: Colors.black54),
+                    Visibility(
+                      visible: useHorizontalShrink ? true : false,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Text('View 3D',
+                            style: GoogleFonts.roboto(
+                                color: Colors.black54,
+                                fontWeight: FontWeight.w700)),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ),
@@ -76,16 +80,15 @@ Widget buttonGithub() {
   );
 }
 
-Widget iconImageDialog(context, images, color) {
+Widget iconImageDialog(context, images, hero, color) {
   return Row(
     children: [
       Tooltip(
         message: 'Quick View',
         child: IconButton(
+            padding: EdgeInsets.zero,
             onPressed: () async {
-              await showDialog(
-                  context: context,
-                  builder: (_) => imageDialog(context, images, null));
+              await imageDialogHero(context, images, hero, null);
             },
             color: color,
             icon: const Icon(
@@ -94,7 +97,7 @@ Widget iconImageDialog(context, images, color) {
             )),
       ),
       IconButton(
-          padding: EdgeInsets.zero,
+          padding: const EdgeInsets.only(left: 4),
           onPressed: () {},
           color: color,
           icon: const Icon(size: 24, Icons.more_vert_rounded)),
@@ -240,7 +243,7 @@ class ButtonLinks extends StatelessWidget {
                                 const Padding(
                                   padding: EdgeInsets.only(top: 4),
                                   child: Divider(
-                                    thickness: 0.2,
+                                    thickness: 0.1,
                                     color: Colors.black,
                                     indent: 25,
                                     endIndent: 25,

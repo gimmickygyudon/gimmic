@@ -22,15 +22,18 @@ class _ResourceState extends State<Resource> {
   // This holds a list of fiction users
   //// You can use data fetched from a database or a server as well
   final List<Map<String, dynamic>> _allResource = [
+    //TODO: (quick fix demo) [index] might be unrelevant and removed in future release
     {
       "id": 1,
       "hero": "catHero",
+      "index": 0,
       "name": "Andy",
       "subname": "Legends of Zelda",
       "size": "29.0 MB"
     },
     {
       "id": 2,
+      "index": 1,
       "hero": "dogHero",
       "name": "Aragon Malay",
       "subname": "Cross Code",
@@ -38,6 +41,7 @@ class _ResourceState extends State<Resource> {
     },
     {
       "id": 3,
+      "index": 0,
       "hero": "lizardHero",
       "name": "Cross",
       "subname": "Cross Code",
@@ -45,6 +49,7 @@ class _ResourceState extends State<Resource> {
     },
     {
       "id": 4,
+      "index": 1,
       "hero": "monkeyHero",
       "name": "Barbara",
       "subname": "Zenity",
@@ -131,9 +136,9 @@ class _ResourceState extends State<Resource> {
       bool hideDetailHorizontal = constraints.maxWidth > 550;
 
       int gridRowCount = 1;
-      useVerticalLayout3x == true ? gridRowCount = 1 : null;
-      useVerticalLayout2x == true ? gridRowCount = 2 : null;
-      useVerticalLayout == true ? gridRowCount = 3 : null;
+      useVerticalLayout3x ? gridRowCount = 1 : null;
+      useVerticalLayout2x ? gridRowCount = 2 : null;
+      useVerticalLayout ? gridRowCount = 3 : null;
 
       return Scaffold(
           appBar: AppBar(
@@ -141,6 +146,11 @@ class _ResourceState extends State<Resource> {
               centerTitle: false,
               backgroundColor: Colors.grey.shade200,
               surfaceTintColor: Colors.grey.shade200,
+              toolbarHeight: useVerticalLayout
+                  ? null
+                  : _showAppbar
+                      ? 70
+                      : 0,
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -180,7 +190,7 @@ class _ResourceState extends State<Resource> {
               child: Column(children: [
                 AnimatedContainer(
                   curve: Curves.fastOutSlowIn,
-                  duration: const Duration(milliseconds: 200),
+                  duration: const Duration(milliseconds: 300),
                   height: _showAppbar ? 70 : 0,
                   child: Visibility(
                     visible: _showAppbar ? true : false,
@@ -240,8 +250,8 @@ class _ResourceState extends State<Resource> {
                                   borderRadius: BorderRadius.circular(25.7),
                                 ),
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                      const BorderSide(color: Colors.white),
+                                  borderSide: const BorderSide(
+                                      color: Colors.transparent),
                                   borderRadius: BorderRadius.circular(25.7),
                                 ),
                               ),
@@ -264,8 +274,11 @@ class _ResourceState extends State<Resource> {
                       : _showAppbar
                           ? const EdgeInsets.symmetric(
                               vertical: 8, horizontal: 24)
-                          : const EdgeInsets.symmetric(
-                              vertical: 0, horizontal: 24),
+                          : useVerticalLayout3x
+                              ? const EdgeInsets.only(
+                                  top: 8, right: 24, left: 24)
+                              : const EdgeInsets.symmetric(
+                                  vertical: 12, horizontal: 24),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -369,7 +382,7 @@ class _ResourceState extends State<Resource> {
                                               filled: false,
                                               fillColor: Colors.white,
                                               isDense: true,
-                                              labelText: useVerticalLayout2x
+                                              labelText: useVerticalLayout3x
                                                   ? null
                                                   : 'Sort By',
                                               labelStyle: GoogleFonts.roboto(
@@ -438,6 +451,7 @@ class _ResourceState extends State<Resource> {
                                   child: Icon(Icons.view_list_outlined)),
                             ],
                           ),
+                          const SizedBox(width: 10),
                         ],
                       ),
                     ],

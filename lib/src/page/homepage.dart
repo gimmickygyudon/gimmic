@@ -85,14 +85,19 @@ class LayoutDesktop extends StatelessWidget {
                               fontWeight: FontWeight.w300,
                               color: Colors.black87)),
                       const SizedBox(width: 8),
-                      Tooltip(
-                        message:
-                            "0.1a : New Update: Added animation on rezising display scale -22 Aug 2022-",
-                        child: Text('ver. 0.0.1+2',
-                            style: GoogleFonts.roboto(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black54)),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: usePhoneLayout
+                            ? Tooltip(
+                                message:
+                                    "0.0.1+4 : New Update: Added animation on rezising display scale",
+                                child: Text('ver. 0.0.1+4',
+                                    style: GoogleFonts.roboto(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black54)),
+                              )
+                            : null,
                       )
                     ]);
               }),
@@ -109,7 +114,7 @@ class LayoutDesktop extends StatelessWidget {
                       Row(
                         children: [
                           AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 600),
+                              duration: const Duration(milliseconds: 200),
                               child: usePhoneLayout
                                   ? TextButton.icon(
                                       icon: const Icon(Icons.light_mode_rounded,
@@ -199,27 +204,30 @@ class LayoutDesktop extends StatelessWidget {
                                 duration: const Duration(milliseconds: 600),
                                 padding: useVLayout
                                     ? const EdgeInsets.only(
-                                        top: 16,
+                                        top: 26,
                                         bottom: 32,
                                         left: 15,
                                         right: 15)
                                     : const EdgeInsets.only(
-                                        top: 16,
+                                        top: 26,
                                         bottom: 84,
                                         left: 15,
                                         right: 15),
                                 child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text(
-                                      maxLines: 3,
-                                      overflow: TextOverflow.fade,
-                                      "0.1a : (new update: added animation on rezising display scale)",
-                                      style: GoogleFonts.jetBrainsMono(
-                                          fontSize: 9,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.black),
+                                    Flexible(
+                                      child: FittedBox(
+                                        child: Text(
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          "An Apps dat runs on every platform or any device",
+                                          style: GoogleFonts.roboto(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w400,
+                                              color: Colors.black54),
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -285,12 +293,17 @@ class LayoutDesktop extends StatelessWidget {
                                 BoxConstraints rowConstraints) {
                               return Row(
                                 mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 12),
-                                    child: CardBig(
-                                        rowConstraints: rowConstraints,
-                                        useVHideDetails: useVHideDetails),
+                                  Expanded(
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 12),
+                                      child: CardBig(
+                                          rowConstraints: rowConstraints,
+                                          useVHideDetails: useVHideDetails,
+                                          useVLayout: useVLayout),
+                                    ),
                                   ),
                                 ],
                               );

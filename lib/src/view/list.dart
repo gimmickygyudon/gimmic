@@ -31,7 +31,12 @@ class _ListResourceState extends State<ListResource> {
             itemBuilder: (context, index) {
               return InkWell(
                 onHover: ((value) => setState(() => selectedIndex = index)),
-                onTap: () => Navigator.pushNamed(context, '/resource/detail'),
+                onTap: () => Navigator.pushNamed(context, '/resource/detail',
+                    arguments: {
+                      'hero': widget.foundResource[index]["hero"] +
+                          index.toString(),
+                      'index': widget.foundResource[index]["index"]
+                    }),
                 child: Card(
                     elevation: (selectedIndex == index) ? 1 : 0,
                     surfaceTintColor: Colors.green,
@@ -49,9 +54,13 @@ class _ListResourceState extends State<ListResource> {
                         aspectRatio: 1 / 1,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                          child: Image(
-                              image: AssetImage(images[index]),
-                              fit: BoxFit.fitHeight),
+                          child: Hero(
+                            tag: widget.foundResource[index]["hero"] +
+                                index.toString(),
+                            child: Image(
+                                image: AssetImage(images[index]),
+                                fit: BoxFit.fitHeight),
+                          ),
                         ),
                       ),
                       title: Text(

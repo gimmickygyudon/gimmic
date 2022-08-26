@@ -11,13 +11,13 @@ import 'package:gimmic/src/page/resource.dart';
 import 'package:gimmic/src/page/unity_viewer.dart';
 import 'package:gimmic/src/plugins/url_strategy.dart';
 
-// default runApp (only for testing)
-void main() {
+// default runApp (only for testing 7 developing)
+/* void main() {
   usePathUrlStrategy();
   runApp(const Gimmic());
-}
+} */
 
-/* Future<void> main() async {
+Future<void> main() async {
   await Firebase.initializeApp(
     // linux isn't implemented yet with firebase platform
     // options: DefaultFirebaseOptions.currentPlatform,
@@ -25,7 +25,7 @@ void main() {
   );
   usePathUrlStrategy();
   runApp(const Gimmic());
-}*/
+}
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
   // Override behavior methods and getters like dragDevices
@@ -49,7 +49,8 @@ class Gimmic extends StatelessWidget {
       routes: {
         '/': (context) => const HomeBase(title: StringResource.logoName),
         '/resource': (context) => const Resource(),
-        '/resource/detail': (context) => const Details(),
+        '/resource/detail': (context) => Details(
+            arguments: ModalRoute.of(context)?.settings.arguments as Map),
         '/resource/detail/view': (context) => const UnityViewer(),
       },
       theme: ThemeData(
