@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gimmic/assets/widgets/chip.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+
+import '../../assets/widgets/dialog.dart';
 
 class ListBigResource extends StatefulWidget {
   final List<Map<String, dynamic>> foundResource;
@@ -85,15 +89,25 @@ class _ListBigResourceState extends State<ListBigResource> {
                                 padding: const EdgeInsets.all(8),
                                 child: AspectRatio(
                                   aspectRatio: 1 / 1,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Hero(
-                                      tag: widget.foundResource[index]["hero"] +
-                                          widget.foundResource[index]["index"]
-                                              .toString(),
-                                      child: Image(
-                                          image: AssetImage(images[index]),
-                                          fit: BoxFit.fitHeight),
+                                  child: InkWell(
+                                    onTap: () => imageDialogHero(
+                                        context,
+                                        images[index],
+                                        widget.foundResource[index]["hero"] +
+                                            widget.foundResource[index]["index"]
+                                                .toString(),
+                                        null),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Hero(
+                                        tag: widget.foundResource[index]
+                                                ["hero"] +
+                                            widget.foundResource[index]["index"]
+                                                .toString(),
+                                        child: Image(
+                                            image: AssetImage(images[index]),
+                                            fit: BoxFit.fitHeight),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -133,22 +147,7 @@ class _ListBigResourceState extends State<ListBigResource> {
                                       padding: const EdgeInsets.only(bottom: 4),
                                       child: Row(
                                         children: [
-                                          Chip(
-                                              labelStyle: GoogleFonts.roboto(
-                                                  fontWeight: FontWeight.w900,
-                                                  fontSize: 10,
-                                                  color: Colors.black54),
-                                              label: const Text('Animal'),
-                                              backgroundColor:
-                                                  Colors.grey.shade200,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 4,
-                                                      vertical: 0),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              )),
+                                          chipTag(14.0, 10.0),
                                         ],
                                       ),
                                     ),
@@ -175,9 +174,11 @@ class _ListBigResourceState extends State<ListBigResource> {
                                       child: Text(
                                         timenow,
                                         style: GoogleFonts.roboto(
-                                          color: Colors.black45,
+                                          color: selectedIndex == index
+                                              ? Colors.black87
+                                              : Colors.black45,
                                           fontSize: 12,
-                                          fontWeight: FontWeight.w700,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                     ),
@@ -201,7 +202,7 @@ class _ListBigResourceState extends State<ListBigResource> {
                                           onPressed: () {},
                                           iconSize: 20,
                                           icon: const Icon(
-                                              Icons.star_border_rounded)),
+                                              Icons.favorite_border)),
                                     ),
                                   ),
                                   Container(
@@ -211,7 +212,13 @@ class _ListBigResourceState extends State<ListBigResource> {
                                             : Colors.grey.shade100,
                                         borderRadius:
                                             BorderRadius.circular(20)),
-                                    child: PopupMenuButton(
+                                    child: PopupMenuButton<int>(
+                                      elevation: 1,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                          side: const BorderSide(
+                                              width: 1, color: Colors.black12)),
                                       icon: Icon(
                                         Icons.more_vert,
                                         color: selectedIndex == index
@@ -222,26 +229,72 @@ class _ListBigResourceState extends State<ListBigResource> {
                                       itemBuilder: (context) => [
                                         PopupMenuItem(
                                           value: 1,
-                                          child: Row(
-                                            children: const [
-                                              Icon(Icons.star),
-                                              SizedBox(
-                                                width: 10,
-                                              ),
-                                              Text("Get The App")
-                                            ],
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 8,
+                                                right: 8,
+                                                top: 0,
+                                                bottom: 0),
+                                            child: Row(
+                                              children: [
+                                                const Icon(
+                                                    Icons.favorite_border,
+                                                    color: Colors.black54),
+                                                const SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Text("Add to Favorites",
+                                                    style: GoogleFonts.roboto(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Colors
+                                                            .grey.shade800))
+                                              ],
+                                            ),
                                           ),
                                         ),
                                         PopupMenuItem(
                                           value: 2,
-                                          child: Row(
-                                            children: const [
-                                              Icon(Icons.chrome_reader_mode),
-                                              SizedBox(
-                                                width: 10,
-                                              ),
-                                              Text("About")
-                                            ],
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8, vertical: 0),
+                                            child: Row(
+                                              children: [
+                                                const Icon(Icons.share_outlined,
+                                                    color: Colors.black54),
+                                                const SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Text("Share",
+                                                    style: GoogleFonts.roboto(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Colors
+                                                            .grey.shade800))
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        PopupMenuItem(
+                                          value: 3,
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8, vertical: 0),
+                                            child: Row(
+                                              children: [
+                                                const Icon(Icons.link_outlined,
+                                                    color: Colors.black54),
+                                                const SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Text("Copy Link",
+                                                    style: GoogleFonts.roboto(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Colors
+                                                            .grey.shade800))
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ],

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gimmic/assets/widgets/builder.dart';
 import 'package:gimmic/assets/widgets/button.dart';
-import 'package:gimmic/src/page/details.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -126,6 +126,7 @@ class _CardBigState extends State<CardBig> {
         child: Hero(
           tag: 'catHello',
           child: Card(
+            color: Colors.blue.shade200,
             margin: const EdgeInsets.all(0),
             elevation: cardSelected ? 8 : 0,
             shadowColor: Colors.black,
@@ -161,12 +162,28 @@ class _CardBigState extends State<CardBig> {
                     crossFadeState: widget.useVHideDetails
                         ? CrossFadeState.showFirst
                         : CrossFadeState.showSecond,
-                    firstChild: const Image(
-                        image: AssetImage("images/hellocat1.jpg"),
-                        fit: BoxFit.cover),
-                    secondChild: const Image(
-                        image: AssetImage("images/hellocat.jpg"),
-                        fit: BoxFit.cover),
+                    firstChild: Image(
+                      image: const AssetImage("images/hellocat1.jpg"),
+                      fit: BoxFit.cover,
+                      frameBuilder: (BuildContext context, Widget child,
+                              int? frame, bool wasSynchronouslyLoaded) =>
+                          imageFrameBulilder(
+                              child, frame, wasSynchronouslyLoaded),
+                      loadingBuilder: (BuildContext context, Widget child,
+                              ImageChunkEvent? loadingProgress) =>
+                          imageLoadingBuilder(child, loadingProgress),
+                    ),
+                    secondChild: Image(
+                      image: const AssetImage("images/hellocat.jpg"),
+                      fit: BoxFit.cover,
+                      frameBuilder: (BuildContext context, Widget child,
+                              int? frame, bool wasSynchronouslyLoaded) =>
+                          imageFrameBulilder(
+                              child, frame, wasSynchronouslyLoaded),
+                      loadingBuilder: (BuildContext context, Widget child,
+                              ImageChunkEvent? loadingProgress) =>
+                          imageLoadingBuilder(child, loadingProgress),
+                    ),
                   ),
                   AnimatedContainer(
                     curve: Curves.easeOut,
@@ -230,7 +247,7 @@ class _CardBigState extends State<CardBig> {
                                           ? "images/hellocat1.jpg"
                                           : "images/hellocat.jpg",
                                       'catHello',
-                                      Colors.black.withOpacity(0.7)),
+                                      Colors.grey.shade200),
                                   secondChild: Padding(
                                     padding: const EdgeInsets.only(left: 6),
                                     child: Text(
@@ -359,4 +376,114 @@ class _CardBigState extends State<CardBig> {
       ),
     );
   }
+}
+
+Widget cardUpdateLog() {
+  return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide.none,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(
+            children: [
+              Text('Update Log'.toUpperCase(),
+                  style: GoogleFonts.roboto(
+                      color: Colors.black54,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ListView(
+            shrinkWrap: true,
+            padding: const EdgeInsets.all(0.0),
+            children: <Widget>[
+              ExpansionTile(
+                leading: InputChip(
+                    label: Text(
+                  '0.0.1+4',
+                  style: GoogleFonts.roboto(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black),
+                )),
+                title: Text(
+                  'Added Card Widget for Update Log',
+                  style: GoogleFonts.roboto(fontWeight: FontWeight.w500),
+                ),
+                subtitle: Text(
+                  'Trailing expansion list model',
+                  style: GoogleFonts.roboto(color: Colors.black54),
+                ),
+                trailing: Chip(
+                    backgroundColor: Colors.grey.shade100,
+                    label: Text(
+                      'August 29',
+                      style: GoogleFonts.roboto(fontSize: 12),
+                    )),
+                children: const <Widget>[
+                  ListTile(title: Text('This is tile number 1')),
+                ],
+              ),
+            ],
+          )
+        ]),
+      ));
+}
+
+Widget cardComment() {
+  return Card(
+    elevation: 0,
+    color: Colors.grey.shade100,
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ListTile(
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+          horizontalTitleGap: 10,
+          leading: const CircleAvatar(
+              maxRadius: 16, child: Icon(Icons.face, size: 30)),
+          title: Text('Comment Bots',
+              style: GoogleFonts.roboto(fontWeight: FontWeight.w600)),
+          subtitle: Text('August 30, 7:27PM',
+              style: GoogleFonts.roboto(
+                  fontSize: 12, fontWeight: FontWeight.w600)),
+          trailing: Column(
+            children: const [
+              Padding(
+                padding: EdgeInsets.only(top: 4),
+                child: Icon(Icons.expand_more),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding:
+              const EdgeInsets.only(left: 20, right: 20, bottom: 0, top: 2),
+          child: Text(
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            "I'm dedicating every day to you Domestic life was never quite my style When you smile, you knock me out, I fall apart! And I thought I was so smart",
+            style: GoogleFonts.roboto(
+                color: Colors.black87,
+                letterSpacing: 0.5,
+                fontWeight: FontWeight.w400),
+          ),
+        ),
+        ButtonBar(
+          children: [
+            IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.add_comment_outlined,
+                    color: Colors.black54))
+          ],
+        )
+      ],
+    ),
+  );
 }

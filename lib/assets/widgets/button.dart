@@ -80,6 +80,15 @@ Widget buttonGithub() {
   );
 }
 
+Widget buttonNotification() {
+  return ElevatedButton.icon(
+      style: const ButtonStyle(alignment: Alignment.center)
+          .copyWith(elevation: ButtonStyleButton.allOrNull(0)),
+      icon: const Icon(Icons.notifications_off_outlined),
+      onPressed: () {},
+      label: const Text('0'));
+}
+
 Widget iconImageDialog(context, images, hero, color) {
   return Row(
     children: [
@@ -94,13 +103,24 @@ Widget iconImageDialog(context, images, hero, color) {
             icon: const Icon(
               size: 24,
               Icons.image_outlined,
+              shadows: [
+                Shadow(
+                    color: Colors.black26, offset: Offset(1, 1), blurRadius: 2),
+              ],
             )),
       ),
       IconButton(
           padding: const EdgeInsets.only(left: 4),
           onPressed: () {},
           color: color,
-          icon: const Icon(size: 24, Icons.more_vert_rounded)),
+          icon: const Icon(
+            size: 24,
+            Icons.more_vert_rounded,
+            shadows: [
+              Shadow(
+                  color: Colors.black26, offset: Offset(1, 1), blurRadius: 2),
+            ],
+          )),
     ],
   );
 }

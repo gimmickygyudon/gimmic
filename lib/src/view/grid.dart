@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:gimmic/assets/widgets/chip.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+
+import '../../assets/widgets/builder.dart';
 
 class GridResource extends StatefulWidget {
   // const GridResource({super.key});
@@ -182,8 +185,20 @@ class _GridResourceState extends State<GridResource> {
                                             : Colors.white
                                       ])),
                                   child: Image(
-                                      image: AssetImage(images[index]),
-                                      fit: BoxFit.cover),
+                                    image: AssetImage(images[index]),
+                                    fit: BoxFit.cover,
+                                    frameBuilder: (BuildContext context,
+                                            Widget child,
+                                            int? frame,
+                                            bool wasSynchronouslyLoaded) =>
+                                        imageFrameBulilder(child, frame,
+                                            wasSynchronouslyLoaded),
+                                    loadingBuilder: (BuildContext context,
+                                            Widget child,
+                                            ImageChunkEvent? loadingProgress) =>
+                                        imageLoadingBuilder(
+                                            child, loadingProgress),
+                                  ),
                                 ),
                               ),
                               Column(
@@ -237,22 +252,8 @@ class _GridResourceState extends State<GridResource> {
                                     top: 20, left: 10, right: 20, bottom: 20),
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.only(left: 5),
-                                    child: Chip(
-                                        labelStyle: GoogleFonts.roboto(
-                                            color: Colors.black54,
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 12),
-                                        label: const Text('Animal'),
-                                        side: BorderSide.none,
-                                        backgroundColor: Colors.white38,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                        )),
-                                  ),
+                                      padding: const EdgeInsets.only(left: 5),
+                                      child: chipTag(16.0, 12.0)),
                                   Padding(
                                     padding: selectedIndex == index
                                         ? const EdgeInsets.all(0)

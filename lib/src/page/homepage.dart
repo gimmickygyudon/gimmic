@@ -31,7 +31,7 @@ class LayoutDesktop extends StatelessWidget {
             : Padding(
                 padding: const EdgeInsets.only(right: 10),
                 child: ButtonLinks(
-                  bgcolor: Colors.red.shade100,
+                  bgcolor: Colors.blue.shade50,
                 )),
         suffixStyle: GoogleFonts.roboto(
           fontWeight: FontWeight.w500,
@@ -79,26 +79,15 @@ class LayoutDesktop extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Gimmicky Gyudon',
-                          style: GoogleFonts.raleway(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w300,
-                              color: Colors.black87)),
+                      Tooltip(
+                        message: 'Version 0.0.1+4',
+                        child: Text('Gimmicky Gyudon',
+                            style: GoogleFonts.raleway(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w300,
+                                color: Colors.black87)),
+                      ),
                       const SizedBox(width: 8),
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 200),
-                        child: usePhoneLayout
-                            ? Tooltip(
-                                message:
-                                    "0.0.1+4 : New Update: Added animation on rezising display scale",
-                                child: Text('ver. 0.0.1+4',
-                                    style: GoogleFonts.roboto(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.black54)),
-                              )
-                            : null,
-                      )
                     ]);
               }),
             ),
@@ -193,44 +182,20 @@ class LayoutDesktop extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Row(
-                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Flexible(
-                                      child: searchbarMain(useVHideDetails)),
+                                      child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 2),
+                                    child: searchbarMain(useVHideDetails),
+                                  )),
                                 ],
                               ),
-                              AnimatedPadding(
-                                curve: Curves.ease,
-                                duration: const Duration(milliseconds: 600),
-                                padding: useVLayout
-                                    ? const EdgeInsets.only(
-                                        top: 26,
-                                        bottom: 32,
-                                        left: 15,
-                                        right: 15)
-                                    : const EdgeInsets.only(
-                                        top: 26,
-                                        bottom: 84,
-                                        left: 15,
-                                        right: 15),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Flexible(
-                                      child: FittedBox(
-                                        child: Text(
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          "An Apps dat runs on every platform or any device",
-                                          style: GoogleFonts.roboto(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w400,
-                                              color: Colors.black54),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              Flexible(
+                                child: Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 8),
+                                    child: cardUpdateLog()),
                               ),
                             ],
                           ),
@@ -253,7 +218,7 @@ class LayoutDesktop extends StatelessWidget {
                                 child: Container(
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(24),
-                                    color: Colors.red.shade100,
+                                    color: Colors.blue.shade100,
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.only(
@@ -262,22 +227,15 @@ class LayoutDesktop extends StatelessWidget {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        buttonGithub(),
+                                        Row(children: [
+                                          buttonNotification(),
+                                          const SizedBox(width: 8),
+                                          buttonGithub(),
+                                        ]),
                                         Row(
                                           children: [
+                                            const SizedBox(width: 8),
                                             ButtonLinks(bgcolor: Colors.white),
-                                            /* Alert Button
-                                            const SizedBox(width: 6),
-                                            Material(
-                                                color: Colors.redAccent.shade100,
-                                                type: MaterialType.circle,
-                                                child: const Padding(
-                                                  padding: EdgeInsets.all(4),
-                                                  child: Icon(
-                                                      Icons
-                                                          .notifications_off_outlined,
-                                                      color: Colors.white),
-                                                )), */
                                           ],
                                         )
                                       ],
@@ -286,9 +244,43 @@ class LayoutDesktop extends StatelessWidget {
                                 ),
                               ),
                             ),
+                            AnimatedSize(
+                                duration: const Duration(milliseconds: 300),
+                                child: SizedBox(
+                                    height: useVHideDetails
+                                        ? 12
+                                        : useVLayout
+                                            ? null
+                                            : 6)),
                             Visibility(
-                                visible: useVHideDetails ? true : false,
-                                child: const SizedBox(height: 24)),
+                              visible: useVLayout ? false : true,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: const [
+                                    Expanded(
+                                      child: Divider(
+                                        thickness: 0.2,
+                                        endIndent: 20,
+                                        indent: 10,
+                                        color: Colors.black,
+                                        height: 36,
+                                      ),
+                                    ),
+                                    Icon(Icons.layers, color: Colors.black54),
+                                    Expanded(
+                                      child: Divider(
+                                        thickness: 0.2,
+                                        endIndent: 10,
+                                        indent: 20,
+                                        color: Colors.black,
+                                        height: 36,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                             LayoutBuilder(builder: (BuildContext context,
                                 BoxConstraints rowConstraints) {
                               return Row(
@@ -297,8 +289,8 @@ class LayoutDesktop extends StatelessWidget {
                                 children: [
                                   Expanded(
                                     child: Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 12),
+                                      padding: const EdgeInsets.only(
+                                          left: 2, right: 2, bottom: 12),
                                       child: CardBig(
                                           rowConstraints: rowConstraints,
                                           useVHideDetails: useVHideDetails,

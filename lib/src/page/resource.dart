@@ -15,7 +15,8 @@ class Resource extends StatefulWidget {
 var _searchController = TextEditingController();
 
 class _ResourceState extends State<Resource> {
-  late ScrollController _scrollViewController;
+  late ScrollController _scrollGridViewController;
+  late ScrollController _scrollListViewController;
   bool _showAppbar = true;
   bool isScrollingDown = false;
 
@@ -64,23 +65,48 @@ class _ResourceState extends State<Resource> {
   void initState() {
     super.initState();
     _foundResource = _allResource; // at the beginning, all users are shown
-    _scrollViewController = ScrollController();
-    _scrollViewController.addListener(() {
-      if (_scrollViewController.position.userScrollDirection ==
+    _scrollGridViewController = ScrollController();
+    _scrollGridViewController.addListener(() {
+      if (_scrollGridViewController.position.userScrollDirection ==
           ScrollDirection.reverse) {
         if (!isScrollingDown) {
-          isScrollingDown = true;
-          _showAppbar = false;
-          setState(() {});
+          setState(() {
+            isScrollingDown = true;
+            _showAppbar = false;
+          });
         }
       }
 
-      if (_scrollViewController.position.userScrollDirection ==
+      if (_scrollGridViewController.position.userScrollDirection ==
           ScrollDirection.forward) {
         if (isScrollingDown) {
-          isScrollingDown = false;
-          _showAppbar = true;
-          setState(() {});
+          setState(() {
+            isScrollingDown = false;
+            _showAppbar = true;
+          });
+        }
+      }
+    });
+
+    _scrollListViewController = ScrollController();
+    _scrollListViewController.addListener(() {
+      if (_scrollListViewController.position.userScrollDirection ==
+          ScrollDirection.reverse) {
+        if (!isScrollingDown) {
+          setState(() {
+            isScrollingDown = true;
+            _showAppbar = false;
+          });
+        }
+      }
+
+      if (_scrollListViewController.position.userScrollDirection ==
+          ScrollDirection.forward) {
+        if (isScrollingDown) {
+          setState(() {
+            isScrollingDown = false;
+            _showAppbar = true;
+          });
         }
       }
     });
@@ -88,8 +114,8 @@ class _ResourceState extends State<Resource> {
 
   @override
   void dispose() {
-    _scrollViewController.dispose();
-    _scrollViewController.removeListener(() {});
+    _scrollGridViewController.dispose();
+    _scrollGridViewController.removeListener(() {});
     super.dispose();
   }
 
@@ -219,23 +245,22 @@ class _ResourceState extends State<Resource> {
                                 prefixIcon: const Icon(Icons.search),
                                 prefixIconConstraints:
                                     const BoxConstraints(minWidth: 55),
-                                suffixStyle: GoogleFonts.roboto(
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                suffixText: useVerticalLayout3x
-                                    ? _searchController.text.isEmpty
-                                        ? null
-                                        : 'Found ${_foundResource.toList().length} Results'
-                                    : null,
                                 suffixIcon: _searchController.text.isEmpty
                                     ? null
-                                    : IconButton(
-                                        icon: const Icon(Icons.clear),
-                                        onPressed: () {
-                                          /* Clear the search field */
-                                          _searchController.clear();
-                                          _runFilter(_searchController.text);
-                                        },
+                                    : Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 4, horizontal: 6),
+                                        child: IconButton(
+                                          icon: const Icon(
+                                            Icons.clear,
+                                            color: Colors.black54,
+                                          ),
+                                          onPressed: () {
+                                            /* Clear the search field */
+                                            _searchController.clear();
+                                            _runFilter(_searchController.text);
+                                          },
+                                        ),
                                       ),
                                 suffixIconConstraints: const BoxConstraints(
                                     minWidth: 50, minHeight: 50),
@@ -273,12 +298,12 @@ class _ResourceState extends State<Resource> {
                               vertical: 0, horizontal: 48)
                       : _showAppbar
                           ? const EdgeInsets.symmetric(
-                              vertical: 8, horizontal: 24)
+                              vertical: 8, horizontal: 16)
                           : useVerticalLayout3x
                               ? const EdgeInsets.only(
                                   top: 8, right: 24, left: 24)
                               : const EdgeInsets.symmetric(
-                                  vertical: 12, horizontal: 24),
+                                  vertical: 12, horizontal: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -558,54 +583,87 @@ class _ResourceState extends State<Resource> {
                     ),
                   ),
                 ),
-                _foundResource.isNotEmpty
-                    ? _layouts[0]
-                        ? GridResource(
-                            useVerticalLayout: useVerticalLayout,
-                            useVerticalLayout2x: useVerticalLayout2x,
-                            useVerticalLayout3x: useVerticalLayout3x,
-                            gridRowCount: gridRowCount,
-                            foundResource: _foundResource,
-                            scrollViewController: _scrollViewController,
-                          )
-                        : useVerticalLayout3x
-                            ? useVerticalLayout2x
-                                ? ListBigResource(
-                                    foundResource: _foundResource,
-                                    layouts: _layouts[0],
-                                    useVerticalLayout: useVerticalLayout,
-                                    hideDetailHorizontal: hideDetailHorizontal,
-                                    scrollViewController: _scrollViewController,
-                                  )
-                                : ListBigResource(
-                                    foundResource: _foundResource,
-                                    layouts: _layouts[0],
-                                    useVerticalLayout: useVerticalLayout,
-                                    hideDetailHorizontal: hideDetailHorizontal,
-                                    scrollViewController: _scrollViewController,
-                                  )
-                            : ListResource(foundResource: _foundResource)
-                    : Padding(
-                        padding: const EdgeInsets.all(20),
-                        child:
-                            Column(mainAxisSize: MainAxisSize.min, children: [
-                          Text(
-                            'No results found',
-                            style: GoogleFonts.roboto(
-                              color: Colors.black87,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w300,
-                            ),
-                            textAlign: TextAlign.center,
+                Flexible(
+                  child: AnimatedSwitcher(
+                    switchInCurve: Curves.fastOutSlowIn,
+                    duration: const Duration(milliseconds: 300),
+                    transitionBuilder: (child, animation) {
+                      const begin = Offset(0, 2);
+                      const end = Offset.zero;
+                      final tween =
+                          Tween(begin: begin, end: end).animate(animation);
+                      return SlideTransition(
+                        position: tween,
+                        child: child,
+                      );
+                    },
+                    child: _foundResource.isNotEmpty
+                        ? _layouts[0]
+                            ? GridResource(
+                                useVerticalLayout: useVerticalLayout,
+                                useVerticalLayout2x: useVerticalLayout2x,
+                                useVerticalLayout3x: useVerticalLayout3x,
+                                gridRowCount: gridRowCount,
+                                foundResource: _foundResource,
+                                scrollViewController: _scrollGridViewController,
+                              )
+                            : useVerticalLayout3x
+                                ? useVerticalLayout2x
+                                    ? ListBigResource(
+                                        foundResource: _foundResource,
+                                        layouts: _layouts[0],
+                                        useVerticalLayout: useVerticalLayout,
+                                        hideDetailHorizontal:
+                                            hideDetailHorizontal,
+                                        scrollViewController:
+                                            _scrollListViewController,
+                                      )
+                                    : ListBigResource(
+                                        foundResource: _foundResource,
+                                        layouts: _layouts[0],
+                                        useVerticalLayout: useVerticalLayout,
+                                        hideDetailHorizontal:
+                                            hideDetailHorizontal,
+                                        scrollViewController:
+                                            _scrollListViewController,
+                                      )
+                                : ListResource(foundResource: _foundResource)
+                        : Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(children: [
+                              Text(
+                                "No results found for '${_searchController.text}'",
+                                style: GoogleFonts.roboto(
+                                  color: Colors.black54,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              Text('(>_<)',
+                                  style: GoogleFonts.robotoMono(
+                                      fontSize: 124,
+                                      color: Colors.black54,
+                                      letterSpacing: -10)),
+                              const SizedBox(height: 36),
+                              OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 24),
+                                      side: BorderSide(color: Colors.blue),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(4))),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    _runFilter(_searchController.text);
+                                  },
+                                  child:
+                                      Text('Clear your search and try again'))
+                            ]),
                           ),
-                          const SizedBox(height: 10),
-                          const Icon(
-                            Icons.sentiment_very_dissatisfied,
-                            size: 48,
-                            color: Colors.black54,
-                          )
-                        ]),
-                      ),
+                  ),
+                ),
               ])));
     });
   }

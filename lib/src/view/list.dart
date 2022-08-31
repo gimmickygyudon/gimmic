@@ -33,8 +33,7 @@ class _ListResourceState extends State<ListResource> {
                 onHover: ((value) => setState(() => selectedIndex = index)),
                 onTap: () => Navigator.pushNamed(context, '/resource/detail',
                     arguments: {
-                      'hero': widget.foundResource[index]["hero"] +
-                          index.toString(),
+                      'hero': widget.foundResource[index]["hero"],
                       'index': widget.foundResource[index]["index"]
                     }),
                 child: Card(
@@ -56,7 +55,7 @@ class _ListResourceState extends State<ListResource> {
                           borderRadius: BorderRadius.circular(12),
                           child: Hero(
                             tag: widget.foundResource[index]["hero"] +
-                                index.toString(),
+                                widget.foundResource[index]["index"].toString(),
                             child: Image(
                                 image: AssetImage(images[index]),
                                 fit: BoxFit.fitHeight),
