@@ -6,6 +6,42 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:universal_html/html.dart' as html;
 
+Widget iconImageDialog(context, images, hero, color) {
+  return Row(
+    children: [
+      Tooltip(
+        message: 'Quick View',
+        child: IconButton(
+            padding: EdgeInsets.zero,
+            onPressed: () async {
+              await imageDialogHero(context, images, hero, null);
+            },
+            color: color,
+            icon: const Icon(
+              size: 24,
+              Icons.image_outlined,
+              shadows: [
+                Shadow(
+                    color: Colors.black26, offset: Offset(1, 1), blurRadius: 2),
+              ],
+            )),
+      ),
+      IconButton(
+          padding: const EdgeInsets.only(left: 4),
+          onPressed: () {},
+          color: color,
+          icon: const Icon(
+            size: 24,
+            Icons.more_vert_rounded,
+            shadows: [
+              Shadow(
+                  color: Colors.black26, offset: Offset(1, 1), blurRadius: 2),
+            ],
+          )),
+    ],
+  );
+}
+
 Widget buttonBigView3D(context, useHorizontalShrink) {
   return Padding(
     padding: const EdgeInsets.all(8),
@@ -89,40 +125,40 @@ Widget buttonNotification() {
       label: const Text('0'));
 }
 
-Widget iconImageDialog(context, images, hero, color) {
-  return Row(
-    children: [
-      Tooltip(
-        message: 'Quick View',
-        child: IconButton(
-            padding: EdgeInsets.zero,
-            onPressed: () async {
-              await imageDialogHero(context, images, hero, null);
-            },
-            color: color,
-            icon: const Icon(
-              size: 24,
-              Icons.image_outlined,
-              shadows: [
-                Shadow(
-                    color: Colors.black26, offset: Offset(1, 1), blurRadius: 2),
-              ],
-            )),
-      ),
-      IconButton(
-          padding: const EdgeInsets.only(left: 4),
-          onPressed: () {},
-          color: color,
-          icon: const Icon(
-            size: 24,
-            Icons.more_vert_rounded,
-            shadows: [
-              Shadow(
-                  color: Colors.black26, offset: Offset(1, 1), blurRadius: 2),
-            ],
-          )),
-    ],
-  );
+Widget buttonView3D(context, usePhoneLayout) {
+  return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: usePhoneLayout
+          ? ElevatedButton.icon(
+              style: const ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll(Colors.black45),
+                  elevation: MaterialStatePropertyAll(0),
+                  padding: MaterialStatePropertyAll(EdgeInsets.all(16))),
+              onPressed: () async => await Navigator.pushNamed(
+                    context,
+                    '/resource/detail/view',
+                  ),
+              icon: const Icon(Icons.view_in_ar_rounded, color: Colors.white),
+              label: Text(
+                '3D View',
+                style: GoogleFonts.roboto(
+                    fontWeight: FontWeight.w400, color: Colors.white),
+              ))
+          : Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                  color: Colors.black45,
+                  borderRadius: BorderRadius.circular(12)),
+              child: IconButton(
+                  tooltip: '3D View',
+                  hoverColor: Colors.transparent,
+                  onPressed: () async => await Navigator.pushNamed(
+                        context,
+                        '/resource/detail/view',
+                      ),
+                  icon: const Icon(Icons.view_in_ar_rounded,
+                      color: Colors.white)),
+            ));
 }
 
 class ButtonLinks extends StatelessWidget {

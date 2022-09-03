@@ -588,7 +588,8 @@ class _ResourceState extends State<Resource> {
                     switchInCurve: Curves.fastOutSlowIn,
                     duration: const Duration(milliseconds: 300),
                     transitionBuilder: (child, animation) {
-                      const begin = Offset(0, 2);
+                      const begin = Offset(0,
+                          2); // maybe point 2 offset is out from given frame that probably cause the issue
                       const end = Offset.zero;
                       final tween =
                           Tween(begin: begin, end: end).animate(animation);
@@ -648,9 +649,10 @@ class _ResourceState extends State<Resource> {
                               const SizedBox(height: 36),
                               OutlinedButton(
                                   style: OutlinedButton.styleFrom(
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 24),
-                                      side: BorderSide(color: Colors.blue),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 24),
+                                      side:
+                                          const BorderSide(color: Colors.blue),
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(4))),
@@ -658,8 +660,8 @@ class _ResourceState extends State<Resource> {
                                     _searchController.clear();
                                     _runFilter(_searchController.text);
                                   },
-                                  child:
-                                      Text('Clear your search and try again'))
+                                  child: const Text(
+                                      'Clear your search and try again'))
                             ]),
                           ),
                   ),

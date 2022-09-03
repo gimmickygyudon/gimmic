@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 imageDialogHero(context, images, arguments, pagePosition) {
   Navigator.of(context).push(PageRouteBuilder(
+      fullscreenDialog: true,
       opaque: false,
       barrierDismissible: true,
       barrierColor: Colors.black54,
@@ -27,10 +28,30 @@ imageDialogHero(context, images, arguments, pagePosition) {
             maxScale: 6,
             child: GestureDetector(
               onTap: () => Navigator.pop(context),
-              child: Image(
-                  image: pagePosition == null
-                      ? AssetImage(images)
-                      : AssetImage(images[pagePosition])),
+              child: Stack(children: [
+                Center(
+                  child: Image(
+                      image: pagePosition == null
+                          ? AssetImage(images)
+                          : AssetImage(images[pagePosition])),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Colors.black12,
+                        borderRadius: BorderRadius.circular(25.7)),
+                    child: IconButton(
+                        constraints: const BoxConstraints(minHeight: 48),
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 24,
+                        )),
+                  ),
+                ),
+              ]),
             ),
           ),
         );

@@ -113,9 +113,6 @@ class _CardBigState extends State<CardBig> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      splashColor: Colors.white54,
-      hoverColor: Colors.white12,
-      highlightColor: Colors.white30,
       onTap: () async {
         await Navigator.push(context,
             SlideInRoute(page: const Resource(), routeName: '/resource'));
@@ -379,111 +376,265 @@ class _CardBigState extends State<CardBig> {
 }
 
 Widget cardUpdateLog() {
-  return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide.none,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(
-            children: [
-              Text('Update Log'.toUpperCase(),
-                  style: GoogleFonts.roboto(
-                      color: Colors.black54,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500)),
-            ],
-          ),
-          const SizedBox(height: 8),
-          ListView(
-            shrinkWrap: true,
-            padding: const EdgeInsets.all(0.0),
-            children: <Widget>[
-              ExpansionTile(
-                leading: InputChip(
-                    label: Text(
-                  '0.0.1+4',
-                  style: GoogleFonts.roboto(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black),
-                )),
-                title: Text(
-                  'Added Card Widget for Update Log',
-                  style: GoogleFonts.roboto(fontWeight: FontWeight.w500),
+  return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+    return Card(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide.none,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(
+              children: [
+                Text('Update Log'.toUpperCase(),
+                    style: GoogleFonts.roboto(
+                        color: Colors.black54,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500)),
+              ],
+            ),
+            const SizedBox(height: 8),
+            ListView(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              children: <Widget>[
+                ExpansionTile(
+                  tilePadding:
+                      constraints.maxWidth > 600 ? null : EdgeInsets.zero,
+                  childrenPadding: EdgeInsets.zero,
+                  leading: InputChip(
+                      label: Text(
+                    '0.0.1+4',
+                    style: GoogleFonts.roboto(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black),
+                  )),
+                  title: Text(
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    'Added Card Widget for Update Log',
+                    style: GoogleFonts.roboto(
+                        fontWeight: FontWeight.w500,
+                        fontSize: constraints.maxWidth > 460 ? null : 14),
+                  ),
+                  subtitle: Text(
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    'Trailing expansion list model',
+                    style: GoogleFonts.roboto(
+                        color: Colors.black54,
+                        fontSize: constraints.maxWidth > 460 ? null : 12),
+                  ),
+                  trailing: Chip(
+                      backgroundColor: Colors.grey.shade100,
+                      label: Text(
+                        constraints.maxWidth > 460 ? 'August 29' : 'Aug 29',
+                        style: GoogleFonts.roboto(fontSize: 12),
+                      )),
+                  children: const <Widget>[
+                    ListTile(title: Text('This is tile number 1')),
+                  ],
                 ),
-                subtitle: Text(
-                  'Trailing expansion list model',
-                  style: GoogleFonts.roboto(color: Colors.black54),
-                ),
-                trailing: Chip(
-                    backgroundColor: Colors.grey.shade100,
-                    label: Text(
-                      'August 29',
-                      style: GoogleFonts.roboto(fontSize: 12),
-                    )),
-                children: const <Widget>[
-                  ListTile(title: Text('This is tile number 1')),
-                ],
-              ),
-            ],
-          )
-        ]),
-      ));
+              ],
+            )
+          ]),
+        ));
+  });
 }
 
-Widget cardComment() {
-  return Card(
-    elevation: 0,
-    color: Colors.grey.shade100,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ListTile(
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-          horizontalTitleGap: 10,
-          leading: const CircleAvatar(
-              maxRadius: 16, child: Icon(Icons.face, size: 30)),
-          title: Text('Comment Bots',
-              style: GoogleFonts.roboto(fontWeight: FontWeight.w600)),
-          subtitle: Text('August 30, 7:27PM',
-              style: GoogleFonts.roboto(
-                  fontSize: 12, fontWeight: FontWeight.w600)),
-          trailing: Column(
-            children: const [
-              Padding(
-                padding: EdgeInsets.only(top: 4),
-                child: Icon(Icons.expand_more),
-              ),
-            ],
+Widget cardYoutube(thumbnails) {
+  return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+    return Card(
+      color: Colors.grey.shade100,
+      elevation: 0,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        hoverColor: Colors.grey.shade200,
+        splashColor: Colors.grey.shade50,
+        onTap: () {},
+        child: Padding(
+          padding: constraints.maxWidth > 320
+              ? const EdgeInsets.symmetric(vertical: 12, horizontal: 12)
+              : EdgeInsets.zero,
+          child: IntrinsicHeight(
+            child: Flex(
+              direction:
+                  constraints.maxWidth > 320 ? Axis.horizontal : Axis.vertical,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                AspectRatio(
+                  aspectRatio: constraints.maxWidth > 320 ? 1.2 : 16 / 9,
+                  child: Stack(fit: StackFit.expand, children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image(
+                          height: 80,
+                          image: AssetImage(thumbnails),
+                          fit: BoxFit.cover),
+                    ),
+                    Align(
+                        alignment: Alignment.bottomRight,
+                        child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                color: Colors.grey.shade800),
+                            margin: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 5, vertical: 1),
+                            child: Text('12:53',
+                                style:
+                                    GoogleFonts.roboto(color: Colors.white))))
+                  ]),
+                ),
+                Flexible(
+                  child: Padding(
+                      padding: const EdgeInsets.fromLTRB(15, 8, 2, 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Flexible(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: const <Widget>[
+                                Text(
+                                  'Sheep Overflow Easy Tutorial',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Padding(padding: EdgeInsets.only(bottom: 2.0)),
+                                Text(
+                                  'An complete tutorial for Beginner to Adapt into',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 12.0,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Flexible(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: const <Widget>[
+                                Text(
+                                  "Raze Im",
+                                  style: TextStyle(
+                                    fontSize: 12.0,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                Text(
+                                  'Sep 2 • 12 min ★★',
+                                  style: TextStyle(
+                                    fontSize: 12.0,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      )),
+                ),
+              ],
+            ),
           ),
         ),
-        Padding(
-          padding:
-              const EdgeInsets.only(left: 20, right: 20, bottom: 0, top: 2),
-          child: Text(
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            "I'm dedicating every day to you Domestic life was never quite my style When you smile, you knock me out, I fall apart! And I thought I was so smart",
-            style: GoogleFonts.roboto(
-                color: Colors.black87,
-                letterSpacing: 0.5,
-                fontWeight: FontWeight.w400),
-          ),
-        ),
-        ButtonBar(
+      ),
+    );
+  });
+}
+
+class CardComment extends StatefulWidget {
+  const CardComment({super.key});
+
+  @override
+  State<CardComment> createState() => _CardCommentState();
+}
+
+bool expandComment = false;
+
+class _CardCommentState extends State<CardComment> {
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      color: Colors.grey.shade100,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        hoverColor: Colors.grey.shade200,
+        splashColor: Colors.grey.shade50,
+        onTap: () {
+          if (expandComment == false) {
+            setState(() {
+              expandComment = true;
+            });
+          } else {
+            setState(() {
+              expandComment = false;
+            });
+          }
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.add_comment_outlined,
-                    color: Colors.black54))
+            ListTile(
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+              horizontalTitleGap: 10,
+              leading: const CircleAvatar(
+                  maxRadius: 18, child: Icon(Icons.face, size: 36)),
+              title: Text('Comment Bots',
+                  style: GoogleFonts.roboto(fontWeight: FontWeight.w600)),
+              subtitle: Text('August 30, 7:27PM',
+                  style: GoogleFonts.roboto(
+                      fontSize: 12, fontWeight: FontWeight.w600)),
+              trailing: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Icon(
+                        expandComment ? Icons.expand_less : Icons.expand_more),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding:
+                  const EdgeInsets.only(left: 20, right: 20, bottom: 0, top: 2),
+              child: Text(
+                maxLines: expandComment ? 10 : 2,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.roboto(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w400,
+                    height: 1.4),
+                "I'm dedicating every day to you Domestic life was never quite my style When you smile, you knock me out, I fall apart! And I thought I was so smart",
+              ),
+            ),
+            ButtonBar(
+              children: [
+                IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.add_comment_outlined,
+                        color: Colors.black54))
+              ],
+            )
           ],
-        )
-      ],
-    ),
-  );
+        ),
+      ),
+    );
+  }
 }

@@ -24,12 +24,12 @@ Widget chipTag(iconsize, fontsize) {
 Widget chipTagOutlined(name, icon, iconsize, fontsize) {
   return FilterChip(
       onSelected: (value) {},
-      avatar: Icon(icon, size: iconsize, color: Colors.black45),
+      avatar: Icon(icon, size: iconsize, color: Colors.black54),
       labelStyle: GoogleFonts.roboto(
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w600,
           fontSize: fontsize,
           letterSpacing: 0.5,
-          color: Colors.black54),
+          color: Colors.black87),
       label: Text(name),
       labelPadding: const EdgeInsets.only(left: 0, right: 10),
       backgroundColor: Colors.transparent,

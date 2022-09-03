@@ -5,56 +5,334 @@ import 'package:gimmic/assets/widgets/card.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+class Resource {
+  const Resource({
+    required this.name,
+    required this.subname,
+    required this.image,
+  });
+
+  final String name;
+  final String subname;
+  final String image;
+
+  @override
+  String toString() {
+    return '$name $subname';
+  }
+}
+
+class SearchBarMain extends StatefulWidget {
+  const SearchBarMain(
+      {super.key,
+      required this.useVHideDetails,
+      required this.timenow,
+      required this.rowConstraints});
+  final BoxConstraints rowConstraints;
+  final bool useVHideDetails;
+  final String timenow;
+
+  @override
+  State<SearchBarMain> createState() => _SearchBarMainState();
+}
+
+class _SearchBarMainState extends State<SearchBarMain> {
+  final TextEditingController _textEditingController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+  bool searching = false;
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    _textEditingController.addListener(() {
+      if (_textEditingController.text.isNotEmpty) {
+        setState(() {
+          searching = true;
+        });
+      } else {
+        setState(() {
+          searching = false;
+        });
+      }
+    });
+    super.initState();
+  }
+
+  final List<Map<String, dynamic>> _allResource = [
+    {
+      "id": 1,
+      "index": 0,
+      "hero": "catHero",
+      "name": "Andy",
+      "subname": "Legends of Zelda",
+      "image": "images/hellocat.jpg",
+      "size": "29.0 MB"
+    },
+    {
+      "id": 2,
+      "index": 1,
+      "hero": "dogHero",
+      "name": "Aragon Malay",
+      "subname": "Cross Code",
+      "image": "images/hellocat1.jpg",
+      "size": "40.2 MB"
+    },
+    {
+      "id": 3,
+      "index": 1,
+      "hero": "lizardHero",
+      "name": "Cross",
+      "subname": "Cross Code",
+      "image": "images/hellocat.jpg",
+      "size": "5.5 MB"
+    },
+    {
+      "id": 4,
+      "index": 1,
+      "hero": "monkeyHero",
+      "name": "Barbara",
+      "subname": "Zenity",
+      "image": "images/hellocat1.jpg",
+      "size": "35.2 MB"
+    },
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return RawAutocomplete<Resource>(
+      textEditingController: _textEditingController,
+      focusNode: _focusNode,
+      fieldViewBuilder:
+          (context, textEditingController, focusNode, onFieldSubmitted) {
+        return TextField(
+          controller: textEditingController,
+          focusNode: focusNode,
+          style: GoogleFonts.roboto(fontWeight: FontWeight.w500),
+          decoration: InputDecoration(
+            isDense: false,
+            filled: true,
+            fillColor: Colors.white,
+            prefixIcon: searching ? null : const Icon(Icons.search),
+            prefixIconConstraints: const BoxConstraints(minWidth: 55),
+            suffixIcon: Padding(
+              padding: EdgeInsets.only(
+                  right: searching
+                      ? 5
+                      : widget.useVHideDetails
+                          ? 20
+                          : 0),
+              child: searching
+                  ? IntrinsicHeight(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                              onPressed: () {
+                                _textEditingController.clear();
+                              },
+                              icon: const Icon(
+                                Icons.close,
+                                color: Colors.black54,
+                              )),
+                          const VerticalDivider(
+                            width: 8,
+                            thickness: 1,
+                            indent: 2,
+                            endIndent: 2,
+                            color: Colors.black38,
+                          ),
+                          IconButton(
+                              onPressed: () {},
+                              icon: const Icon(
+                                Icons.search,
+                                color: Colors.blue,
+                              )),
+                        ],
+                      ),
+                    )
+                  : widget.useVHideDetails
+                      ? Text(widget.timenow,
+                          style: GoogleFonts.roboto(
+                            color: Colors.black54,
+                            fontWeight: FontWeight.w500,
+                          ))
+                      : Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: ButtonLinks(
+                            bgcolor: Colors.blue.shade50,
+                          )),
+            ),
+            suffixStyle: GoogleFonts.roboto(
+              fontWeight: FontWeight.w500,
+            ),
+            hintText: 'Search...',
+            hintStyle: GoogleFonts.roboto(
+              fontWeight: FontWeight.w500,
+            ),
+            labelText: widget.useVHideDetails ? null : 'How are you today?',
+            contentPadding: searching
+                ? const EdgeInsets.symmetric(horizontal: 16)
+                : EdgeInsets.zero,
+            suffixIconConstraints: const BoxConstraints(minWidth: 40),
+            focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide.none,
+                borderRadius: searching
+                    ? const BorderRadius.only(
+                        topRight: Radius.circular(12),
+                        topLeft: Radius.circular(12))
+                    : BorderRadius.circular(25.7)),
+            enabledBorder: OutlineInputBorder(
+              borderSide: const BorderSide(color: Colors.transparent),
+              borderRadius: BorderRadius.circular(25.7),
+            ),
+          ),
+        );
+      },
+      optionsViewBuilder: (context, onSelected, options) {
+        bool notFound = false;
+
+        return Align(
+          alignment: Alignment.topLeft,
+          child: Material(
+            color: Colors.transparent,
+            child: Card(
+              margin: EdgeInsets.zero,
+              color: Colors.white,
+              elevation: 1,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                    bottomRight: Radius.circular(12),
+                    bottomLeft: Radius.circular(12)),
+              ),
+              child: SizedBox(
+                width: widget.rowConstraints.maxWidth,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  itemCount: options.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return ListTile(
+                          minLeadingWidth: 4,
+                          leading: const Icon(
+                            Icons.search,
+                            size: 22,
+                            color: Colors.blue,
+                          ),
+                          title: RichText(
+                              text: TextSpan(
+                                  text: _textEditingController.text,
+                                  style: GoogleFonts.roboto(
+                                      color: Colors.black87,
+                                      fontWeight: FontWeight.w500),
+                                  children: [
+                                TextSpan(
+                                    text: ' - Search',
+                                    style: GoogleFonts.roboto(
+                                        color: Colors.black54,
+                                        wordSpacing: 2,
+                                        fontWeight: FontWeight.w500))
+                              ])));
+                    }
+                    index -= 1;
+                    final Resource option = options.elementAt(index);
+
+                    if (option.name == option.subname &&
+                        option.name == option.image) {
+                      notFound = true;
+                    }
+                    return Visibility(
+                      visible: notFound ? false : true,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: GestureDetector(
+                          onTap: () {
+                            onSelected(option);
+                          },
+                          child: ListTile(
+                            dense: true,
+                            leading: Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: CircleAvatar(
+                                  radius: 18,
+                                  backgroundImage: AssetImage(option.image)),
+                            ),
+                            title: Text(
+                              option.name,
+                              style:
+                                  GoogleFonts.roboto(fontSize: 16, height: 0),
+                            ),
+                            subtitle: Text(
+                              option.subname,
+                              style: GoogleFonts.roboto(fontSize: 12),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        if (textEditingValue.text == '') {
+          return const Iterable<Resource>.empty();
+        }
+
+        List<Resource> resource = <Resource>[];
+
+        /* for (var element in _allResource) {
+          suggestionsName.add(element["name"]);
+        } */
+
+        for (final item in _allResource) {
+          resource.add(Resource(
+              name: item["name"],
+              subname: item["subname"],
+              image: item['image']));
+        }
+
+        final suggestionsName = resource
+            .where((Resource resource) => resource.name
+                .toLowerCase()
+                .contains(textEditingValue.text.toLowerCase()))
+            .toList();
+
+        final suggestionsSubName = resource
+            .where((Resource resource) => resource.subname
+                .toLowerCase()
+                .contains(textEditingValue.text.toLowerCase()))
+            .toList();
+
+        var finalSuggestionsName = suggestionsName..addAll(suggestionsSubName);
+        finalSuggestionsName = finalSuggestionsName.toSet().toList();
+        if (finalSuggestionsName.isEmpty) {
+          finalSuggestionsName.add(Resource(
+              name: textEditingValue.text,
+              subname: textEditingValue.text,
+              image: textEditingValue.text));
+        }
+
+        return finalSuggestionsName;
+      },
+      onSelected: (Resource selection) {
+        debugPrint('You just selected $selection');
+      },
+    );
+  }
+}
+
 class LayoutDesktop extends StatelessWidget {
   LayoutDesktop({super.key});
   final String timenow = DateFormat("EEEE, MMMM dd").format(DateTime.now());
-
-  Widget searchbarMain(useVHideDetails) {
-    return TextField(
-      onChanged: (value) => {},
-      style: GoogleFonts.roboto(fontWeight: FontWeight.w500),
-      decoration: InputDecoration(
-        isDense: false,
-        filled: true,
-        fillColor: Colors.white,
-        prefixIcon: const Icon(Icons.search),
-        prefixIconConstraints: const BoxConstraints(minWidth: 55),
-        suffixIcon: useVHideDetails
-            ? Padding(
-                padding: const EdgeInsets.only(right: 20),
-                child: Text(timenow,
-                    style: GoogleFonts.roboto(
-                      color: Colors.black54,
-                      fontWeight: FontWeight.w500,
-                    )),
-              )
-            : Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: ButtonLinks(
-                  bgcolor: Colors.blue.shade50,
-                )),
-        suffixStyle: GoogleFonts.roboto(
-          fontWeight: FontWeight.w500,
-        ),
-        hintText: 'Search...',
-        hintStyle: GoogleFonts.roboto(
-          fontWeight: FontWeight.w500,
-        ),
-        labelText: useVHideDetails ? null : 'How are you today?',
-        contentPadding: EdgeInsets.zero,
-        suffixIconConstraints:
-            BoxConstraints(minWidth: useVHideDetails ? 150 : 40),
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.blue, width: 2),
-          borderRadius: BorderRadius.circular(25.7),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.transparent),
-          borderRadius: BorderRadius.circular(25.7),
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -187,7 +465,15 @@ class LayoutDesktop extends StatelessWidget {
                                       child: Padding(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 2),
-                                    child: searchbarMain(useVHideDetails),
+                                    child: LayoutBuilder(
+                                      builder: (BuildContext context,
+                                          BoxConstraints rowConstraints) {
+                                        return SearchBarMain(
+                                            rowConstraints: rowConstraints,
+                                            useVHideDetails: useVHideDetails,
+                                            timenow: timenow);
+                                      },
+                                    ),
                                   )),
                                 ],
                               ),

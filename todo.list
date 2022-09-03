@@ -1,0 +1,34 @@
+Changelog 0.0.1+4
+ - Comment [widget] added
+ - Tagged item now has an icon
+ - Proper Description implemented
+ - Visual improvement on no search result
+ - Apps dependencies updated
+
+ToDo
+ - Add video tutorial link on description page
+ - Add gradient on description scrolling for indication
+ - Add button on comment for upload image and visual button reply
+ - Add compact button layouts
+ - hover widget popup details
+ - make blender version clickable copy on click with snackbar
+ - dislike button or hide button widget (item, etc)
+ - Download Option
+ - Properly show the 3d button
+ - Slide to Right animation on Detail page
+
+Issue
+    // Transition between layouts in Resource page
+    AnimatedSwitcher(
+        switchInCurve: Curves.fastOutSlowIn,
+        duration: const Duration(milliseconds: 300),
+        transitionBuilder: (child, animation) {
+            const begin = Offset(0, 2); // maybe point 2 offset is out from given frame that probably cause the issue
+            const end = Offset.zero;
+            final tween =
+                Tween(begin: begin, end: end).animate(animation);
+            return SlideTransition(
+            position: tween,
+            child: child,
+            );
+        },
