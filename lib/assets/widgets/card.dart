@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../src/page/resource.dart';
+import '../functions/route.dart';
 
 const _shimmerGradient = LinearGradient(
   colors: [
@@ -53,42 +54,6 @@ class _ShimmerLoadingState extends State<ShimmerLoading> {
   }
 }
 
-class SlideInRoute extends PageRouteBuilder {
-  final Widget page;
-
-  SlideInRoute({required this.page, required String routeName})
-      : super(
-          settings: RouteSettings(name: routeName), // set name here
-          pageBuilder: (
-            BuildContext context,
-            Animation<double> animation,
-            Animation<double> secondaryAnimation,
-          ) =>
-              page,
-          transitionsBuilder: (
-            BuildContext context,
-            Animation<double> animation,
-            Animation<double> secondaryAnimation,
-            Widget child,
-          ) {
-            const begin = Offset(0, 1);
-            const end = Offset.zero;
-            final tween = Tween(begin: begin, end: end).animate(CurvedAnimation(
-                parent: animation,
-                curve: const Interval(
-                  0,
-                  1,
-                  curve: Curves.fastOutSlowIn,
-                )));
-            return SlideTransition(
-              position: tween,
-              child: child,
-            );
-          },
-          transitionDuration: const Duration(milliseconds: 300),
-        );
-}
-
 class CardBig extends StatefulWidget {
   final BoxConstraints rowConstraints;
   final bool useVHideDetails;
@@ -114,8 +79,11 @@ class _CardBigState extends State<CardBig> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () async {
-        await Navigator.push(context,
-            SlideInRoute(page: const Resource(), routeName: '/resource'));
+        await Navigator.push(
+            context,
+            SlideInRoute(
+                page: const Resource(arguments: {'keyword': ''}),
+                routeName: '/resource'));
       },
       child: MouseRegion(
         onEnter: ((value) => setState(() => cardSelected = true)),
@@ -280,7 +248,8 @@ class _CardBigState extends State<CardBig> {
                                 await Navigator.push(
                                     context,
                                     SlideInRoute(
-                                        page: const Resource(),
+                                        page: const Resource(
+                                            arguments: {'keyword': ''}),
                                         routeName: '/resource'));
                               },
                               child: Text("Get Started",
@@ -436,8 +405,44 @@ Widget cardUpdateLog() {
                         constraints.maxWidth > 460 ? 'August 29' : 'Aug 29',
                         style: GoogleFonts.roboto(fontSize: 12),
                       )),
-                  children: const <Widget>[
-                    ListTile(title: Text('This is tile number 1')),
+                  children: <Widget>[
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text('Added comment section',
+                            style: GoogleFonts.roboto(fontSize: 14))),
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text('Tagged item now has an icon',
+                            style: GoogleFonts.roboto(fontSize: 14))),
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text('Proper Description implemented',
+                            style: GoogleFonts.roboto(fontSize: 14))),
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text('Visual improvement on no search result',
+                            style: GoogleFonts.roboto(fontSize: 14))),
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text('Apps dependencies updated',
+                            style: GoogleFonts.roboto(fontSize: 14))),
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text(
+                            'Search function in homepage is working for now',
+                            style: GoogleFonts.roboto(fontSize: 14))),
                   ],
                 ),
               ],
@@ -494,7 +499,9 @@ Widget cardYoutube(thumbnails) {
                 ),
                 Flexible(
                   child: Padding(
-                      padding: const EdgeInsets.fromLTRB(15, 8, 2, 8),
+                      padding: constraints.maxWidth > 320
+                          ? const EdgeInsets.fromLTRB(15, 4, 2, 4)
+                          : const EdgeInsets.fromLTRB(15, 8, 2, 8),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
@@ -527,19 +534,37 @@ Widget cardYoutube(thumbnails) {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.end,
-                              children: const <Widget>[
-                                Text(
+                              children: <Widget>[
+                                const Text(
                                   "Raze Im",
                                   style: TextStyle(
-                                    fontSize: 12.0,
+                                    fontSize: 12,
                                     color: Colors.black87,
                                   ),
                                 ),
-                                Text(
-                                  'Sep 2 • 12 min ★★',
-                                  style: TextStyle(
-                                    fontSize: 12.0,
-                                    color: Colors.black54,
+                                RichText(
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                          text: 'Sep 2 • 12 min  ',
+                                          style: GoogleFonts.roboto(
+                                              fontSize: 12,
+                                              color: Colors.black54)),
+                                      const WidgetSpan(
+                                        child: Padding(
+                                          padding: EdgeInsets.only(bottom: 1),
+                                          child: Icon(Icons.star,
+                                              size: 12, color: Colors.black54),
+                                        ),
+                                      ),
+                                      const WidgetSpan(
+                                        child: Padding(
+                                          padding: EdgeInsets.only(bottom: 1),
+                                          child: Icon(Icons.star,
+                                              size: 12, color: Colors.black54),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
@@ -624,13 +649,43 @@ class _CardCommentState extends State<CardComment> {
                 "I'm dedicating every day to you Domestic life was never quite my style When you smile, you knock me out, I fall apart! And I thought I was so smart",
               ),
             ),
-            ButtonBar(
-              children: [
-                IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.add_comment_outlined,
-                        color: Colors.black54))
-              ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ButtonBar(
+                buttonPadding: EdgeInsets.zero,
+                buttonMinWidth: 0,
+                children: [
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 600),
+                    child: expandComment
+                        ? IconButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () {},
+                            icon: TextButton(
+                                onPressed: () {},
+                                child: const Text('Add Reaction')))
+                        : IconButton(
+                            onPressed: () {},
+                            icon: const Icon(Icons.add_reaction,
+                                color: Colors.black54, size: 22)),
+                  ),
+                  AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 600),
+                      child: expandComment
+                          ? IconButton(
+                              padding: EdgeInsets.zero,
+                              onPressed: () {},
+                              icon: TextButton(
+                                  onPressed: () {}, child: const Text('Reply')))
+                          : IconButton(
+                              tooltip: 'Reply',
+                              onPressed: () {},
+                              icon: const Icon(
+                                Icons.reply,
+                                color: Colors.black54,
+                              )))
+                ],
+              ),
             )
           ],
         ),

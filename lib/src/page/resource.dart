@@ -6,7 +6,11 @@ import 'package:gimmic/src/view/list_big.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Resource extends StatefulWidget {
-  const Resource({super.key});
+  const Resource({
+    super.key,
+    required this.arguments,
+  });
+  final Map<dynamic, dynamic> arguments;
 
   @override
   State<Resource> createState() => _ResourceState();
@@ -64,7 +68,12 @@ class _ResourceState extends State<Resource> {
   @override
   void initState() {
     super.initState();
-    _foundResource = _allResource; // at the beginning, all users are shown
+    _searchController.text = widget.arguments['keyword'].toString();
+    _runFilter(widget.arguments['keyword'].toString());
+    if (widget.arguments['keyword'] == '') {
+      _foundResource = _allResource;
+    } // at the beginning, all users are shown
+
     _scrollGridViewController = ScrollController();
     _scrollGridViewController.addListener(() {
       if (_scrollGridViewController.position.userScrollDirection ==
@@ -116,6 +125,8 @@ class _ResourceState extends State<Resource> {
   void dispose() {
     _scrollGridViewController.dispose();
     _scrollGridViewController.removeListener(() {});
+    _scrollListViewController.dispose();
+    _scrollListViewController.removeListener(() {});
     super.dispose();
   }
 
@@ -126,14 +137,15 @@ class _ResourceState extends State<Resource> {
       results = _allResource;
     } else {
       final name = _allResource
-          .where((name) =>
-              name["name"].toLowerCase().contains(enteredKeyword.toLowerCase()))
+          .where((name) => name["name"]
+              .toLowerCase()
+              .contains(enteredKeyword.trim().toLowerCase()))
           .toList();
 
       final subname = _allResource
           .where((subname) => subname["subname"]
               .toLowerCase()
-              .contains(enteredKeyword.toLowerCase()))
+              .contains(enteredKeyword.trim().toLowerCase()))
           .toList();
 
       results = name..addAll(subname);

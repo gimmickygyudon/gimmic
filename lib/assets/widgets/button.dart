@@ -1,10 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gimmic/assets/functions/url.dart';
 import 'package:gimmic/assets/widgets/dialog.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:universal_html/html.dart' as html;
 
 Widget iconImageDialog(context, images, hero, color) {
   return Row(
@@ -96,15 +94,7 @@ Widget buttonGithub() {
               ? Colors.grey.shade800
               : Colors.grey.shade700;
         }))).copyWith(elevation: ButtonStyleButton.allOrNull(0)),
-    onPressed: () async {
-      String url = 'https://github.com/gimmickygyudon/gimmic/';
-      final Uri uri = Uri.parse(url);
-      if (kIsWeb) {
-        html.window.open(url, '_blank');
-      } else if (await canLaunchUrl(uri)) {
-        launchUrl(uri);
-      }
-    },
+    onPressed: () => urlLink('https://github.com/gimmickygyudon/gimmic/'),
     icon: const Icon(
       FontAwesomeIcons.github,
       size: 18,
@@ -246,50 +236,41 @@ class ButtonLinks extends StatelessWidget {
                                           child: Tooltip(
                                             message: links[index],
                                             child: IconButton(
-                                              padding: const EdgeInsets.only(
-                                                  top: 14,
-                                                  bottom: 14,
-                                                  left: 6,
-                                                  right: 6),
-                                              style: ButtonStyle(
-                                                  shape: MaterialStatePropertyAll(
-                                                      RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      12)))),
-                                              icon: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: <Widget>[
-                                                  Icon(
-                                                    linksIcon[index],
-                                                    color: Colors.grey.shade800,
-                                                  ),
-                                                  const SizedBox(height: 10),
-                                                  Text(
-                                                    linksName[index],
-                                                    style: GoogleFonts.roboto(
+                                                padding: const EdgeInsets.only(
+                                                    top: 14,
+                                                    bottom: 14,
+                                                    left: 6,
+                                                    right: 6),
+                                                style: ButtonStyle(
+                                                    shape: MaterialStatePropertyAll(
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        12)))),
+                                                icon: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: <Widget>[
+                                                    Icon(
+                                                      linksIcon[index],
                                                       color:
                                                           Colors.grey.shade800,
-                                                      fontWeight:
-                                                          FontWeight.w500,
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
-                                              onPressed: () async {
-                                                String url = links[index];
-                                                final Uri uri = Uri.parse(url);
-                                                if (kIsWeb) {
-                                                  html.window
-                                                      .open(url, '_blank');
-                                                } else if (await canLaunchUrl(
-                                                    uri)) {
-                                                  launchUrl(uri);
-                                                }
-                                              },
-                                            ),
+                                                    const SizedBox(height: 10),
+                                                    Text(
+                                                      linksName[index],
+                                                      style: GoogleFonts.roboto(
+                                                        color: Colors
+                                                            .grey.shade800,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                onPressed: () =>
+                                                    urlLink(links[index])),
                                           ),
                                         );
                                       }),

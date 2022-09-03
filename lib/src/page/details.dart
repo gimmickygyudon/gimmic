@@ -436,6 +436,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                           ),
                           subtitle: const Text('Legends of Zelda'),
                           trailing: IconButton(
+                              tooltip: 'Add to Favorites',
                               onPressed: () {},
                               icon: const Icon(
                                 Icons.favorite_border,
@@ -484,6 +485,61 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                           ),
                         ),
                         const Divider(height: 20),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text('Creator',
+                                      style: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.w500)),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Icon(Icons.face, size: 16),
+                                      SizedBox(width: 4),
+                                      Text('Me'),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text('License',
+                                      style: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.w500)),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Icon(FontAwesomeIcons.creativeCommonsZero,
+                                          size: 16),
+                                      SizedBox(width: 4),
+                                      Text('CC0'),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text('Date',
+                                      style: GoogleFonts.roboto(
+                                          fontWeight: FontWeight.w500)),
+                                  const Text('3 Sep 2022')
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        const Divider(height: 20),
                         Theme(
                           data: ThemeData()
                               .copyWith(dividerColor: Colors.transparent),
@@ -499,7 +555,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                             textColor: Colors.orange,
                             iconColor: Colors.orange,
                             leading: IconButton(
-                                tooltip: 'Open Blender',
+                                tooltip: 'Blender',
                                 onPressed: () {},
                                 icon: const Icon(
                                   IconSoftware.blender3d_filled,
@@ -507,7 +563,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                 )),
                             children: const [
                               ListTile(
-                                title: Text('Verticies'),
+                                title: Text('Face Count'),
                                 subtitle: Text('115,835'),
                               ),
                               ListTile(
@@ -534,7 +590,6 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                             ),
                             subtitle: const Text('Cycles / Eevee'),
                             leading: IconButton(
-                                tooltip: 'Open Image',
                                 onPressed: () {},
                                 icon: const Icon(
                                   Icons.image_outlined,
@@ -554,7 +609,43 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        Theme(
+                          data: ThemeData()
+                              .copyWith(dividerColor: Colors.transparent),
+                          child: ExpansionTile(
+                            tilePadding:
+                                const EdgeInsets.symmetric(horizontal: 0),
+                            title: Text(
+                              'Textures & Materials',
+                              style: GoogleFonts.roboto(
+                                  fontWeight: FontWeight.w400),
+                            ),
+                            textColor: Colors.green,
+                            iconColor: Colors.green,
+                            leading: IconButton(
+                                tooltip: 'Surface',
+                                onPressed: () {},
+                                icon: const Icon(
+                                  Icons.texture_rounded,
+                                )),
+                            children: const [
+                              ListTile(
+                                title: Text('Source'),
+                                subtitle: Text('https://www.textures.com'),
+                              ),
+                              ListTile(
+                                title: Text('Texture Used'),
+                                subtitle: Text('0'),
+                              ),
+                              ListTile(
+                                title: Text('Material'),
+                                subtitle: Text(
+                                    'Diffuse, Roughness and Falloff, Displacement, Others (Brightness, Contrast, etc.)'),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 18),
                         Row(
                           children: [
                             const Padding(
@@ -570,7 +661,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                             const Expanded(child: Divider(indent: 12)),
                           ],
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 8),
                         cardYoutube(images[0]),
                       ]),
                     ),

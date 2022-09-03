@@ -123,7 +123,7 @@ class _GridResourceState extends State<GridResource> {
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               mainAxisExtent: widget.useVerticalLayout
                   ? MediaQuery.of(context).size.width / 3.25
-                  : 370,
+                  : 390,
               crossAxisCount: widget.gridRowCount,
               crossAxisSpacing: widget.useVerticalLayout ? 20 : 10,
               mainAxisSpacing: 20),

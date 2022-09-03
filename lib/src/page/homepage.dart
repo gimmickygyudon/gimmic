@@ -1,24 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gimmic/assets/colors.dart';
 import 'package:gimmic/assets/widgets/button.dart';
 import 'package:gimmic/assets/widgets/card.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../../assets/functions/route.dart';
+import '../../src/page/resource.dart' as resource;
+
 class Resource {
   const Resource({
     required this.name,
     required this.subname,
     required this.image,
+    required this.index,
+    required this.hero,
   });
 
   final String name;
   final String subname;
   final String image;
+  final int index;
+  final String hero;
 
   @override
   String toString() {
-    return '$name $subname';
+    return name;
   }
 }
 
@@ -37,20 +45,17 @@ class SearchBarMain extends StatefulWidget {
 }
 
 class _SearchBarMainState extends State<SearchBarMain> {
-  final TextEditingController _textEditingController = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
+  late TextEditingController _textEditingController;
+  late FocusNode _focusNode;
+  late FocusAttachment _nodeAttachment;
   bool searching = false;
 
   @override
-  void dispose() {
-    _textEditingController.dispose();
-    super.dispose();
-  }
-
-  @override
   void initState() {
+    _focusNode = FocusNode();
+    _textEditingController = TextEditingController();
     _textEditingController.addListener(() {
-      if (_textEditingController.text.isNotEmpty) {
+      if (_textEditingController.text.trim().isNotEmpty) {
         setState(() {
           searching = true;
         });
@@ -60,7 +65,44 @@ class _SearchBarMainState extends State<SearchBarMain> {
         });
       }
     });
+    _nodeAttachment = _focusNode.attach(context, onKey: _handleKeyPress);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    _nodeAttachment.detach();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  KeyEventResult _handleKeyPress(FocusNode node, RawKeyEvent event) {
+    if (event is RawKeyDownEvent) {
+      /* debugPrint(searchIndex.toString());
+      debugPrint(searchKeyword); */
+      /* debugPrint(
+          'Focus node ${node.debugLabel} got key event: ${event.logicalKey}'); */
+      if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+        setState(() {
+          selectedIndex -= 1;
+        });
+
+        return KeyEventResult.handled;
+      } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+        setState(() {
+          selectedIndex += 1;
+        });
+
+        return KeyEventResult.handled;
+      } else if (event.logicalKey == LogicalKeyboardKey.escape) {
+        setState(() {
+          _textEditingController.clear();
+        });
+        return KeyEventResult.handled;
+      }
+    }
+    return KeyEventResult.ignored;
   }
 
   final List<Map<String, dynamic>> _allResource = [
@@ -84,7 +126,7 @@ class _SearchBarMainState extends State<SearchBarMain> {
     },
     {
       "id": 3,
-      "index": 1,
+      "index": 0,
       "hero": "lizardHero",
       "name": "Cross",
       "subname": "Cross Code",
@@ -102,8 +144,12 @@ class _SearchBarMainState extends State<SearchBarMain> {
     },
   ];
 
+  int selectedIndex = 0, searchIndex = 0;
+  String searchHero = '', searchKeyword = '';
+  bool notFound = true;
   @override
   Widget build(BuildContext context) {
+    _nodeAttachment.reparent();
     return RawAutocomplete<Resource>(
       textEditingController: _textEditingController,
       focusNode: _focusNode,
@@ -112,6 +158,21 @@ class _SearchBarMainState extends State<SearchBarMain> {
         return TextField(
           controller: textEditingController,
           focusNode: focusNode,
+          autofocus: true,
+          onSubmitted: (value) async {
+            if (selectedIndex == -1 || notFound && searching) {
+              await Navigator.push(
+                  context,
+                  SlideInRoute(
+                      page: resource.Resource(
+                          arguments: {'keyword': searchKeyword}),
+                      routeName: '/resource'));
+            } else if (notFound == false && searching) {
+              await Navigator.pushNamed(context, '/resource/detail',
+                  arguments: {'hero': searchHero, 'index': searchIndex});
+            }
+            textEditingController.clear();
+          },
           style: GoogleFonts.roboto(fontWeight: FontWeight.w500),
           decoration: InputDecoration(
             isDense: false,
@@ -147,7 +208,18 @@ class _SearchBarMainState extends State<SearchBarMain> {
                             color: Colors.black38,
                           ),
                           IconButton(
-                              onPressed: () {},
+                              onPressed: () async {
+                                if (searching) {
+                                  await Navigator.push(
+                                      context,
+                                      SlideInRoute(
+                                          page: resource.Resource(arguments: {
+                                            'keyword':
+                                                _textEditingController.text
+                                          }),
+                                          routeName: '/resource'));
+                                }
+                              },
                               icon: const Icon(
                                 Icons.search,
                                 color: Colors.blue,
@@ -164,7 +236,7 @@ class _SearchBarMainState extends State<SearchBarMain> {
                       : Padding(
                           padding: const EdgeInsets.only(right: 10),
                           child: ButtonLinks(
-                            bgcolor: Colors.blue.shade50,
+                            bgcolor: Colors.lightBlue.shade100,
                           )),
             ),
             suffixStyle: GoogleFonts.roboto(
@@ -194,13 +266,27 @@ class _SearchBarMainState extends State<SearchBarMain> {
         );
       },
       optionsViewBuilder: (context, onSelected, options) {
-        bool notFound = false;
+        if (selectedIndex < -1) {
+          selectedIndex = options.length - 1;
+        } else if (selectedIndex >= options.length) {
+          selectedIndex = -1;
+        }
+        if (selectedIndex == -1) {
+          searchKeyword = _textEditingController.text;
+        }
+
+        if (selectedIndex >= 0 && selectedIndex <= options.length) {
+          searchKeyword = options.elementAt(selectedIndex).name;
+          searchHero = options.elementAt(selectedIndex).hero;
+          searchIndex = options.elementAt(selectedIndex).index;
+        }
 
         return Align(
           alignment: Alignment.topLeft,
           child: Material(
             color: Colors.transparent,
             child: Card(
+              clipBehavior: Clip.antiAliasWithSaveLayer,
               margin: EdgeInsets.zero,
               color: Colors.white,
               elevation: 1,
@@ -216,61 +302,95 @@ class _SearchBarMainState extends State<SearchBarMain> {
                   padding: EdgeInsets.zero,
                   itemCount: options.length + 1,
                   itemBuilder: (context, index) {
-                    if (index == 0) {
-                      return ListTile(
-                          minLeadingWidth: 4,
-                          leading: const Icon(
-                            Icons.search,
-                            size: 22,
-                            color: Colors.blue,
-                          ),
-                          title: RichText(
-                              text: TextSpan(
-                                  text: _textEditingController.text,
-                                  style: GoogleFonts.roboto(
-                                      color: Colors.black87,
-                                      fontWeight: FontWeight.w500),
-                                  children: [
-                                TextSpan(
-                                    text: ' - Search',
-                                    style: GoogleFonts.roboto(
-                                        color: Colors.black54,
-                                        wordSpacing: 2,
-                                        fontWeight: FontWeight.w500))
-                              ])));
-                    }
                     index -= 1;
+                    if (index == -1) {
+                      return InkWell(
+                        onTap: () async {
+                          await Navigator.push(
+                              context,
+                              SlideInRoute(
+                                  page: resource.Resource(arguments: {
+                                    'keyword': _textEditingController.text
+                                  }),
+                                  routeName: '/resource'));
+                        },
+                        onHover: (value) {},
+                        child: ListTile(
+                            selected: selectedIndex == index ? true : false,
+                            selectedTileColor: selectedIndex == index
+                                ? Colors.lightBlue.shade50
+                                : null,
+                            minLeadingWidth: 4,
+                            leading: const Icon(
+                              Icons.search,
+                              size: 22,
+                              color: Colors.blue,
+                            ),
+                            trailing: selectedIndex == index
+                                ? const Icon(
+                                    Icons.question_mark_rounded,
+                                    size: 18,
+                                  )
+                                : null,
+                            title: RichText(
+                                text: TextSpan(
+                                    text: _textEditingController.text,
+                                    style: GoogleFonts.roboto(
+                                        color: Colors.black87,
+                                        fontWeight: FontWeight.w500),
+                                    children: [
+                                  TextSpan(
+                                      text: ' - Search',
+                                      style: GoogleFonts.roboto(
+                                          color: Colors.black54,
+                                          wordSpacing: 2,
+                                          fontWeight: FontWeight.w500))
+                                ]))),
+                      );
+                    }
+                    if (index == -1) {
+                      index = 0;
+                    }
+
                     final Resource option = options.elementAt(index);
 
                     if (option.name == option.subname &&
                         option.name == option.image) {
                       notFound = true;
+                    } else {
+                      notFound = false;
                     }
                     return Visibility(
                       visible: notFound ? false : true,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: GestureDetector(
-                          onTap: () {
-                            onSelected(option);
-                          },
-                          child: ListTile(
-                            dense: true,
-                            leading: Padding(
-                              padding: const EdgeInsets.only(top: 4),
-                              child: CircleAvatar(
-                                  radius: 18,
-                                  backgroundImage: AssetImage(option.image)),
-                            ),
-                            title: Text(
-                              option.name,
-                              style:
-                                  GoogleFonts.roboto(fontSize: 16, height: 0),
-                            ),
-                            subtitle: Text(
-                              option.subname,
-                              style: GoogleFonts.roboto(fontSize: 12),
-                            ),
+                      child: InkWell(
+                        onTap: () async {
+                          await Navigator.pushNamed(context, '/resource/detail',
+                              arguments: {
+                                'hero': option.hero,
+                                'index': option.index
+                              });
+                        },
+                        onHover: (value) {},
+                        child: ListTile(
+                          selected: selectedIndex == index ? true : false,
+                          selectedTileColor: selectedIndex == index
+                              ? Colors.lightBlue.shade100
+                              : null,
+                          selectedColor: Colors.lightBlue.shade900,
+                          dense: true,
+                          leading: CircleAvatar(
+                              radius: 18,
+                              backgroundImage: AssetImage(option.image)),
+                          trailing: selectedIndex == index
+                              ? const Icon(Icons.chevron_right)
+                              : null,
+                          title: Text(
+                            option.name,
+                            style: GoogleFonts.roboto(fontSize: 16),
+                          ),
+                          subtitle: Text(
+                            option.subname,
+                            style: GoogleFonts.roboto(fontSize: 12, height: 1),
                           ),
                         ),
                       ),
@@ -283,7 +403,8 @@ class _SearchBarMainState extends State<SearchBarMain> {
         );
       },
       optionsBuilder: (TextEditingValue textEditingValue) {
-        if (textEditingValue.text == '') {
+        if (textEditingValue.text.trim() == '') {
+          selectedIndex = 0;
           return const Iterable<Resource>.empty();
         }
 
@@ -297,7 +418,9 @@ class _SearchBarMainState extends State<SearchBarMain> {
           resource.add(Resource(
               name: item["name"],
               subname: item["subname"],
-              image: item['image']));
+              image: item['image'],
+              index: item['index'],
+              hero: item['hero']));
         }
 
         final suggestionsName = resource
@@ -316,15 +439,18 @@ class _SearchBarMainState extends State<SearchBarMain> {
         finalSuggestionsName = finalSuggestionsName.toSet().toList();
         if (finalSuggestionsName.isEmpty) {
           finalSuggestionsName.add(Resource(
-              name: textEditingValue.text,
-              subname: textEditingValue.text,
-              image: textEditingValue.text));
+            name: textEditingValue.text,
+            subname: textEditingValue.text,
+            image: textEditingValue.text,
+            index: 0,
+            hero: textEditingValue.text,
+          ));
         }
 
         return finalSuggestionsName;
       },
       onSelected: (Resource selection) {
-        debugPrint('You just selected $selection');
+        // debugPrint('You just selected $selection');
       },
     );
   }

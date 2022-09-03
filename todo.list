@@ -1,11 +1,13 @@
 Changelog 0.0.1+4
- - Comment [widget] added
+ - Added comment section
  - Tagged item now has an icon
  - Proper Description implemented
  - Visual improvement on no search result
  - Apps dependencies updated
+ - Search function in homepage is working for now
 
 ToDo
+ - Up and down point comment and share reply text button
  - Add video tutorial link on description page
  - Add gradient on description scrolling for indication
  - Add button on comment for upload image and visual button reply
