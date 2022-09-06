@@ -11,6 +11,8 @@ import 'package:gimmic/src/page/resource.dart';
 import 'package:gimmic/src/page/unity_viewer.dart';
 import 'package:gimmic/src/plugins/url_strategy.dart';
 
+import 'package:responsive_framework/responsive_framework.dart';
+
 // default runApp (only for testing 7 developing)
 /* void main() {
   usePathUrlStrategy();
@@ -42,21 +44,42 @@ class Gimmic extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: StringResource.logoName,
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const HomeBase(title: StringResource.logoName),
-        '/resource': (context) => Resource(
-            arguments: ModalRoute.of(context)?.settings.arguments as Map),
-        '/resource/detail': (context) => Details(
-            arguments: ModalRoute.of(context)?.settings.arguments as Map),
-        '/resource/detail/view': (context) => const UnityViewer(),
+    return GestureDetector(
+      onTap: () {
+        FocusScopeNode currentFocus = FocusScope.of(context);
+
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
       },
-      theme: ThemeData(
-        useMaterial3: true,
-        primarySwatch: Colors.blue,
+      child: MaterialApp(
+        builder: (context, child) => ResponsiveWrapper.builder(
+          child,
+          maxWidth: 16000,
+          minWidth: 9000,
+          defaultScale: true,
+          breakpoints: [
+            const ResponsiveBreakpoint.resize(480, name: MOBILE),
+            const ResponsiveBreakpoint.autoScaleDown(848, name: TABLET),
+            const ResponsiveBreakpoint.resize(1024, name: DESKTOP),
+            const ResponsiveBreakpoint.autoScale(1600, name: '4K'),
+          ],
+        ),
+        debugShowCheckedModeBanner: false,
+        title: StringResource.title,
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const HomeBase(title: StringResource.title),
+          '/resource': (context) => Resource(
+              arguments: ModalRoute.of(context)?.settings.arguments as Map),
+          '/resource/detail': (context) => Details(
+              arguments: ModalRoute.of(context)?.settings.arguments as Map),
+          '/resource/detail/view': (context) => const UnityViewer(),
+        },
+        theme: ThemeData(
+          visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
+          useMaterial3: true,
+        ),
       ),
     );
   }

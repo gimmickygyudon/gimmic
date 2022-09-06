@@ -12,13 +12,6 @@ class HomeBase extends StatefulWidget {
 class _HomeBaseState extends State<HomeBase> {
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-      if (constraints.maxWidth > 600) {
-        return LayoutDesktop();
-      } else {
-        return LayoutDesktop();
-      }
-    });
+    return LayoutDesktop();
   }
 }

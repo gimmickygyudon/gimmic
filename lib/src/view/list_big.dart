@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gimmic/assets/functions/platform.dart';
 import 'package:gimmic/assets/widgets/chip.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -43,6 +44,7 @@ class _ListBigResourceState extends State<ListBigResource> {
           ? const EdgeInsets.only(bottom: 0, top: 6, left: 24, right: 24)
           : const EdgeInsets.only(bottom: 0, top: 6, left: 0, right: 0),
       child: ListView.builder(
+          physics: const BouncingScrollPhysics(),
           controller: widget.scrollViewController,
           itemCount: widget.foundResource.length,
           itemBuilder: (context, index) {
@@ -108,7 +110,8 @@ class _ListBigResourceState extends State<ListBigResource> {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.all(8),
+                              padding: EdgeInsets.fromLTRB(
+                                  8, 8, 8, isWebMobile ? 0 : 4),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment:
@@ -138,7 +141,8 @@ class _ListBigResourceState extends State<ListBigResource> {
                                         ),
                                       ]),
                                   Padding(
-                                    padding: const EdgeInsets.only(bottom: 4),
+                                    padding: EdgeInsets.only(
+                                        bottom: isWebMobile ? 0 : 4),
                                     child: Row(
                                       children: [
                                         chipTag(14.0, 10.0),
@@ -152,7 +156,15 @@ class _ListBigResourceState extends State<ListBigResource> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8),
+                        padding: EdgeInsets.fromLTRB(
+                            8,
+                            isWebMobile ? 4 : 8,
+                            8,
+                            isWebMobile
+                                ? 0
+                                : selectedIndex == index
+                                    ? 8
+                                    : 4),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.end,
@@ -172,124 +184,102 @@ class _ListBigResourceState extends State<ListBigResource> {
                                             ? Colors.black87
                                             : Colors.black45,
                                         fontSize: 12,
-                                        fontWeight: FontWeight.w600,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   ),
                                 ),
-                                Visibility(
-                                  visible: widget.hideDetailHorizontal
-                                      ? true
-                                      : false,
-                                  child: Container(
-                                    margin: const EdgeInsets.only(right: 8),
-                                    decoration: BoxDecoration(
-                                        color: selectedIndex == index
-                                            ? Colors.white
-                                            : Colors.grey.shade100,
-                                        borderRadius:
-                                            BorderRadius.circular(20)),
-                                    child: IconButton(
-                                        color: selectedIndex == index
-                                            ? Colors.black87
-                                            : Colors.black54,
-                                        onPressed: () {},
-                                        iconSize: 20,
-                                        icon:
-                                            const Icon(Icons.favorite_border)),
-                                  ),
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                      color: selectedIndex == index
-                                          ? Colors.white
-                                          : Colors.grey.shade100,
-                                      borderRadius: BorderRadius.circular(20)),
-                                  child: PopupMenuButton<int>(
-                                    elevation: 1,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(6),
-                                        side: const BorderSide(
-                                            width: 1, color: Colors.black12)),
-                                    icon: Icon(
-                                      Icons.more_vert,
-                                      color: selectedIndex == index
-                                          ? Colors.black87
-                                          : Colors.black54,
-                                    ),
+                                IconButton(
+                                    visualDensity: const VisualDensity(
+                                        horizontal: -2, vertical: -2),
+                                    color: selectedIndex == index
+                                        ? Colors.black87
+                                        : Colors.black54,
+                                    onPressed: () {},
                                     iconSize: 20,
-                                    itemBuilder: (context) => [
-                                      PopupMenuItem(
-                                        value: 1,
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 8,
-                                              right: 8,
-                                              top: 0,
-                                              bottom: 0),
-                                          child: Row(
-                                            children: [
-                                              const Icon(Icons.favorite_border,
-                                                  color: Colors.black54),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              Text("Add to Favorites",
-                                                  style: GoogleFonts.roboto(
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color:
-                                                          Colors.grey.shade800))
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      PopupMenuItem(
-                                        value: 2,
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 8, vertical: 0),
-                                          child: Row(
-                                            children: [
-                                              const Icon(Icons.share_outlined,
-                                                  color: Colors.black54),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              Text("Share",
-                                                  style: GoogleFonts.roboto(
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color:
-                                                          Colors.grey.shade800))
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      PopupMenuItem(
-                                        value: 3,
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 8, vertical: 0),
-                                          child: Row(
-                                            children: [
-                                              const Icon(Icons.link_outlined,
-                                                  color: Colors.black54),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              Text("Copy Link",
-                                                  style: GoogleFonts.roboto(
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color:
-                                                          Colors.grey.shade800))
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                    icon: const Icon(Icons.favorite_border)),
+                                PopupMenuButton<int>(
+                                  elevation: 1,
+                                  padding: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                      side: const BorderSide(
+                                          width: 1, color: Colors.black12)),
+                                  icon: Icon(
+                                    Icons.more_vert,
+                                    color: selectedIndex == index
+                                        ? Colors.black87
+                                        : Colors.black54,
                                   ),
+                                  iconSize: 20,
+                                  itemBuilder: (context) => [
+                                    PopupMenuItem(
+                                      value: 1,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 8,
+                                            right: 8,
+                                            top: 0,
+                                            bottom: 0),
+                                        child: Row(
+                                          children: [
+                                            const Icon(Icons.favorite_border,
+                                                color: Colors.black54),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text("Add to Favorites",
+                                                style: GoogleFonts.roboto(
+                                                    fontWeight: FontWeight.w500,
+                                                    color:
+                                                        Colors.grey.shade800))
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      value: 2,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 0),
+                                        child: Row(
+                                          children: [
+                                            const Icon(Icons.share_outlined,
+                                                color: Colors.black54),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text("Share",
+                                                style: GoogleFonts.roboto(
+                                                    fontWeight: FontWeight.w500,
+                                                    color:
+                                                        Colors.grey.shade800))
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      value: 3,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 0),
+                                        child: Row(
+                                          children: [
+                                            const Icon(Icons.link_outlined,
+                                                color: Colors.black54),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text("Copy Link",
+                                                style: GoogleFonts.roboto(
+                                                    fontWeight: FontWeight.w500,
+                                                    color:
+                                                        Colors.grey.shade800))
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 )
                               ],
                             ),
@@ -309,6 +299,8 @@ class _ListBigResourceState extends State<ListBigResource> {
                                   size: 22,
                                 ),
                                 style: ButtonStyle(
+                                  visualDensity: const VisualDensity(
+                                      horizontal: -2, vertical: -2),
                                   padding: selectedIndex == index
                                       ? null
                                       : const MaterialStatePropertyAll(

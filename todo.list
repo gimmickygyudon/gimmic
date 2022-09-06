@@ -1,3 +1,11 @@
+Changelog 0.0.1+5
+ - Dragging or scrolling in description and comments section now will expand it
+ - Fix inconsistent text and button on some devices
+ - Using CanvasKit as default renderer
+ - Html renderer removed (cause lag issue on some devices)
+ - Ipad and Surface product display fixed
+ - Add support up to 8K monitor
+
 Changelog 0.0.1+4
  - Added comment section
  - Tagged item now has an icon
@@ -7,6 +15,7 @@ Changelog 0.0.1+4
  - Search function in homepage is working for now
 
 ToDo
+ - Add button search in google when no result found
  - Up and down point comment and share reply text button
  - Add video tutorial link on description page
  - Add gradient on description scrolling for indication
@@ -18,19 +27,3 @@ ToDo
  - Download Option
  - Properly show the 3d button
  - Slide to Right animation on Detail page
-
-Issue
-    // Transition between layouts in Resource page
-    AnimatedSwitcher(
-        switchInCurve: Curves.fastOutSlowIn,
-        duration: const Duration(milliseconds: 300),
-        transitionBuilder: (child, animation) {
-            const begin = Offset(0, 2); // maybe point 2 offset is out from given frame that probably cause the issue
-            const end = Offset.zero;
-            final tween =
-                Tween(begin: begin, end: end).animate(animation);
-            return SlideTransition(
-            position: tween,
-            child: child,
-            );
-        },

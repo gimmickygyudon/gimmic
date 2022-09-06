@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gimmic/assets/functions/platform.dart';
 import 'package:gimmic/assets/icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -61,6 +62,25 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
         }
       }
     });
+    controller.addListener(() {
+      if (controller.position.userScrollDirection == ScrollDirection.reverse) {
+        if (!isScrollingDown) {
+          setState(() {
+            isScrollingDown = true;
+            toogleThumbnail = false;
+          });
+        }
+      }
+
+      if (controller.position.userScrollDirection == ScrollDirection.forward) {
+        if (isScrollingDown) {
+          setState(() {
+            isScrollingDown = false;
+            toogleThumbnail = true;
+          });
+        }
+      }
+    });
 
     throttle(sink.stream).listen((offset) {
       _pageController.animateTo(offset,
@@ -72,6 +92,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
   void dispose() {
     sink.close();
     _pageController.dispose();
+    controller.dispose();
     super.dispose();
   }
 
@@ -171,6 +192,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
               onPointerSignal: _handlePointerSignal,
               child: _IgnorePointerSignal(
                 child: PageView.builder(
+                    physics: const BouncingScrollPhysics(),
                     scrollDirection: Axis.horizontal,
                     itemCount: images.length,
                     pageSnapping: true,
@@ -258,12 +280,12 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                 )
                               : useSmallLayout
                                   ? Tab(
-                                      child: detailCardTab(
-                                          0, Icons.data_object, "Hello Cat"),
+                                      child: detailCardTabIcon(
+                                          0, Icons.data_object),
                                     )
                                   : Tab(
-                                      child: detailCardTabIcon(
-                                          0, Icons.data_object)),
+                                      child: detailCardTab(
+                                          0, Icons.data_object, "Hello Cat")),
                           _tabController.index == 1
                               ? Tab(
                                   child: detailCardTab(
@@ -271,12 +293,12 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                 )
                               : useSmallLayout
                                   ? Tab(
-                                      child: detailCardTab(
-                                          1, Icons.forum_outlined, "Comments"),
+                                      child: detailCardTabIcon(
+                                          1, Icons.forum_outlined),
                                     )
                                   : Tab(
-                                      child: detailCardTabIcon(
-                                          1, Icons.forum_outlined))
+                                      child: detailCardTab(
+                                          1, Icons.forum_outlined, "Comments"))
                         ]),
                     AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
@@ -285,8 +307,10 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                           : Align(
                               alignment: Alignment.centerRight,
                               child: Container(
-                                padding: const EdgeInsets.only(
-                                    right: 42, bottom: 5, top: 5),
+                                padding: isWebMobile
+                                    ? const EdgeInsets.only(right: 48)
+                                    : const EdgeInsets.only(
+                                        right: 48, bottom: 5, top: 5),
                                 child: ToggleButtons(
                                   borderRadius: BorderRadius.circular(25.7),
                                   constraints: const BoxConstraints(
@@ -319,11 +343,15 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                     Align(
                       alignment: Alignment.centerRight,
                       child: Container(
-                        margin: const EdgeInsets.only(
-                            top: 6, left: 6, right: 0, bottom: 6),
-                        decoration: BoxDecoration(
-                            color: Colors.grey.shade50,
-                            borderRadius: BorderRadius.circular(25.7)),
+                        margin: isWebMobile
+                            ? null
+                            : const EdgeInsets.only(
+                                top: 6, left: 6, right: 0, bottom: 6),
+                        decoration: isWebMobile
+                            ? null
+                            : BoxDecoration(
+                                color: Colors.grey.shade50,
+                                borderRadius: BorderRadius.circular(25.7)),
                         child: PopupMenuButton<int>(
                           elevation: 1,
                           color: Colors.grey.shade50,
@@ -415,263 +443,371 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                 child: TabBarView(
                   controller: _tabController,
                   children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          left: 25, right: 25, bottom: 0, top: 10),
-                      child: ListView(children: [
-                        ExpansionTile(
-                          onExpansionChanged: (value) {
-                            setState(() {
-                              toogleThumbnail = false;
-                            });
-                          },
-                          tilePadding:
-                              const EdgeInsets.symmetric(horizontal: 0),
-                          title: Text(
-                            'Aragon Malay',
-                            style: GoogleFonts.roboto(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w400,
-                                letterSpacing: -0.5),
-                          ),
-                          subtitle: const Text('Legends of Zelda'),
-                          trailing: IconButton(
-                              tooltip: 'Add to Favorites',
-                              onPressed: () {},
-                              icon: const Icon(
-                                Icons.favorite_border,
-                                color: Colors.black87,
-                              )),
-                          children: [
-                            SelectionArea(
-                              child: Text(
-                                "A cat is a furry animal that has a long tail and sharp claws. Cats are often kept as pets. Cats are lions, tigers, and other wild animals in the same family.",
-                                style: GoogleFonts.roboto(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    letterSpacing: 0.1,
-                                    height: 1.6,
-                                    color: Colors.black87),
-                              ),
-                            ),
-                            ButtonBar(children: [
-                              TextButton.icon(
-                                  onPressed: () {},
-                                  icon: const Icon(FontAwesomeIcons.wikipediaW,
-                                      size: 14),
-                                  label: const Text('Wikipedia')),
-                              TextButton.icon(
-                                  onPressed: () {},
-                                  icon: const Icon(FontAwesomeIcons.google,
-                                      size: 14),
-                                  label: const Text('Google'))
-                            ]),
-                          ],
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          child: Row(
-                            children: [
-                              Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: chipTagOutlined(
-                                      'Cat', FontAwesomeIcons.cat, 16.0, 12.0)),
-                              const SizedBox(width: 6),
-                              Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: chipTagOutlined('Animal',
-                                      Icons.pets_rounded, 16.0, 12.0)),
-                            ],
-                          ),
-                        ),
-                        const Divider(height: 20),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
+                    Scrollbar(
+                      thumbVisibility: true,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 25, right: 25, bottom: 0, top: 10),
+                        child: ScrollConfiguration(
+                          behavior: ScrollConfiguration.of(context)
+                              .copyWith(scrollbars: false),
+                          child: NotificationListener(
+                            onNotification: (OverscrollNotification value) {
+                              if (value.overscroll < 0 &&
+                                  _scrollViewController.offset +
+                                          value.overscroll <=
+                                      0) {
+                                if (_scrollViewController.offset != 0) {
+                                  _scrollViewController.jumpTo(0);
+                                }
+                                return true;
+                              }
+                              if (_scrollViewController.offset +
+                                      value.overscroll >=
+                                  _scrollViewController
+                                      .position.maxScrollExtent) {
+                                if (_scrollViewController.offset !=
+                                    _scrollViewController
+                                        .position.maxScrollExtent) {
+                                  _scrollViewController.jumpTo(
+                                      _scrollViewController
+                                          .position.maxScrollExtent);
+                                }
+                                return true;
+                              }
+                              _scrollViewController.jumpTo(
+                                  _scrollViewController.offset +
+                                      value.overscroll);
+                              return true;
+                            },
+                            child: ListView(
+                                controller: controller,
+                                keyboardDismissBehavior:
+                                    ScrollViewKeyboardDismissBehavior.onDrag,
+                                physics: const ClampingScrollPhysics(),
+                                shrinkWrap: true,
                                 children: [
-                                  Text('Creator',
+                                  ExpansionTile(
+                                    onExpansionChanged: (value) {
+                                      setState(() {
+                                        toogleThumbnail = false;
+                                      });
+                                    },
+                                    tilePadding: const EdgeInsets.symmetric(
+                                        horizontal: 0),
+                                    title: Text(
+                                      'Aragon Malay',
                                       style: GoogleFonts.roboto(
-                                          fontWeight: FontWeight.w500)),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: const [
-                                      Icon(Icons.face, size: 16),
-                                      SizedBox(width: 4),
-                                      Text('Me'),
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.w400,
+                                          letterSpacing: -0.5),
+                                    ),
+                                    subtitle: const Text('Legends of Zelda'),
+                                    trailing: IconButton(
+                                        tooltip: 'Add to Favorites',
+                                        onPressed: () {},
+                                        icon: const Icon(
+                                          Icons.favorite_border,
+                                          color: Colors.black87,
+                                        )),
+                                    children: [
+                                      SelectionArea(
+                                        child: Text(
+                                          "A cat is a furry animal that has a long tail and sharp claws. Cats are often kept as pets. Cats are lions, tigers, and other wild animals in the same family.",
+                                          style: GoogleFonts.roboto(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w400,
+                                              letterSpacing: 0.1,
+                                              height: 1.6,
+                                              color: Colors.black87),
+                                        ),
+                                      ),
+                                      ButtonBar(children: [
+                                        TextButton.icon(
+                                            onPressed: () {},
+                                            icon: const Icon(
+                                                FontAwesomeIcons.wikipediaW,
+                                                size: 14),
+                                            label: const Text('Wikipedia')),
+                                        TextButton.icon(
+                                            onPressed: () {},
+                                            icon: const Icon(
+                                                FontAwesomeIcons.google,
+                                                size: 14),
+                                            label: const Text('Google'))
+                                      ]),
                                     ],
-                                  )
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text('License',
-                                      style: GoogleFonts.roboto(
-                                          fontWeight: FontWeight.w500)),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12),
+                                    child: Row(
+                                      children: [
+                                        Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: chipTagOutlined(
+                                                'Cat',
+                                                FontAwesomeIcons.cat,
+                                                16.0,
+                                                12.0)),
+                                        const SizedBox(width: 6),
+                                        Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: chipTagOutlined(
+                                                'Animal',
+                                                Icons.pets_rounded,
+                                                16.0,
+                                                12.0)),
+                                      ],
+                                    ),
+                                  ),
+                                  const Divider(height: 20),
+                                  const SizedBox(height: 8),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: const [
-                                      Icon(FontAwesomeIcons.creativeCommonsZero,
-                                          size: 16),
-                                      SizedBox(width: 4),
-                                      Text('CC0'),
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Text('Creator',
+                                                style: GoogleFonts.roboto(
+                                                    fontWeight:
+                                                        FontWeight.w500)),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: const [
+                                                Icon(Icons.face, size: 16),
+                                                SizedBox(width: 4),
+                                                Text('Me'),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Text('License',
+                                                style: GoogleFonts.roboto(
+                                                    fontWeight:
+                                                        FontWeight.w500)),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: const [
+                                                Icon(
+                                                    FontAwesomeIcons
+                                                        .creativeCommonsZero,
+                                                    size: 16),
+                                                SizedBox(width: 4),
+                                                Text('CC0'),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Text('Date',
+                                                style: GoogleFonts.roboto(
+                                                    fontWeight:
+                                                        FontWeight.w500)),
+                                            const Text('3 Sep 2022')
+                                          ],
+                                        ),
+                                      )
                                     ],
-                                  )
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text('Date',
-                                      style: GoogleFonts.roboto(
-                                          fontWeight: FontWeight.w500)),
-                                  const Text('3 Sep 2022')
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        const Divider(height: 20),
-                        Theme(
-                          data: ThemeData()
-                              .copyWith(dividerColor: Colors.transparent),
-                          child: ExpansionTile(
-                            tilePadding:
-                                const EdgeInsets.symmetric(horizontal: 0),
-                            title: Text(
-                              'Blender',
-                              style: GoogleFonts.roboto(
-                                  fontSize: 18, fontWeight: FontWeight.w400),
-                            ),
-                            subtitle: const Text('3.2.2 (bcfdb14560e7)'),
-                            textColor: Colors.orange,
-                            iconColor: Colors.orange,
-                            leading: IconButton(
-                                tooltip: 'Blender',
-                                onPressed: () {},
-                                icon: const Icon(
-                                  IconSoftware.blender3d_filled,
-                                  color: Colors.orangeAccent,
-                                )),
-                            children: const [
-                              ListTile(
-                                title: Text('Face Count'),
-                                subtitle: Text('115,835'),
-                              ),
-                              ListTile(
-                                title: Text('Objects'),
-                                subtitle: Text('19'),
-                              ),
-                              ListTile(
-                                title: Text('File Size'),
-                                subtitle: Text('28 MB'),
-                              ),
-                            ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  const Divider(height: 20),
+                                  Theme(
+                                    data: ThemeData().copyWith(
+                                        dividerColor: Colors.transparent),
+                                    child: ExpansionTile(
+                                      tilePadding: const EdgeInsets.symmetric(
+                                          horizontal: 0),
+                                      title: Text(
+                                        'Blender',
+                                        style: GoogleFonts.roboto(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                      subtitle:
+                                          const Text('3.2.2 (bcfdb14560e7)'),
+                                      textColor: Colors.orange,
+                                      iconColor: Colors.orange,
+                                      leading: IconButton(
+                                          tooltip: 'Blender',
+                                          onPressed: () {},
+                                          icon: const Icon(
+                                            IconSoftware.blender3dfilled,
+                                            color: Colors.orangeAccent,
+                                          )),
+                                      children: const [
+                                        ListTile(
+                                          title: Text('Face Count'),
+                                          subtitle: Text('115,835'),
+                                        ),
+                                        ListTile(
+                                          title: Text('Objects'),
+                                          subtitle: Text('19'),
+                                        ),
+                                        ListTile(
+                                          title: Text('File Size'),
+                                          subtitle: Text('28 MB'),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Theme(
+                                    data: ThemeData().copyWith(
+                                        dividerColor: Colors.transparent),
+                                    child: ExpansionTile(
+                                      tilePadding: const EdgeInsets.symmetric(
+                                          horizontal: 0),
+                                      title: Text(
+                                        'Renderer',
+                                        style: GoogleFonts.roboto(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                      subtitle: const Text('Cycles / Eevee'),
+                                      leading: IconButton(
+                                          onPressed: () {},
+                                          icon: const Icon(
+                                            Icons.image_outlined,
+                                          )),
+                                      children: const [
+                                        ListTile(
+                                          title: Text('Resolution'),
+                                          subtitle: Text('2080 x 2080 Pixels'),
+                                        ),
+                                        ListTile(
+                                          title: Text('Aspect Ratio'),
+                                          subtitle: Text('1.000 / 1.000'),
+                                        ),
+                                        SizedBox(
+                                          height: 8,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Theme(
+                                    data: ThemeData().copyWith(
+                                        dividerColor: Colors.transparent),
+                                    child: ExpansionTile(
+                                      tilePadding: const EdgeInsets.symmetric(
+                                          horizontal: 0),
+                                      title: Text(
+                                        'Textures & Materials',
+                                        style: GoogleFonts.roboto(
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                      textColor: Colors.green,
+                                      iconColor: Colors.green,
+                                      leading: IconButton(
+                                          tooltip: 'Surface',
+                                          onPressed: () {},
+                                          icon: const Icon(
+                                            Icons.texture_rounded,
+                                          )),
+                                      children: const [
+                                        ListTile(
+                                          title: Text('Source'),
+                                          subtitle:
+                                              Text('https://www.textures.com'),
+                                        ),
+                                        ListTile(
+                                          title: Text('Texture Used'),
+                                          subtitle: Text('0'),
+                                        ),
+                                        ListTile(
+                                          title: Text('Material'),
+                                          subtitle: Text(
+                                              'Diffuse, Roughness and Falloff, Displacement, Others (Brightness, Contrast, etc.)'),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 18),
+                                  Row(
+                                    children: [
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 6),
+                                        child: Icon(FontAwesomeIcons.youtube,
+                                            size: 16, color: Colors.red),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            8, 0, 4, 0),
+                                        child: Text('Youtube Tutorial',
+                                            style: GoogleFonts.roboto(
+                                                fontSize: 14)),
+                                      ),
+                                      const Expanded(
+                                          child: Divider(indent: 12)),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  cardYoutube(images[0]),
+                                ]),
                           ),
                         ),
-                        Theme(
-                          data: ThemeData()
-                              .copyWith(dividerColor: Colors.transparent),
-                          child: ExpansionTile(
-                            tilePadding:
-                                const EdgeInsets.symmetric(horizontal: 0),
-                            title: Text(
-                              'Renderer',
-                              style: GoogleFonts.roboto(
-                                  fontSize: 18, fontWeight: FontWeight.w400),
-                            ),
-                            subtitle: const Text('Cycles / Eevee'),
-                            leading: IconButton(
-                                onPressed: () {},
-                                icon: const Icon(
-                                  Icons.image_outlined,
-                                )),
-                            children: const [
-                              ListTile(
-                                title: Text('Resolution'),
-                                subtitle: Text('2080 x 2080 Pixels'),
-                              ),
-                              ListTile(
-                                title: Text('Aspect Ratio'),
-                                subtitle: Text('1.000 / 1.000'),
-                              ),
-                              SizedBox(
-                                height: 8,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Theme(
-                          data: ThemeData()
-                              .copyWith(dividerColor: Colors.transparent),
-                          child: ExpansionTile(
-                            tilePadding:
-                                const EdgeInsets.symmetric(horizontal: 0),
-                            title: Text(
-                              'Textures & Materials',
-                              style: GoogleFonts.roboto(
-                                  fontWeight: FontWeight.w400),
-                            ),
-                            textColor: Colors.green,
-                            iconColor: Colors.green,
-                            leading: IconButton(
-                                tooltip: 'Surface',
-                                onPressed: () {},
-                                icon: const Icon(
-                                  Icons.texture_rounded,
-                                )),
-                            children: const [
-                              ListTile(
-                                title: Text('Source'),
-                                subtitle: Text('https://www.textures.com'),
-                              ),
-                              ListTile(
-                                title: Text('Texture Used'),
-                                subtitle: Text('0'),
-                              ),
-                              ListTile(
-                                title: Text('Material'),
-                                subtitle: Text(
-                                    'Diffuse, Roughness and Falloff, Displacement, Others (Brightness, Contrast, etc.)'),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 18),
-                        Row(
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.only(left: 6),
-                              child: Icon(FontAwesomeIcons.youtube,
-                                  size: 16, color: Colors.red),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(8, 0, 4, 0),
-                              child: Text('Youtube Tutorial',
-                                  style: GoogleFonts.roboto(fontSize: 14)),
-                            ),
-                            const Expanded(child: Divider(indent: 12)),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        cardYoutube(images[0]),
-                      ]),
+                      ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 10),
-                      child: ListView(
-                        children: const <Widget>[
-                          CardComment(),
-                        ],
+                    Scrollbar(
+                      thumbVisibility: true,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 10),
+                        child: ScrollConfiguration(
+                          behavior: ScrollConfiguration.of(context)
+                              .copyWith(scrollbars: false),
+                          child: NotificationListener(
+                            onNotification: (OverscrollNotification value) {
+                              if (value.overscroll < 0 &&
+                                  _scrollViewController.offset +
+                                          value.overscroll <=
+                                      0) {
+                                if (_scrollViewController.offset != 0) {
+                                  _scrollViewController.jumpTo(0);
+                                }
+                                return true;
+                              }
+                              if (_scrollViewController.offset +
+                                      value.overscroll >=
+                                  _scrollViewController
+                                      .position.maxScrollExtent) {
+                                if (_scrollViewController.offset !=
+                                    _scrollViewController
+                                        .position.maxScrollExtent) {
+                                  _scrollViewController.jumpTo(
+                                      _scrollViewController
+                                          .position.maxScrollExtent);
+                                }
+                                return true;
+                              }
+                              _scrollViewController.jumpTo(
+                                  _scrollViewController.offset +
+                                      value.overscroll);
+                              return true;
+                            },
+                            child: ListView(
+                              keyboardDismissBehavior:
+                                  ScrollViewKeyboardDismissBehavior.onDrag,
+                              children: const <Widget>[
+                                CardComment(),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     )
                   ],
@@ -685,13 +821,15 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                 top: 10,
                 left: 20,
                 right: 20,
-                bottom: useVerticalLayout ? 20 : 10),
+                bottom: useVerticalLayout ? 10 : 20),
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               child: _tabController.index == 0
                   ? ElevatedButton.icon(
                       icon: const Icon(Icons.file_download_outlined),
                       style: ButtonStyle(
+                        visualDensity:
+                            const VisualDensity(horizontal: -2, vertical: -2),
                         backgroundColor:
                             MaterialStateProperty.all(Colors.green.shade100),
                         foregroundColor:
@@ -701,7 +839,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                               : Colors.green;
                         }),
                         minimumSize: MaterialStateProperty.all(
-                            const Size(double.infinity, 56)),
+                            const Size(double.infinity, 50)),
                         elevation: const MaterialStatePropertyAll(0),
                         overlayColor: MaterialStateProperty.resolveWith(
                           (states) {
@@ -715,8 +853,12 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                       label: const Text("Download"),
                     )
                   : TextField(
-                      autofocus: true,
+                      autofocus: false,
+                      autocorrect: true,
                       decoration: InputDecoration(
+                          contentPadding: isWebMobile
+                              ? const EdgeInsets.symmetric(vertical: 12)
+                              : null,
                           isDense: true,
                           filled: true,
                           hintText: "Message...",
@@ -753,6 +895,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
 
   Widget detailCardTabIcon(index, icons) {
     return IconButton(
+      visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
       onPressed: () {
         setState(() {
           _tabController.animateTo(index);
@@ -779,12 +922,14 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
     return ElevatedButton.icon(
       style: _tabController.index == index
           ? ButtonStyle(
+              visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
               padding: const MaterialStatePropertyAll(EdgeInsets.all(16)),
               shape: MaterialStateProperty.all(RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12))),
               backgroundColor: MaterialStateProperty.all(Colors.orange),
               elevation: MaterialStateProperty.all(0))
           : ButtonStyle(
+              visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
               padding: const MaterialStatePropertyAll(EdgeInsets.all(16)),
               backgroundColor: MaterialStateProperty.all(Colors.grey.shade200),
               elevation: MaterialStateProperty.all(0)),
@@ -813,9 +958,9 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      bool useSmallLayout = constraints.maxWidth > 1100;
-      bool usePhoneLayout = constraints.maxWidth > 550;
-      bool useVerticalLayout = constraints.maxWidth > 800;
+      bool useSmallLayout = constraints.maxHeight > constraints.maxWidth / 2;
+      bool usePhoneLayout = constraints.maxHeight < constraints.maxWidth / 2;
+      bool useVerticalLayout = constraints.maxHeight < constraints.maxWidth;
       return Scaffold(
           extendBodyBehindAppBar: true,
           body: Container(
@@ -830,9 +975,9 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                     padding: useVerticalLayout
                         ? useSmallLayout
                             ? const EdgeInsets.only(
-                                top: 12, left: 24, right: 0, bottom: 12)
-                            : const EdgeInsets.only(
                                 top: 12, left: 12, right: 0, bottom: 12)
+                            : const EdgeInsets.only(
+                                top: 12, left: 24, right: 0, bottom: 12)
                         : EdgeInsets.zero,
                     child: CustomScrollView(
                         controller: _scrollViewController,
@@ -883,7 +1028,9 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                 ? constraints.maxHeight - 150
                                 : usePhoneLayout
                                     ? constraints.maxHeight - 205 - 118
-                                    : constraints.maxHeight - 325,
+                                    : constraints.maxHeight > 600
+                                        ? constraints.maxHeight - 485
+                                        : constraints.maxHeight - 325,
                             flexibleSpace: AnimatedPadding(
                               duration: const Duration(milliseconds: 300),
                               padding: useVerticalLayout
@@ -905,8 +1052,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                       alignment: Alignment.bottomRight,
                                       child: Padding(
                                           padding: const EdgeInsets.all(16),
-                                          child: buttonView3D(
-                                              context, usePhoneLayout)))
+                                          child: buttonView3D(context)))
                                 ]),
                               ),
                             ),
@@ -971,7 +1117,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                 ),
                 AnimatedSize(
                     duration: const Duration(milliseconds: 400),
-                    child: SizedBox(width: useSmallLayout ? 8 : 0)),
+                    child: SizedBox(width: useSmallLayout ? 0 : 8)),
                 Visibility(
                   visible: useVerticalLayout ? true : false,
                   child: Expanded(
@@ -981,9 +1127,9 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                         duration: const Duration(milliseconds: 600),
                         padding: useSmallLayout
                             ? const EdgeInsets.only(
-                                top: 12, left: 0, right: 24, bottom: 12)
+                                top: 12, left: 0, right: 12, bottom: 12)
                             : const EdgeInsets.only(
-                                top: 12, left: 0, right: 12, bottom: 12),
+                                top: 12, left: 0, right: 24, bottom: 12),
                         child: detailCard(
                             context, useSmallLayout, useVerticalLayout),
                       )),

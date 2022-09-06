@@ -247,7 +247,7 @@ class _ResourceState extends State<Resource> {
                             child: TextField(
                               onChanged: (value) => _runFilter(value),
                               controller: _searchController,
-                              autofocus: true,
+                              autofocus: false,
                               style: GoogleFonts.roboto(
                                   fontWeight: FontWeight.w500),
                               decoration: InputDecoration(
@@ -323,8 +323,7 @@ class _ResourceState extends State<Resource> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          SizedBox(
-                            width: 175,
+                          IntrinsicWidth(
                             child: DropdownButtonFormField(
                               isDense: true,
                               decoration: InputDecoration(
@@ -460,6 +459,7 @@ class _ResourceState extends State<Resource> {
                                   : null),
                           const SizedBox(width: 10),
                           ToggleButtons(
+                            renderBorder: false,
                             color: Colors.black54,
                             fillColor: Colors.transparent,
                             constraints: const BoxConstraints(
@@ -492,22 +492,6 @@ class _ResourceState extends State<Resource> {
                         ],
                       ),
                     ],
-                  ),
-                ),
-                Visibility(
-                  visible: _showAppbar ? true : false,
-                  child: AnimatedPadding(
-                    curve: Curves.fastOutSlowIn,
-                    duration: const Duration(milliseconds: 600),
-                    padding: useVerticalLayout
-                        ? const EdgeInsets.only(left: 48, right: 48, bottom: 12)
-                        : const EdgeInsets.only(left: 24, right: 24, bottom: 6),
-                    child: const Divider(
-                      color: Colors.black,
-                      thickness: 0.1,
-                      indent: 0,
-                      endIndent: 0,
-                    ),
                   ),
                 ),
                 AnimatedContainer(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gimmic/assets/functions/platform.dart';
 import 'package:gimmic/assets/widgets/chip.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -50,6 +51,7 @@ Widget downloadButton(context, selectedIndex, index, size) {
         size: 22,
       ),
       style: ButtonStyle(
+        visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
         padding: selectedIndex == index
             ? null
             : const MaterialStatePropertyAll(EdgeInsets.zero),
@@ -118,6 +120,7 @@ class _GridResourceState extends State<GridResource> {
           ? const EdgeInsets.only(bottom: 0, top: 6, left: 48, right: 48)
           : const EdgeInsets.only(bottom: 0, top: 6, left: 24, right: 24),
       child: GridView.builder(
+          physics: const BouncingScrollPhysics(),
           controller: widget.scrollViewController,
           itemCount: widget.foundResource.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -126,10 +129,10 @@ class _GridResourceState extends State<GridResource> {
                   : 390,
               crossAxisCount: widget.gridRowCount,
               crossAxisSpacing: widget.useVerticalLayout ? 20 : 10,
-              mainAxisSpacing: 20),
+              mainAxisSpacing: 0),
           itemBuilder: (context, index) {
             return Padding(
-              padding: const EdgeInsets.only(bottom: 0),
+              padding: const EdgeInsets.only(bottom: 20),
               child: InkWell(
                 onHover: ((value) => setState(() => selectedIndex = index)),
                 onTap: () async => await Navigator.pushNamed(
@@ -202,8 +205,11 @@ class _GridResourceState extends State<GridResource> {
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 6, left: 20, right: 20),
+                                    padding: isWebMobile
+                                        ? const EdgeInsets.only(
+                                            top: 6, left: 15, right: 15)
+                                        : const EdgeInsets.only(
+                                            top: 6, left: 20, right: 20),
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -228,7 +234,8 @@ class _GridResourceState extends State<GridResource> {
                                       ],
                                     )),
                                 Padding(
-                                  padding: const EdgeInsets.only(left: 20),
+                                  padding: EdgeInsets.only(
+                                      left: isWebMobile ? 15 : 20),
                                   child: Text(
                                     widget.foundResource[index]["subname"],
                                     style: GoogleFonts.roboto(
@@ -243,25 +250,36 @@ class _GridResourceState extends State<GridResource> {
                               ],
                             ),
                             const SizedBox(height: 20),
-                            ButtonBar(
-                              alignment: MainAxisAlignment.spaceBetween,
-                              buttonPadding: const EdgeInsets.only(
-                                  top: 20, left: 10, right: 20, bottom: 20),
-                              children: [
-                                Padding(
-                                    padding: const EdgeInsets.only(left: 5),
-                                    child: chipTag(16.0, 12.0)),
-                                Padding(
-                                  padding: selectedIndex == index
-                                      ? const EdgeInsets.all(0)
-                                      : const EdgeInsets.only(right: 5),
-                                  child: downloadButton(
-                                      context,
-                                      selectedIndex,
-                                      index,
-                                      widget.foundResource[index]["size"]),
-                                )
-                              ],
+                            Padding(
+                              padding: isWebMobile
+                                  ? const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 5)
+                                  : EdgeInsets.zero,
+                              child: ButtonBar(
+                                alignment: MainAxisAlignment.spaceBetween,
+                                buttonPadding: isWebMobile
+                                    ? EdgeInsets.zero
+                                    : const EdgeInsets.only(
+                                        top: 10,
+                                        bottom: 0,
+                                        left: 10,
+                                        right: 20),
+                                children: [
+                                  Padding(
+                                      padding: const EdgeInsets.only(left: 5),
+                                      child: chipTag(16.0, 12.0)),
+                                  Padding(
+                                    padding: selectedIndex == index
+                                        ? const EdgeInsets.all(0)
+                                        : const EdgeInsets.only(right: 5),
+                                    child: downloadButton(
+                                        context,
+                                        selectedIndex,
+                                        index,
+                                        widget.foundResource[index]["size"]),
+                                  )
+                                ],
+                              ),
                             ),
                           ],
                         ),

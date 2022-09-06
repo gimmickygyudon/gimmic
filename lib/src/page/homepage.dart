@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gimmic/assets/colors.dart';
+import 'package:gimmic/assets/label.dart';
 import 'package:gimmic/assets/widgets/button.dart';
 import 'package:gimmic/assets/widgets/card.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../../assets/functions/platform.dart';
 import '../../assets/functions/route.dart';
 import '../../src/page/resource.dart' as resource;
 
@@ -158,7 +160,6 @@ class _SearchBarMainState extends State<SearchBarMain> {
         return TextField(
           controller: textEditingController,
           focusNode: focusNode,
-          autofocus: true,
           onSubmitted: (value) async {
             if (selectedIndex == -1 || notFound && searching) {
               await Navigator.push(
@@ -200,13 +201,20 @@ class _SearchBarMainState extends State<SearchBarMain> {
                                 Icons.close,
                                 color: Colors.black54,
                               )),
-                          const VerticalDivider(
-                            width: 8,
-                            thickness: 1,
-                            indent: 2,
-                            endIndent: 2,
-                            color: Colors.black38,
-                          ),
+                          isWebMobile
+                              ? const VerticalDivider(
+                                  width: 8,
+                                  thickness: 1,
+                                  indent: 12,
+                                  endIndent: 12,
+                                  color: Colors.black26,
+                                )
+                              : const VerticalDivider(
+                                  width: 8,
+                                  thickness: 1,
+                                  indent: 4,
+                                  endIndent: 4,
+                                  color: Colors.black26),
                           IconButton(
                               onPressed: () async {
                                 if (searching) {
@@ -231,10 +239,12 @@ class _SearchBarMainState extends State<SearchBarMain> {
                       ? Text(widget.timenow,
                           style: GoogleFonts.roboto(
                             color: Colors.black54,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w400,
                           ))
                       : Padding(
-                          padding: const EdgeInsets.only(right: 10),
+                          padding: isWebMobile
+                              ? EdgeInsets.zero
+                              : const EdgeInsets.only(right: 10),
                           child: ButtonLinks(
                             bgcolor: Colors.lightBlue.shade100,
                           )),
@@ -246,7 +256,7 @@ class _SearchBarMainState extends State<SearchBarMain> {
             hintStyle: GoogleFonts.roboto(
               fontWeight: FontWeight.w500,
             ),
-            labelText: widget.useVHideDetails ? null : 'How are you today?',
+            labelText: widget.useVHideDetails ? null : 'How are you?',
             contentPadding: searching
                 ? const EdgeInsets.symmetric(horizontal: 16)
                 : EdgeInsets.zero,
@@ -286,11 +296,12 @@ class _SearchBarMainState extends State<SearchBarMain> {
           child: Material(
             color: Colors.transparent,
             child: Card(
-              clipBehavior: Clip.antiAliasWithSaveLayer,
+              clipBehavior: Clip.antiAlias,
               margin: EdgeInsets.zero,
               color: Colors.white,
               elevation: 1,
               shape: const RoundedRectangleBorder(
+                side: BorderSide.none,
                 borderRadius: BorderRadius.only(
                     bottomRight: Radius.circular(12),
                     bottomLeft: Radius.circular(12)),
@@ -378,9 +389,16 @@ class _SearchBarMainState extends State<SearchBarMain> {
                               : null,
                           selectedColor: Colors.lightBlue.shade900,
                           dense: true,
-                          leading: CircleAvatar(
-                              radius: 18,
-                              backgroundImage: AssetImage(option.image)),
+                          leading: AspectRatio(
+                            aspectRatio: 1 / 1,
+                            child: Container(
+                                height: 36,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    image: DecorationImage(
+                                        fit: BoxFit.cover,
+                                        image: AssetImage(option.image)))),
+                          ),
                           trailing: selectedIndex == index
                               ? const Icon(Icons.chevron_right)
                               : null,
@@ -484,8 +502,8 @@ class LayoutDesktop extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Tooltip(
-                        message: 'Version 0.0.1+4',
-                        child: Text('Gimmicky Gyudon',
+                        message: StringResource.version,
+                        child: Text(StringResource.title,
                             style: GoogleFonts.raleway(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w300,
@@ -534,6 +552,7 @@ class LayoutDesktop extends StatelessWidget {
             ],
           ),
           body: SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             child: AnimatedPadding(
               curve: Curves.fastOutSlowIn,
               duration: const Duration(milliseconds: 600),
@@ -633,8 +652,11 @@ class LayoutDesktop extends StatelessWidget {
                                     color: Colors.blue.shade100,
                                   ),
                                   child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 16, right: 8),
+                                    padding: isWebMobile
+                                        ? const EdgeInsets.only(
+                                            left: 12, right: 4)
+                                        : const EdgeInsets.only(
+                                            left: 12, right: 8),
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -646,7 +668,6 @@ class LayoutDesktop extends StatelessWidget {
                                         ]),
                                         Row(
                                           children: [
-                                            const SizedBox(width: 8),
                                             ButtonLinks(bgcolor: Colors.white),
                                           ],
                                         )
@@ -675,17 +696,18 @@ class LayoutDesktop extends StatelessWidget {
                                         thickness: 0.2,
                                         endIndent: 20,
                                         indent: 10,
-                                        color: Colors.black,
+                                        color: Colors.black54,
                                         height: 36,
                                       ),
                                     ),
-                                    Icon(Icons.layers, color: Colors.black54),
+                                    Icon(Icons.layers_outlined,
+                                        color: Colors.black54),
                                     Expanded(
                                       child: Divider(
                                         thickness: 0.2,
                                         endIndent: 10,
                                         indent: 20,
-                                        color: Colors.black,
+                                        color: Colors.black54,
                                         height: 36,
                                       ),
                                     ),
@@ -701,8 +723,11 @@ class LayoutDesktop extends StatelessWidget {
                                 children: [
                                   Expanded(
                                     child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 2, right: 2, bottom: 12),
+                                      padding: useVLayout
+                                          ? const EdgeInsets.only(
+                                              left: 2, right: 2, bottom: 12)
+                                          : const EdgeInsets.only(
+                                              left: 12, right: 12, bottom: 12),
                                       child: CardBig(
                                           rowConstraints: rowConstraints,
                                           useVHideDetails: useVHideDetails,

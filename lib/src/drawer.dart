@@ -12,11 +12,11 @@ class SideDrawer extends StatelessWidget {
         children: [
           ListTile(
             onTap: () => Navigator.pop(context),
-            title: const Text(StringResource.resourceMenu),
+            title: const Text(StringResource.resource),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(StringResource.aboutMenu),
+            child: const Text(StringResource.about),
           ),
         ],
       ),

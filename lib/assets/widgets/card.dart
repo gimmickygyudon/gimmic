@@ -5,54 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../src/page/resource.dart';
+import '../functions/platform.dart';
 import '../functions/route.dart';
-
-const _shimmerGradient = LinearGradient(
-  colors: [
-    Color(0xFFEBEBF4),
-    Color(0xFFF4F4F4),
-    Color(0xFFEBEBF4),
-  ],
-  stops: [
-    0.1,
-    0.3,
-    0.4,
-  ],
-  begin: Alignment(-1, -0.3),
-  end: Alignment(1, 0.3),
-  tileMode: TileMode.clamp,
-);
-
-class ShimmerLoading extends StatefulWidget {
-  const ShimmerLoading({
-    super.key,
-    required this.isLoading,
-    required this.child,
-  });
-
-  final bool isLoading;
-  final Widget child;
-
-  @override
-  State<ShimmerLoading> createState() => _ShimmerLoadingState();
-}
-
-class _ShimmerLoadingState extends State<ShimmerLoading> {
-  @override
-  Widget build(BuildContext context) {
-    if (!widget.isLoading) {
-      return widget.child;
-    }
-
-    return ShaderMask(
-      blendMode: BlendMode.srcATop,
-      shaderCallback: (bounds) {
-        return _shimmerGradient.createShader(bounds);
-      },
-      child: widget.child,
-    );
-  }
-}
 
 class CardBig extends StatefulWidget {
   final BoxConstraints rowConstraints;
@@ -70,9 +24,9 @@ class CardBig extends StatefulWidget {
 
 class _CardBigState extends State<CardBig> {
   final String timecard = DateFormat("MMMM dd").format(DateTime.now());
-  final Shader linearGradient = const LinearGradient(
+  /* final Shader linearGradient = const LinearGradient(
     colors: <Color>[Colors.white, Colors.lightBlue],
-  ).createShader(const Rect.fromLTWH(0, 0, 200, 70));
+  ).createShader(const Rect.fromLTWH(0, 0, 200, 70)); */
   bool cardSelected = false;
 
   @override
@@ -153,8 +107,11 @@ class _CardBigState extends State<CardBig> {
                   AnimatedContainer(
                     curve: Curves.easeOut,
                     duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.only(
-                        bottom: 20, left: 20, right: 20, top: 20),
+                    padding: EdgeInsets.only(
+                        bottom: 20,
+                        left: 20,
+                        right: 20,
+                        top: isWebMobile ? 10 : 20),
                     alignment: Alignment.bottomCenter,
                     decoration: BoxDecoration(
                       border: cardSelected
@@ -180,6 +137,7 @@ class _CardBigState extends State<CardBig> {
                         ButtonBar(
                           alignment: MainAxisAlignment.spaceBetween,
                           buttonPadding: EdgeInsets.zero,
+                          buttonHeight: 12,
                           children: [
                             Row(
                               children: [
@@ -221,7 +179,7 @@ class _CardBigState extends State<CardBig> {
                                           fontSize:
                                               widget.useVHideDetails ? 14 : 12,
                                           fontWeight: FontWeight.w300,
-                                          color: Colors.grey.shade300),
+                                          color: Colors.grey.shade200),
                                     ),
                                   ),
                                 ),
@@ -229,6 +187,8 @@ class _CardBigState extends State<CardBig> {
                             ),
                             ElevatedButton(
                               style: ButtonStyle(
+                                visualDensity: const VisualDensity(
+                                    horizontal: -2, vertical: -2),
                                 backgroundColor:
                                     MaterialStateProperty.resolveWith(
                                   (states) {
@@ -240,8 +200,6 @@ class _CardBigState extends State<CardBig> {
                                 ),
                                 foregroundColor: MaterialStateProperty.all(
                                     Colors.orange.shade300),
-                                /* minimumSize: MaterialStateProperty.all(
-                                                                          const Size(220, 50)), */
                                 elevation: const MaterialStatePropertyAll(0),
                               ),
                               onPressed: () async {
@@ -274,8 +232,7 @@ class _CardBigState extends State<CardBig> {
                                           fontSize:
                                               widget.useVHideDetails ? 32 : 28,
                                           fontWeight: FontWeight.w600,
-                                          foreground: Paint()
-                                            ..shader = linearGradient,
+                                          color: Colors.blue,
                                           letterSpacing: -0.5,
                                         ),
                                         child: const Text('Resource')),
@@ -368,6 +325,8 @@ Widget cardUpdateLog() {
             ),
             const SizedBox(height: 8),
             ListView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              physics: const ClampingScrollPhysics(),
               shrinkWrap: true,
               padding: EdgeInsets.zero,
               children: <Widget>[
@@ -375,20 +334,98 @@ Widget cardUpdateLog() {
                   tilePadding:
                       constraints.maxWidth > 600 ? null : EdgeInsets.zero,
                   childrenPadding: EdgeInsets.zero,
-                  leading: InputChip(
+                  leading: Chip(
+                      backgroundColor: Colors.blue.shade50,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6)),
                       label: Text(
-                    '0.0.1+4',
+                        '0.0.1+5',
+                        style: GoogleFonts.roboto(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: isWebMobile ? Colors.blue : Colors.blue),
+                      )),
+                  title: Text(
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    'Add Support Up To 4K Monitor or above',
                     style: GoogleFonts.roboto(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black),
-                  )),
+                        fontWeight: FontWeight.w400,
+                        fontSize: constraints.maxWidth > 460 ? null : 14),
+                  ),
+                  subtitle: Text(
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    'Responsive Framework',
+                    style: GoogleFonts.roboto(
+                        color: Colors.black54,
+                        fontSize: constraints.maxWidth > 460 ? null : 12),
+                  ),
+                  trailing: Chip(
+                      backgroundColor: Colors.grey.shade50,
+                      label: Text(
+                        constraints.maxWidth > 460 ? 'September 6' : 'Sep 6',
+                        style: GoogleFonts.roboto(
+                            fontSize: 12, color: Colors.black54),
+                      )),
+                  children: <Widget>[
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text(
+                            'Fix inconsistent text and button on some devices',
+                            style: GoogleFonts.roboto(fontSize: 14))),
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text('Ipad and Surface product display fixed',
+                            style: GoogleFonts.roboto(fontSize: 14))),
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text(
+                            'Dragging or Scrolling in description and comments section now will expand it',
+                            style: GoogleFonts.roboto(fontSize: 14))),
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text('Using CanvasKit as default renderer',
+                            style: GoogleFonts.roboto(fontSize: 14))),
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text(
+                            'Html renderer removed (cause lag issue on some devices)',
+                            style: GoogleFonts.roboto(fontSize: 14))),
+                  ],
+                ),
+                ExpansionTile(
+                  tilePadding:
+                      constraints.maxWidth > 600 ? null : EdgeInsets.zero,
+                  childrenPadding: EdgeInsets.zero,
+                  leading: Chip(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4)),
+                      backgroundColor: Colors.grey.shade100,
+                      label: Text(
+                        '0.0.1+4',
+                        style: GoogleFonts.roboto(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color:
+                                isWebMobile ? Colors.black54 : Colors.black54),
+                      )),
                   title: Text(
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     'Added Card Widget for Update Log',
                     style: GoogleFonts.roboto(
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w400,
                         fontSize: constraints.maxWidth > 460 ? null : 14),
                   ),
                   subtitle: Text(
@@ -400,10 +437,11 @@ Widget cardUpdateLog() {
                         fontSize: constraints.maxWidth > 460 ? null : 12),
                   ),
                   trailing: Chip(
-                      backgroundColor: Colors.grey.shade100,
+                      backgroundColor: Colors.grey.shade50,
                       label: Text(
                         constraints.maxWidth > 460 ? 'August 29' : 'Aug 29',
-                        style: GoogleFonts.roboto(fontSize: 12),
+                        style: GoogleFonts.roboto(
+                            fontSize: 12, color: Colors.black54),
                       )),
                   children: <Widget>[
                     ListTile(
@@ -479,7 +517,7 @@ Widget cardYoutube(thumbnails) {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Image(
-                          height: 80,
+                          height: 70,
                           image: AssetImage(thumbnails),
                           fit: BoxFit.cover),
                     ),
@@ -530,6 +568,8 @@ Widget cardYoutube(thumbnails) {
                               ],
                             ),
                           ),
+                          SizedBox(
+                              height: constraints.maxWidth > 320 ? null : 8),
                           Flexible(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -665,6 +705,7 @@ class _CardCommentState extends State<CardComment> {
                                 onPressed: () {},
                                 child: const Text('Add Reaction')))
                         : IconButton(
+                            tooltip: 'Reply',
                             onPressed: () {},
                             icon: const Icon(Icons.add_reaction,
                                 color: Colors.black54, size: 22)),
