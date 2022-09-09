@@ -1,4 +1,10 @@
-Changelog 0.0.1+5
+Changelog 0.0.2+
+ - Items Card Revamped
+ - New 2 items on popup menu
+ - Image indicators added
+ - Added ability to navigate url/page easily
+
+Changelog 0.0.2+0
  - Dragging or scrolling in description and comments section now will expand it
  - Fix inconsistent text and button on some devices
  - Using CanvasKit as default renderer
@@ -15,6 +21,9 @@ Changelog 0.0.1+4
  - Search function in homepage is working for now
 
 ToDo
+ - add DisplayFeature like hinge, fold, cutout
+
+ - Animate slide page to details page
  - Add button search in google when no result found
  - Up and down point comment and share reply text button
  - Add video tutorial link on description page

@@ -1,16 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:gimmic/src/view/grid.dart';
 import 'package:gimmic/src/view/list.dart';
 import 'package:gimmic/src/view/list_big.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Resource extends StatefulWidget {
-  const Resource({
-    super.key,
-    required this.arguments,
-  });
-  final Map<dynamic, dynamic> arguments;
+  const Resource({Key? key, this.arguments}) : super(key: key);
+  final String? arguments;
 
   @override
   State<Resource> createState() => _ResourceState();
@@ -22,6 +22,7 @@ class _ResourceState extends State<Resource> {
   late ScrollController _scrollGridViewController;
   late ScrollController _scrollListViewController;
   bool _showAppbar = true;
+  bool _loading = true;
   bool isScrollingDown = false;
 
   // This holds a list of fiction users
@@ -68,11 +69,14 @@ class _ResourceState extends State<Resource> {
   @override
   void initState() {
     super.initState();
-    _searchController.text = widget.arguments['keyword'].toString();
-    _runFilter(widget.arguments['keyword'].toString());
-    if (widget.arguments['keyword'] == '') {
-      _foundResource = _allResource;
-    } // at the beginning, all users are shown
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.arguments == null) {
+        _foundResource = _allResource; // at the beginning, all users are shown
+      } else {
+        _searchController.text = widget.arguments!;
+        _runFilter(widget.arguments!);
+      }
+    });
 
     _scrollGridViewController = ScrollController();
     _scrollGridViewController.addListener(() {
@@ -132,9 +136,14 @@ class _ResourceState extends State<Resource> {
 
   void _runFilter(String enteredKeyword) {
     List<Map<String, dynamic>> results = [];
+    setState(() {
+      _loading = true;
+    });
     if (enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
       results = _allResource;
+
+      GoRouter.of(context).replace('/resource');
     } else {
       final name = _allResource
           .where((name) => name["name"]
@@ -152,6 +161,14 @@ class _ResourceState extends State<Resource> {
       results = results.toSet().toList();
       // we use the toLowerCase() method to make it case-insensitive
 
+      GoRouter.of(context).replace('/resource?search=$enteredKeyword');
+      if (results.isEmpty) {
+        Timer(const Duration(seconds: 1), () {
+          setState(() {
+            _loading = false;
+          });
+        });
+      }
     }
 
     // Refresh the UI
@@ -160,7 +177,7 @@ class _ResourceState extends State<Resource> {
     });
   }
 
-  String sortbyValue = 'Name';
+  String sortbyValue = 'Most Updated';
   String tagResults = 'All Categories';
 
   final List<bool> _layouts = [true, false];
@@ -268,7 +285,8 @@ class _ResourceState extends State<Resource> {
                                             color: Colors.black54,
                                           ),
                                           onPressed: () {
-                                            /* Clear the search field */
+                                            GoRouter.of(context)
+                                                .replace('/resource');
                                             _searchController.clear();
                                             _runFilter(_searchController.text);
                                           },
@@ -343,7 +361,7 @@ class _ResourceState extends State<Resource> {
                                   fillColor: Colors.white,
                                   isDense: true,
                                   prefixIcon: const Icon(
-                                    Icons.category_outlined,
+                                    Icons.interests_outlined,
                                     size: 20,
                                     color: Colors.black87,
                                   )),
@@ -353,7 +371,7 @@ class _ResourceState extends State<Resource> {
                                   color: Colors.black87),
                               value: tagResults,
                               elevation: 1,
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(6),
                               onChanged: (String? newValue) {
                                 setState(() {
                                   tagResults = newValue!;
@@ -385,75 +403,69 @@ class _ResourceState extends State<Resource> {
                           AnimatedSwitcher(
                               duration: const Duration(milliseconds: 200),
                               child: useVerticalLayout3x
-                                  ? AnimatedSize(
-                                      curve: Curves.ease,
-                                      duration:
-                                          const Duration(milliseconds: 600),
-                                      child: SizedBox(
-                                        width: useVerticalLayout2x ? 145 : 100,
-                                        child: DropdownButtonFormField(
-                                          isDense: true,
-                                          elevation: 1,
-                                          decoration: InputDecoration(
-                                              contentPadding:
-                                                  const EdgeInsets.only(
-                                                      top: 8,
-                                                      bottom: 8,
-                                                      right: 4,
-                                                      left: 12),
-                                              enabledBorder: OutlineInputBorder(
-                                                borderSide: const BorderSide(
-                                                    color: Colors.transparent,
-                                                    width: 2),
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                              border: OutlineInputBorder(
-                                                borderSide: const BorderSide(
-                                                    color: Colors.transparent,
-                                                    width: 2),
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                              ),
-                                              filled: false,
-                                              fillColor: Colors.white,
-                                              isDense: true,
-                                              labelText: useVerticalLayout3x
-                                                  ? null
-                                                  : 'Sort By',
-                                              labelStyle: GoogleFonts.roboto(
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                              prefixText: useVerticalLayout2x
-                                                  ? 'Sort By: '
-                                                  : null,
-                                              prefixStyle: GoogleFonts.roboto(
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Colors.grey.shade600)),
-                                          style: GoogleFonts.roboto(
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.black87),
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                          dropdownColor: Colors.white,
-                                          value: sortbyValue,
-                                          onChanged: (String? newValue) {
-                                            setState(() {
-                                              sortbyValue = newValue!;
-                                            });
-                                          },
-                                          items: <String>[
-                                            'Name',
-                                            'Upload',
-                                            'Size'
-                                          ].map<DropdownMenuItem<String>>(
-                                              (String value) {
-                                            return DropdownMenuItem<String>(
-                                              value: value,
-                                              child: Text(value),
-                                            );
-                                          }).toList(),
-                                        ),
+                                  ? IntrinsicWidth(
+                                      child: DropdownButtonFormField(
+                                        isDense: true,
+                                        elevation: 1,
+                                        decoration: InputDecoration(
+                                            contentPadding:
+                                                const EdgeInsets.only(
+                                                    top: 8,
+                                                    bottom: 8,
+                                                    right: 4,
+                                                    left: 12),
+                                            enabledBorder: OutlineInputBorder(
+                                              borderSide: const BorderSide(
+                                                  color: Colors.transparent,
+                                                  width: 2),
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            border: OutlineInputBorder(
+                                              borderSide: const BorderSide(
+                                                  color: Colors.transparent,
+                                                  width: 2),
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            filled: false,
+                                            fillColor: Colors.white,
+                                            isDense: true,
+                                            labelText: useVerticalLayout3x
+                                                ? null
+                                                : 'Sort By',
+                                            labelStyle: GoogleFonts.roboto(
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                            prefixText: useVerticalLayout2x
+                                                ? 'Sort By: '
+                                                : null,
+                                            prefixStyle: GoogleFonts.roboto(
+                                                fontWeight: FontWeight.w400,
+                                                color: Colors.grey.shade600)),
+                                        style: GoogleFonts.roboto(
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.black87),
+                                        borderRadius: BorderRadius.circular(6),
+                                        dropdownColor: Colors.white,
+                                        value: sortbyValue,
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            sortbyValue = newValue!;
+                                          });
+                                        },
+                                        items: <String>[
+                                          'Most Updated',
+                                          'Name',
+                                          'Upload',
+                                          'Size'
+                                        ].map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
                                       ),
                                     )
                                   : null),
@@ -627,38 +639,66 @@ class _ResourceState extends State<Resource> {
                                 : ListResource(foundResource: _foundResource)
                         : Padding(
                             padding: const EdgeInsets.all(20),
-                            child: Column(children: [
-                              Text(
-                                "No results found for '${_searchController.text}'",
-                                style: GoogleFonts.roboto(
-                                  color: Colors.black54,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                                textAlign: TextAlign.center,
+                            child: AnimatedCrossFade(
+                              layoutBuilder: ((topChild, topChildKey,
+                                  bottomChild, bottomChildKey) {
+                                return Stack(
+                                  clipBehavior: Clip.none,
+                                  alignment: Alignment.topCenter,
+                                  children: [
+                                    Positioned(
+                                        key: bottomChildKey,
+                                        child: bottomChild),
+                                    Positioned(
+                                        key: topChildKey, child: topChild)
+                                  ],
+                                );
+                              }),
+                              crossFadeState: _loading
+                                  ? CrossFadeState.showFirst
+                                  : CrossFadeState.showSecond,
+                              duration: const Duration(milliseconds: 200),
+                              firstChild: const Padding(
+                                padding: EdgeInsets.only(top: 32),
+                                child: SizedBox(
+                                    height: 70,
+                                    width: 70,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 6)),
                               ),
-                              Text('(>_<)',
-                                  style: GoogleFonts.robotoMono(
-                                      fontSize: 124,
-                                      color: Colors.black54,
-                                      letterSpacing: -10)),
-                              const SizedBox(height: 36),
-                              OutlinedButton(
-                                  style: OutlinedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 24),
-                                      side:
-                                          const BorderSide(color: Colors.blue),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(4))),
-                                  onPressed: () {
-                                    _searchController.clear();
-                                    _runFilter(_searchController.text);
-                                  },
-                                  child: const Text(
-                                      'Clear your search and try again'))
-                            ]),
+                              secondChild: Column(children: [
+                                Text(
+                                  "No results found for '${_searchController.text}'",
+                                  style: GoogleFonts.roboto(
+                                    color: Colors.black54,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                Text('(>_<)',
+                                    style: GoogleFonts.robotoMono(
+                                        fontSize: 124,
+                                        color: Colors.black54,
+                                        letterSpacing: -10)),
+                                const SizedBox(height: 36),
+                                OutlinedButton(
+                                    style: OutlinedButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 24),
+                                        side: const BorderSide(
+                                            color: Colors.blue),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(4))),
+                                    onPressed: () {
+                                      _searchController.clear();
+                                      _runFilter(_searchController.text);
+                                    },
+                                    child: const Text(
+                                        'Clear your search and try again'))
+                              ]),
+                            ),
                           ),
                   ),
                 ),

@@ -15,8 +15,8 @@ import '../../assets/widgets/chip.dart';
 import '../../assets/widgets/dialog.dart';
 
 class Details extends StatefulWidget {
-  const Details({super.key, required this.arguments});
-  final Map<dynamic, dynamic> arguments;
+  const Details({Key? key, this.arguments}) : super(key: key);
+  final Map<dynamic, dynamic>? arguments;
 
   @override
   State<Details> createState() => _DetailsState();
@@ -31,15 +31,27 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
 
   final String timenow = DateFormat("EEEEE, MMMM dd").format(DateTime.now());
   final ScrollController controller = ScrollController();
+  final ScrollController controllerComment = ScrollController();
   final sink = StreamController<double>();
-  late int activePage = widget.arguments['index'];
+  int activePage = 0;
+  Map<dynamic, dynamic> arguments = {
+    'name': 'default',
+    'hero': 'default',
+    'index': 0
+  };
 
   @override
   void initState() {
-    super.initState();
+    if (widget.arguments != null) {
+      arguments = widget.arguments!;
+    }
+    activePage = int.parse(arguments['index']);
     _pageController = PageController(
-        viewportFraction: 1, initialPage: widget.arguments['index']);
+        viewportFraction: 1, initialPage: int.parse(arguments['index']));
+
+    super.initState();
     _tabController = TabController(length: 2, vsync: this);
+
     _scrollViewController = ScrollController();
     _scrollViewController.addListener(() {
       if (_scrollViewController.position.userScrollDirection ==
@@ -93,6 +105,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
     sink.close();
     _pageController.dispose();
     controller.dispose();
+    controllerComment.dispose();
     super.dispose();
   }
 
@@ -103,13 +116,19 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
 // indicators of images
   List<Widget> imageIndicators(imagesLength, currentIndex) {
     return List<Widget>.generate(imagesLength, (index) {
-      return Container(
-        margin: const EdgeInsets.all(3),
-        width: 10,
-        height: 10,
-        decoration: BoxDecoration(
-            color: currentIndex == index ? Colors.black : Colors.black26,
-            shape: BoxShape.circle),
+      return GestureDetector(
+        onTap: () => _pageController.animateToPage(index,
+            duration: const Duration(milliseconds: 400), curve: Curves.ease),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 400),
+          margin: const EdgeInsets.all(3),
+          width: currentIndex == index ? 30 : 10,
+          height: 6,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(25.7),
+            color: currentIndex == index ? Colors.black54 : Colors.black26,
+          ),
+        ),
       );
     });
   }
@@ -125,7 +144,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
           aspectRatio: 1 / 1,
           child: AnimatedPadding(
             curve: Curves.easeOut,
-            duration: const Duration(milliseconds: 200),
+            duration: const Duration(milliseconds: 300),
             padding: hoveredThumbnail == index
                 ? const EdgeInsets.all(4)
                 : const EdgeInsets.all(6),
@@ -148,6 +167,15 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                   semanticContainer: true,
                   elevation: hoveredThumbnail == index ? 2 : 0,
                   shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                          color: currentIndex == index
+                              ? hoveredThumbnail == index
+                                  ? Colors.orange
+                                  : Colors.orange.shade400
+                              : hoveredThumbnail == index
+                                  ? Colors.blue.shade400
+                                  : Colors.transparent,
+                          width: 3),
                       borderRadius: BorderRadius.circular(12)),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 100),
@@ -156,17 +184,6 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                         image: AssetImage(images[index]),
                         fit: BoxFit.cover,
                       ),
-                      border: Border(
-                          bottom: BorderSide(
-                              // color: Colors.blue,
-                              color: currentIndex == index
-                                  ? hoveredThumbnail == index
-                                      ? Colors.blue
-                                      : Colors.blue.shade400
-                                  : hoveredThumbnail == index
-                                      ? Colors.orange.shade400
-                                      : Colors.transparent,
-                              width: 3)),
                     ),
                   ),
                 ),
@@ -229,7 +246,8 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
   }
 
   bool toogleThumbnail = true;
-  Widget detailCard(context, useSmallLayout, useVerticalLayout) {
+  Widget detailCard(
+      context, useSmallLayout, useVerticalLayout, usePhoneLayout) {
     return Card(
       clipBehavior: Clip.antiAliasWithSaveLayer,
       elevation: 0,
@@ -238,200 +256,256 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
+          Container(
+            width: double.infinity,
+            color: Colors.grey.shade100,
+            child: AnimatedPadding(
+              duration: const Duration(milliseconds: 400),
+              padding: useVerticalLayout
+                  ? EdgeInsets.zero
+                  : const EdgeInsets.only(top: 16, bottom: 8),
+              child: Center(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 400),
+                  height: useVerticalLayout ? null : 4,
+                  width: useVerticalLayout ? null : 32,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25.7),
+                      color: Colors.grey.shade400),
+                ),
+              ),
+            ),
+          ),
           Container(
             color: Colors.grey.shade100,
             child: DefaultTabController(
               initialIndex: 1,
               length: 2,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    top: 15, left: 10, right: 15, bottom: 0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Stack(children: [
-                    TabBar(
-                        indicator: const UnderlineTabIndicator(
-                            borderSide: BorderSide.none,
-                            insets: EdgeInsets.only(left: 20, right: 15)),
-                        isScrollable: true,
-                        indicatorWeight: 3,
-                        labelColor: Colors.orange,
-                        unselectedLabelColor: Colors.black45,
-                        // labelPadding: const EdgeInsets.all(0),
-                        labelPadding: const EdgeInsets.only(
-                            top: 0, left: 15, right: 0, bottom: 10),
-                        controller: _tabController,
-                        labelStyle: GoogleFonts.roboto(
-                            fontWeight: FontWeight.w500, fontSize: 16),
-                        onTap: (e) {
-                          setState(() {
-                            tabController(_tabController.index);
-                            toogleThumbnail = false;
-                          });
-                        },
-                        tabs: <Widget>[
-                          _tabController.index == 0
-                              ? Tab(
-                                  child: detailCardTab(
-                                      0, Icons.data_object, "Hello Cat"),
-                                )
-                              : useSmallLayout
-                                  ? Tab(
-                                      child: detailCardTabIcon(
-                                          0, Icons.data_object),
-                                    )
-                                  : Tab(
-                                      child: detailCardTab(
-                                          0, Icons.data_object, "Hello Cat")),
-                          _tabController.index == 1
-                              ? Tab(
-                                  child: detailCardTab(
-                                      1, Icons.forum_outlined, "Comments"),
-                                )
-                              : useSmallLayout
-                                  ? Tab(
-                                      child: detailCardTabIcon(
-                                          1, Icons.forum_outlined),
-                                    )
-                                  : Tab(
-                                      child: detailCardTab(
-                                          1, Icons.forum_outlined, "Comments"))
-                        ]),
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      child: useVerticalLayout
-                          ? null
-                          : Align(
-                              alignment: Alignment.centerRight,
-                              child: Container(
-                                padding: isWebMobile
-                                    ? const EdgeInsets.only(right: 48)
-                                    : const EdgeInsets.only(
-                                        right: 48, bottom: 5, top: 5),
-                                child: ToggleButtons(
-                                  borderRadius: BorderRadius.circular(25.7),
-                                  constraints: const BoxConstraints(
-                                      minHeight: 34, minWidth: 34),
-                                  renderBorder: false,
-                                  isSelected: [toogleThumbnail],
-                                  onPressed: (index) {
-                                    setState(() {
-                                      if (toogleThumbnail == false) {
-                                        toogleThumbnail = true;
-                                      } else {
-                                        toogleThumbnail = false;
-                                      }
-                                    });
-                                  },
-                                  children: const [
-                                    Tooltip(
-                                      message: 'Show Thumbnails',
-                                      child: Icon(
-                                        Icons.photo_library,
-                                        color: Colors.black54,
-                                        size: 20,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                    ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Container(
-                        margin: isWebMobile
-                            ? null
-                            : const EdgeInsets.only(
-                                top: 6, left: 6, right: 0, bottom: 6),
-                        decoration: isWebMobile
-                            ? null
-                            : BoxDecoration(
-                                color: Colors.grey.shade50,
-                                borderRadius: BorderRadius.circular(25.7)),
-                        child: PopupMenuButton<int>(
-                          elevation: 1,
-                          color: Colors.grey.shade50,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6),
-                              side: const BorderSide(
-                                  width: 1, color: Colors.black12)),
-                          icon: const Icon(
-                            Icons.more_vert,
-                            color: Colors.black54,
+              child: AnimatedPadding(
+                duration: const Duration(milliseconds: 400),
+                padding: EdgeInsets.only(
+                    top: useVerticalLayout ? 15 : 0,
+                    left: 10,
+                    right: 15,
+                    bottom: 0),
+                child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TabBar(
+                          indicator: const UnderlineTabIndicator(
+                              borderSide: BorderSide.none,
+                              insets: EdgeInsets.only(left: 20, right: 15)),
+                          isScrollable: true,
+                          indicatorWeight: 3,
+                          labelColor: Colors.orange,
+                          unselectedLabelColor: Colors.black45,
+                          // labelPadding: const EdgeInsets.all(0),
+                          labelPadding: const EdgeInsets.only(
+                              top: 0, left: 15, right: 0, bottom: 10),
+                          controller: _tabController,
+                          labelStyle: GoogleFonts.roboto(
+                              fontWeight: FontWeight.w500, fontSize: 16),
+                          onTap: (e) {
+                            setState(() {
+                              tabController(_tabController.index);
+                              toogleThumbnail = false;
+                            });
+                          },
+                          tabs: <Widget>[
+                            _tabController.index == 0
+                                ? Tab(
+                                    child: detailCardTab(
+                                        0, Icons.data_object, "Hello Cat"),
+                                  )
+                                : useSmallLayout
+                                    ? Tab(
+                                        child: detailCardTabIcon(
+                                            0, Icons.data_object),
+                                      )
+                                    : Tab(
+                                        child: detailCardTab(
+                                            0, Icons.data_object, "Hello Cat")),
+                            _tabController.index == 1
+                                ? Tab(
+                                    child: detailCardTab(
+                                        1, Icons.forum_outlined, "Comments"),
+                                  )
+                                : useSmallLayout
+                                    ? Tab(
+                                        child: detailCardTabIcon(
+                                            1, Icons.forum_outlined),
+                                      )
+                                    : Tab(
+                                        child: detailCardTab(1,
+                                            Icons.forum_outlined, "Comments"))
+                          ]),
+                      Row(
+                        children: [
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            child: useVerticalLayout
+                                ? null
+                                : ToggleButtons(
+                                    borderRadius: BorderRadius.circular(25.7),
+                                    constraints: const BoxConstraints(
+                                        minHeight: 34, minWidth: 34),
+                                    renderBorder: false,
+                                    isSelected: [toogleThumbnail],
+                                    onPressed: (index) {
+                                      setState(() {
+                                        if (toogleThumbnail == false) {
+                                          toogleThumbnail = true;
+                                        } else {
+                                          toogleThumbnail = false;
+                                        }
+                                      });
+                                    },
+                                    children: const [
+                                      Tooltip(
+                                        message: 'Show Thumbnails',
+                                        child: Icon(
+                                          Icons.photo_library,
+                                          color: Colors.black54,
+                                          size: 20,
+                                        ),
+                                      )
+                                    ],
+                                  ),
                           ),
-                          iconSize: 22,
-                          padding: EdgeInsets.zero,
-                          itemBuilder: (context) => [
-                            PopupMenuItem(
-                              value: 1,
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 8, right: 8, top: 0, bottom: 0),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.favorite_border,
-                                        color: Colors.black54),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text("Add to Favorites",
-                                        style: GoogleFonts.roboto(
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.grey.shade800))
-                                  ],
-                                ),
+                          Container(
+                            margin: isWebMobile
+                                ? null
+                                : const EdgeInsets.only(
+                                    top: 6, left: 6, right: 0, bottom: 6),
+                            decoration: isWebMobile
+                                ? null
+                                : BoxDecoration(
+                                    color: Colors.grey.shade50,
+                                    borderRadius: BorderRadius.circular(25.7)),
+                            child: PopupMenuButton<int>(
+                              elevation: 1,
+                              color: Colors.grey.shade50,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                  side: const BorderSide(
+                                      width: 1, color: Colors.black12)),
+                              icon: const Icon(
+                                Icons.more_vert,
+                                color: Colors.black54,
                               ),
-                            ),
-                            PopupMenuItem(
-                              value: 2,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 0),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.share_outlined,
-                                        color: Colors.black54),
-                                    const SizedBox(
-                                      width: 10,
+                              iconSize: 22,
+                              padding: EdgeInsets.zero,
+                              itemBuilder: (context) => [
+                                PopupMenuItem(
+                                  value: 1,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 8, right: 8, top: 0, bottom: 0),
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.favorite_border,
+                                            color: Colors.black54),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text("Add to Favorites",
+                                            style: GoogleFonts.roboto(
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.grey.shade800))
+                                      ],
                                     ),
-                                    Text("Share",
-                                        style: GoogleFonts.roboto(
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.grey.shade800))
-                                  ],
+                                  ),
                                 ),
-                              ),
-                            ),
-                            PopupMenuItem(
-                              value: 3,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 0),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.link_outlined,
-                                        color: Colors.black54),
-                                    const SizedBox(
-                                      width: 10,
+                                PopupMenuItem(
+                                  value: 2,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 0),
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.share_outlined,
+                                            color: Colors.black54),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text("Share",
+                                            style: GoogleFonts.roboto(
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.grey.shade800))
+                                      ],
                                     ),
-                                    Text("Copy Link",
-                                        style: GoogleFonts.roboto(
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.grey.shade800))
-                                  ],
+                                  ),
                                 ),
-                              ),
+                                PopupMenuItem(
+                                  value: 3,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 0),
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.link_outlined,
+                                            color: Colors.black54),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text("Copy Link",
+                                            style: GoogleFonts.roboto(
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.grey.shade800))
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const PopupMenuDivider(),
+                                PopupMenuItem(
+                                  value: 4,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 0),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.block,
+                                            color: Colors.yellow.shade800),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text("Not Interested",
+                                            style: GoogleFonts.roboto(
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.yellow.shade800))
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                PopupMenuItem(
+                                  value: 5,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 0),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.flag,
+                                            color: Colors.red.shade800),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text("Report Item",
+                                            style: GoogleFonts.roboto(
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.red.shade800))
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          )
+                        ],
                       ),
-                    )
-                  ]),
-                ),
+                    ]),
               ),
             ),
           ),
@@ -444,6 +518,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                   controller: _tabController,
                   children: <Widget>[
                     Scrollbar(
+                      controller: controller,
                       thumbVisibility: true,
                       child: Padding(
                         padding: const EdgeInsets.only(
@@ -628,8 +703,9 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                   const SizedBox(height: 8),
                                   const Divider(height: 20),
                                   Theme(
-                                    data: ThemeData().copyWith(
-                                        dividerColor: Colors.transparent),
+                                    data: ThemeData(useMaterial3: true)
+                                        .copyWith(
+                                            dividerColor: Colors.transparent),
                                     child: ExpansionTile(
                                       tilePadding: const EdgeInsets.symmetric(
                                           horizontal: 0),
@@ -667,8 +743,9 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                     ),
                                   ),
                                   Theme(
-                                    data: ThemeData().copyWith(
-                                        dividerColor: Colors.transparent),
+                                    data: ThemeData(useMaterial3: true)
+                                        .copyWith(
+                                            dividerColor: Colors.transparent),
                                     child: ExpansionTile(
                                       tilePadding: const EdgeInsets.symmetric(
                                           horizontal: 0),
@@ -700,8 +777,9 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                     ),
                                   ),
                                   Theme(
-                                    data: ThemeData().copyWith(
-                                        dividerColor: Colors.transparent),
+                                    data: ThemeData(useMaterial3: true)
+                                        .copyWith(
+                                            dividerColor: Colors.transparent),
                                     child: ExpansionTile(
                                       tilePadding: const EdgeInsets.symmetric(
                                           horizontal: 0),
@@ -763,6 +841,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                       ),
                     ),
                     Scrollbar(
+                      controller: controllerComment,
                       thumbVisibility: true,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
@@ -800,6 +879,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                               return true;
                             },
                             child: ListView(
+                              controller: controllerComment,
                               keyboardDismissBehavior:
                                   ScrollViewKeyboardDismissBehavior.onDrag,
                               children: const <Widget>[
@@ -857,7 +937,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                       autocorrect: true,
                       decoration: InputDecoration(
                           contentPadding: isWebMobile
-                              ? const EdgeInsets.symmetric(vertical: 12)
+                              ? const EdgeInsets.symmetric(vertical: 16)
                               : null,
                           isDense: true,
                           filled: true,
@@ -1045,14 +1125,26 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                 child: Stack(children: [
                                   FlexibleSpaceBar(
                                     title: null,
-                                    background:
-                                        imageMain(context, widget.arguments),
+                                    background: imageMain(context, arguments),
                                   ),
                                   Align(
                                       alignment: Alignment.bottomRight,
                                       child: Padding(
                                           padding: const EdgeInsets.all(16),
-                                          child: buttonView3D(context)))
+                                          child: buttonView3D(context))),
+                                  Align(
+                                    alignment: Alignment.bottomCenter,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: imageIndicators(
+                                            images.length, activePage),
+                                      ),
+                                    ),
+                                  )
                                 ]),
                               ),
                             ),
@@ -1094,7 +1186,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                               MainAxisAlignment.center,
                                           children: imageThumbnails(
                                               images.length,
-                                              widget.arguments,
+                                              arguments,
                                               activePage,
                                               useVerticalLayout),
                                         ),
@@ -1107,7 +1199,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                   child: Flexible(
                                       flex: 6,
                                       child: detailCard(context, useSmallLayout,
-                                          useVerticalLayout)),
+                                          useVerticalLayout, usePhoneLayout)),
                                 )
                               ],
                             ),
@@ -1130,8 +1222,8 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                 top: 12, left: 0, right: 12, bottom: 12)
                             : const EdgeInsets.only(
                                 top: 12, left: 0, right: 24, bottom: 12),
-                        child: detailCard(
-                            context, useSmallLayout, useVerticalLayout),
+                        child: detailCard(context, useSmallLayout,
+                            useVerticalLayout, usePhoneLayout),
                       )),
                 )
               ],

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gimmic/assets/functions/platform.dart';
 import 'package:gimmic/assets/widgets/chip.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../assets/widgets/builder.dart';
+import '../../assets/widgets/button.dart';
 
 class GridResource extends StatefulWidget {
   final bool useVerticalLayout;
@@ -135,12 +137,13 @@ class _GridResourceState extends State<GridResource> {
               padding: const EdgeInsets.only(bottom: 20),
               child: InkWell(
                 onHover: ((value) => setState(() => selectedIndex = index)),
-                onTap: () async => await Navigator.pushNamed(
-                    context, '/resource/detail',
-                    arguments: {
-                      'hero': widget.foundResource[index]["hero"],
-                      'index': widget.foundResource[index]["index"]
-                    }),
+                onTap: () => context.pushNamed('details', params: {
+                  'name': widget.foundResource[index]['name'].toLowerCase(),
+                }, extra: {
+                  "name": "${widget.foundResource[index]['name']}",
+                  "hero": "${widget.foundResource[index]['hero']}",
+                  "index": '${widget.foundResource[index]['index']}'
+                }),
                 child: Hero(
                   tag: widget.foundResource[index]["hero"] +
                       widget.foundResource[index]["index"].toString(),
@@ -184,100 +187,125 @@ class _GridResourceState extends State<GridResource> {
                                           ? Colors.green.shade50
                                           : Colors.white
                                     ])),
-                                child: Image(
-                                  image: AssetImage(images[index]),
-                                  fit: BoxFit.cover,
-                                  frameBuilder: (BuildContext context,
-                                          Widget child,
-                                          int? frame,
-                                          bool wasSynchronouslyLoaded) =>
-                                      imageFrameBulilder(
-                                          child, frame, wasSynchronouslyLoaded),
-                                  loadingBuilder: (BuildContext context,
-                                          Widget child,
-                                          ImageChunkEvent? loadingProgress) =>
-                                      imageLoadingBuilder(
-                                          child, loadingProgress),
-                                ),
+                                child: Stack(fit: StackFit.expand, children: [
+                                  Image(
+                                    image: AssetImage(images[index]),
+                                    fit: BoxFit.cover,
+                                    frameBuilder: (BuildContext context,
+                                            Widget child,
+                                            int? frame,
+                                            bool wasSynchronouslyLoaded) =>
+                                        imageFrameBulilder(child, frame,
+                                            wasSynchronouslyLoaded),
+                                    loadingBuilder: (BuildContext context,
+                                            Widget child,
+                                            ImageChunkEvent? loadingProgress) =>
+                                        imageLoadingBuilder(
+                                            child, loadingProgress),
+                                  ),
+                                  Align(
+                                      alignment: Alignment.topRight,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8),
+                                        child: buttonMoreMenu(),
+                                      )),
+                                ]),
                               ),
                             ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Padding(
-                                    padding: isWebMobile
-                                        ? const EdgeInsets.only(
-                                            top: 6, left: 15, right: 15)
-                                        : const EdgeInsets.only(
-                                            top: 6, left: 20, right: 20),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          widget.foundResource[index]["name"],
-                                          style: TextStyle(
-                                              color: Colors.black87,
-                                              fontSize:
-                                                  widget.useVerticalLayout2x
-                                                      ? 24
-                                                      : 18,
-                                              fontWeight: FontWeight.w400,
-                                              letterSpacing: -1),
-                                        ),
-                                        Text(timenow,
-                                            style: GoogleFonts.roboto(
-                                              color: Colors.black45,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
-                                            ))
-                                      ],
-                                    )),
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                      left: isWebMobile ? 15 : 20),
-                                  child: Text(
-                                    widget.foundResource[index]["subname"],
-                                    style: GoogleFonts.roboto(
-                                        color: Colors.black54,
-                                        fontSize: widget.useVerticalLayout2x
-                                            ? 14
-                                            : 12,
-                                        fontWeight: FontWeight.w500,
-                                        letterSpacing: 0),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
                             Padding(
-                              padding: isWebMobile
-                                  ? const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5)
-                                  : EdgeInsets.zero,
-                              child: ButtonBar(
-                                alignment: MainAxisAlignment.spaceBetween,
-                                buttonPadding: isWebMobile
-                                    ? EdgeInsets.zero
-                                    : const EdgeInsets.only(
-                                        top: 10,
-                                        bottom: 0,
-                                        left: 10,
-                                        right: 20),
+                              padding: const EdgeInsets.only(bottom: 6),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  Padding(
-                                      padding: const EdgeInsets.only(left: 5),
-                                      child: chipTag(16.0, 12.0)),
-                                  Padding(
-                                    padding: selectedIndex == index
-                                        ? const EdgeInsets.all(0)
-                                        : const EdgeInsets.only(right: 5),
-                                    child: downloadButton(
-                                        context,
-                                        selectedIndex,
-                                        index,
-                                        widget.foundResource[index]["size"]),
-                                  )
+                                  Theme(
+                                    data: ThemeData(useMaterial3: true)
+                                        .copyWith(
+                                            dividerColor: Colors.transparent),
+                                    child: ListTileTheme(
+                                      iconColor: Colors.green,
+                                      textColor: Colors.green,
+                                      dense: true,
+                                      horizontalTitleGap: 0,
+                                      child: ExpansionTile(
+                                        controlAffinity:
+                                            ListTileControlAffinity.leading,
+                                        title: Text(
+                                            widget.foundResource[index]["name"],
+                                            style: TextStyle(
+                                                color: Colors.black87,
+                                                fontSize:
+                                                    widget.useVerticalLayout2x
+                                                        ? 20
+                                                        : 16,
+                                                fontWeight: FontWeight.w400,
+                                                letterSpacing: -1)),
+                                        subtitle: Text(
+                                            widget.foundResource[index]
+                                                ["subname"],
+                                            style: GoogleFonts.roboto(
+                                                height: 1,
+                                                color: Colors.black54,
+                                                fontSize:
+                                                    widget.useVerticalLayout2x
+                                                        ? 14
+                                                        : 12,
+                                                fontWeight: FontWeight.w500,
+                                                letterSpacing: 0)),
+                                        trailing: IconButton(
+                                            visualDensity: const VisualDensity(
+                                                horizontal: -2, vertical: -2),
+                                            color: selectedIndex == index
+                                                ? Colors.black87
+                                                : Colors.black54,
+                                            onPressed: () {},
+                                            iconSize: 20,
+                                            icon: const Icon(
+                                                Icons.favorite_border)),
+                                        children: <Widget>[
+                                          const SizedBox(height: 16),
+                                          AnimatedPadding(
+                                            duration: const Duration(
+                                                milliseconds: 400),
+                                            padding: isWebMobile
+                                                ? const EdgeInsets.symmetric(
+                                                    horizontal: 10, vertical: 5)
+                                                : selectedIndex == index
+                                                    ? const EdgeInsets.only(
+                                                        left: 10,
+                                                        right: 10,
+                                                        bottom: 5)
+                                                    : const EdgeInsets.only(
+                                                        left: 10, right: 10),
+                                            child: ButtonBar(
+                                              alignment: MainAxisAlignment
+                                                  .spaceBetween,
+                                              buttonPadding: EdgeInsets.zero,
+                                              children: [
+                                                Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 5),
+                                                    child: chipTag(16.0, 12.0)),
+                                                Padding(
+                                                  padding: selectedIndex ==
+                                                          index
+                                                      ? const EdgeInsets.all(0)
+                                                      : const EdgeInsets.only(
+                                                          right: 5),
+                                                  child: downloadButton(
+                                                      context,
+                                                      selectedIndex,
+                                                      index,
+                                                      widget.foundResource[
+                                                          index]["size"]),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),

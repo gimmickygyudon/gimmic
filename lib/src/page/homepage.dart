@@ -4,6 +4,7 @@ import 'package:gimmic/assets/colors.dart';
 import 'package:gimmic/assets/label.dart';
 import 'package:gimmic/assets/widgets/button.dart';
 import 'package:gimmic/assets/widgets/card.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -162,17 +163,16 @@ class _SearchBarMainState extends State<SearchBarMain> {
           focusNode: focusNode,
           onSubmitted: (value) async {
             if (selectedIndex == -1 || notFound && searching) {
-              await Navigator.push(
-                  context,
-                  SlideInRoute(
-                      page: resource.Resource(
-                          arguments: {'keyword': searchKeyword}),
-                      routeName: '/resource'));
+              context.push('/resource?search=${searchKeyword.trim()}');
             } else if (notFound == false && searching) {
-              await Navigator.pushNamed(context, '/resource/detail',
-                  arguments: {'hero': searchHero, 'index': searchIndex});
+              context.pushNamed('details', params: {
+                'name': searchKeyword.toLowerCase(),
+              }, extra: {
+                "name": "{$searchKeyword}",
+                "hero": "{$searchHero}",
+                "index": '$searchIndex'
+              });
             }
-            textEditingController.clear();
           },
           style: GoogleFonts.roboto(fontWeight: FontWeight.w500),
           decoration: InputDecoration(
@@ -186,7 +186,7 @@ class _SearchBarMainState extends State<SearchBarMain> {
                   right: searching
                       ? 5
                       : widget.useVHideDetails
-                          ? 20
+                          ? 10
                           : 0),
               child: searching
                   ? IntrinsicHeight(
@@ -218,14 +218,8 @@ class _SearchBarMainState extends State<SearchBarMain> {
                           IconButton(
                               onPressed: () async {
                                 if (searching) {
-                                  await Navigator.push(
-                                      context,
-                                      SlideInRoute(
-                                          page: resource.Resource(arguments: {
-                                            'keyword':
-                                                _textEditingController.text
-                                          }),
-                                          routeName: '/resource'));
+                                  context.push(
+                                      '/resource?search=${textEditingController.text}');
                                 }
                               },
                               icon: const Icon(
@@ -236,15 +230,35 @@ class _SearchBarMainState extends State<SearchBarMain> {
                       ),
                     )
                   : widget.useVHideDetails
-                      ? Text(widget.timenow,
-                          style: GoogleFonts.roboto(
-                            color: Colors.black54,
-                            fontWeight: FontWeight.w400,
-                          ))
+                      ? Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            AnimatedSwitcher(
+                              switchInCurve: Curves.ease,
+                              switchOutCurve: Curves.ease,
+                              duration: const Duration(milliseconds: 100),
+                              child: _focusNode.hasFocus
+                                  ? null
+                                  : Chip(
+                                      backgroundColor:
+                                          Colors.black.withOpacity(0.025),
+                                      labelStyle: GoogleFonts.roboto(
+                                        fontSize: 14,
+                                        color: Colors.black54,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                      label:
+                                          const Text(StringResource.greetings),
+                                    ),
+                            ),
+                            const SizedBox(width: 6),
+                            buttonNotification(),
+                          ],
+                        )
                       : Padding(
                           padding: isWebMobile
-                              ? EdgeInsets.zero
-                              : const EdgeInsets.only(right: 10),
+                              ? const EdgeInsets.only(right: 6)
+                              : const EdgeInsets.only(right: 8),
                           child: ButtonLinks(
                             bgcolor: Colors.lightBlue.shade100,
                           )),
@@ -256,13 +270,15 @@ class _SearchBarMainState extends State<SearchBarMain> {
             hintStyle: GoogleFonts.roboto(
               fontWeight: FontWeight.w500,
             ),
-            labelText: widget.useVHideDetails ? null : 'How are you?',
+            labelText: widget.useVHideDetails ? null : StringResource.greetings,
             contentPadding: searching
                 ? const EdgeInsets.symmetric(horizontal: 16)
                 : EdgeInsets.zero,
             suffixIconConstraints: const BoxConstraints(minWidth: 40),
             focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide.none,
+                borderSide: searching
+                    ? BorderSide.none
+                    : const BorderSide(width: 2, color: Colors.blue),
                 borderRadius: searching
                     ? const BorderRadius.only(
                         topRight: Radius.circular(12),
@@ -317,13 +333,8 @@ class _SearchBarMainState extends State<SearchBarMain> {
                     if (index == -1) {
                       return InkWell(
                         onTap: () async {
-                          await Navigator.push(
-                              context,
-                              SlideInRoute(
-                                  page: resource.Resource(arguments: {
-                                    'keyword': _textEditingController.text
-                                  }),
-                                  routeName: '/resource'));
+                          context.push(
+                              '/resource?search=${_textEditingController.text}');
                         },
                         onHover: (value) {},
                         child: ListTile(
@@ -495,7 +506,7 @@ class LayoutDesktop extends StatelessWidget {
             title: AnimatedPadding(
               curve: Curves.fastOutSlowIn,
               duration: const Duration(milliseconds: 600),
-              padding: EdgeInsets.only(left: usePhoneLayout ? 40 : 20),
+              padding: EdgeInsets.only(left: usePhoneLayout ? 0 : 20),
               child: Builder(builder: (context) {
                 return Row(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -506,7 +517,7 @@ class LayoutDesktop extends StatelessWidget {
                         child: Text(StringResource.title,
                             style: GoogleFonts.raleway(
                                 fontSize: 20,
-                                fontWeight: FontWeight.w300,
+                                fontWeight: FontWeight.w600,
                                 color: Colors.black87)),
                       ),
                       const SizedBox(width: 8),
@@ -557,13 +568,13 @@ class LayoutDesktop extends StatelessWidget {
               curve: Curves.fastOutSlowIn,
               duration: const Duration(milliseconds: 600),
               padding: usePhoneLayout
-                  ? const EdgeInsets.only(left: 48, right: 48)
+                  ? const EdgeInsets.only(left: 8, right: 48)
                   : const EdgeInsets.only(left: 24, right: 24),
               child: Column(
                 children: [
                   const Padding(
                     padding:
-                        EdgeInsets.only(top: 0, left: 12, right: 12, bottom: 0),
+                        EdgeInsets.only(top: 0, left: 4, right: 12, bottom: 0),
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
@@ -577,11 +588,11 @@ class LayoutDesktop extends StatelessWidget {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(
-                        top: 0, left: 12, right: 12, bottom: 32),
+                        top: 0, left: 4, right: 12, bottom: 32),
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        useVHideDetails ? 'How are you today?' : timenow,
+                        useVHideDetails ? timenow : timenow,
                         style: const TextStyle(
                           color: Colors.black54,
                           fontSize: 18,
@@ -662,8 +673,6 @@ class LayoutDesktop extends StatelessWidget {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Row(children: [
-                                          buttonNotification(),
-                                          const SizedBox(width: 8),
                                           buttonGithub(),
                                         ]),
                                         Row(

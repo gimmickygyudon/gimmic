@@ -12,7 +12,7 @@ Widget iconImageDialog(context, images, hero, color) {
         message: 'Quick View',
         child: IconButton(
             visualDensity: isWebMobile
-                ? const VisualDensity(horizontal: -4, vertical: -4)
+                ? const VisualDensity(horizontal: -2, vertical: -2)
                 : null,
             padding: EdgeInsets.zero,
             onPressed: () async {
@@ -20,7 +20,7 @@ Widget iconImageDialog(context, images, hero, color) {
             },
             color: color,
             icon: const Icon(
-              size: 24,
+              size: 20,
               Icons.image_outlined,
               color: Colors.white,
               shadows: [
@@ -29,20 +29,7 @@ Widget iconImageDialog(context, images, hero, color) {
               ],
             )),
       ),
-      IconButton(
-          visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-          padding: const EdgeInsets.only(left: 4),
-          onPressed: () {},
-          color: color,
-          icon: const Icon(
-            size: 24,
-            Icons.more_vert_rounded,
-            color: Colors.white,
-            shadows: [
-              Shadow(
-                  color: Colors.black26, offset: Offset(1, 1), blurRadius: 2),
-            ],
-          )),
+      buttonMoreMenu()
     ],
   );
 }
@@ -119,11 +106,12 @@ Widget buttonNotification() {
   return ElevatedButton.icon(
       style: const ButtonStyle(
               visualDensity: VisualDensity(horizontal: -2, vertical: -2),
+              backgroundColor: MaterialStatePropertyAll(Colors.transparent),
               alignment: Alignment.center)
           .copyWith(elevation: ButtonStyleButton.allOrNull(0)),
-      icon: const Icon(Icons.notifications_off_outlined),
+      icon: const Icon(Icons.notifications_none_outlined),
       onPressed: () {},
-      label: const Text('0'));
+      label: Text('0', style: GoogleFonts.roboto(fontWeight: FontWeight.w500)));
 }
 
 Widget buttonView3DIcon(context) {
@@ -160,6 +148,114 @@ Widget buttonView3D(context) {
         style: GoogleFonts.roboto(
             fontWeight: FontWeight.w400, color: Colors.blue.shade100),
       ));
+}
+
+Widget buttonMoreMenu() {
+  return PopupMenuButton<int>(
+    elevation: 1,
+    padding: EdgeInsets.zero,
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(6),
+        side: const BorderSide(width: 1, color: Colors.black12)),
+    icon: const Icon(
+      Icons.more_vert,
+      color: Colors.white,
+      shadows: [
+        Shadow(color: Colors.black26, offset: Offset(1, 1), blurRadius: 2),
+      ],
+    ),
+    iconSize: 20,
+    itemBuilder: (context) => [
+      PopupMenuItem(
+        value: 1,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 8, right: 8, top: 0, bottom: 0),
+          child: Row(
+            children: [
+              const Icon(Icons.favorite_border, color: Colors.black54),
+              const SizedBox(
+                width: 10,
+              ),
+              Text("Add to Favorites",
+                  style: GoogleFonts.roboto(
+                      fontWeight: FontWeight.w500, color: Colors.grey.shade800))
+            ],
+          ),
+        ),
+      ),
+      PopupMenuItem(
+        value: 2,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+          child: Row(
+            children: [
+              const Icon(Icons.share_outlined, color: Colors.black54),
+              const SizedBox(
+                width: 10,
+              ),
+              Text("Share",
+                  style: GoogleFonts.roboto(
+                      fontWeight: FontWeight.w500, color: Colors.grey.shade800))
+            ],
+          ),
+        ),
+      ),
+      PopupMenuItem(
+        value: 3,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+          child: Row(
+            children: [
+              const Icon(Icons.link_outlined, color: Colors.black54),
+              const SizedBox(
+                width: 10,
+              ),
+              Text("Copy Link",
+                  style: GoogleFonts.roboto(
+                      fontWeight: FontWeight.w500, color: Colors.grey.shade800))
+            ],
+          ),
+        ),
+      ),
+      const PopupMenuDivider(),
+      PopupMenuItem(
+        value: 4,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+          child: Row(
+            children: [
+              Icon(Icons.not_interested_outlined,
+                  color: Colors.yellow.shade800),
+              const SizedBox(
+                width: 10,
+              ),
+              Text("Not Interested",
+                  style: GoogleFonts.roboto(
+                      fontWeight: FontWeight.w500,
+                      color: Colors.yellow.shade800))
+            ],
+          ),
+        ),
+      ),
+      PopupMenuItem(
+        value: 5,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+          child: Row(
+            children: [
+              Icon(Icons.flag, color: Colors.red.shade800),
+              const SizedBox(
+                width: 10,
+              ),
+              Text("Report Item",
+                  style: GoogleFonts.roboto(
+                      fontWeight: FontWeight.w500, color: Colors.red.shade800))
+            ],
+          ),
+        ),
+      ),
+    ],
+  );
 }
 
 class ButtonLinks extends StatelessWidget {

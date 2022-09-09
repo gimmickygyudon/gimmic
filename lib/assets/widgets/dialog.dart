@@ -18,40 +18,47 @@ imageDialogHero(context, images, arguments, pagePosition) {
         );
       },
       pageBuilder: (BuildContext context, animation, secondaryAnimation) {
-        return Hero(
-          tag: pagePosition == null
-              ? arguments
-              : arguments['hero'] + pagePosition.toString(),
-          child: InteractiveViewer(
-            panEnabled: true,
-            minScale: 1,
-            maxScale: 6,
-            child: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Stack(children: [
-                Center(
-                  child: Image(
-                      image: pagePosition == null
-                          ? AssetImage(images)
-                          : AssetImage(images[pagePosition])),
+        return GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: SizedBox(
+            height: double.infinity,
+            width: double.infinity,
+            child: Hero(
+              tag: pagePosition == null
+                  ? arguments
+                  : arguments['hero'] + pagePosition.toString(),
+              child: InteractiveViewer(
+                panEnabled: true,
+                minScale: 1,
+                maxScale: 6,
+                child: GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Stack(children: [
+                    Center(
+                      child: Image(
+                          image: pagePosition == null
+                              ? AssetImage(images)
+                              : AssetImage(images[pagePosition])),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.black12,
+                            borderRadius: BorderRadius.circular(25.7)),
+                        child: IconButton(
+                            constraints: const BoxConstraints(minHeight: 48),
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(
+                              Icons.close,
+                              color: Colors.white,
+                              size: 24,
+                            )),
+                      ),
+                    ),
+                  ]),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.black12,
-                        borderRadius: BorderRadius.circular(25.7)),
-                    child: IconButton(
-                        constraints: const BoxConstraints(minHeight: 48),
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(
-                          Icons.close,
-                          color: Colors.white,
-                          size: 24,
-                        )),
-                  ),
-                ),
-              ]),
+              ),
             ),
           ),
         );

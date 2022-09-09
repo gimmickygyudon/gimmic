@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:gimmic/assets/widgets/builder.dart';
-import 'package:gimmic/assets/widgets/button.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import 'package:gimmic/assets/widgets/builder.dart';
+import 'package:gimmic/assets/widgets/button.dart';
 import '../../src/page/resource.dart';
 import '../functions/platform.dart';
 import '../functions/route.dart';
@@ -32,12 +33,8 @@ class _CardBigState extends State<CardBig> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () async {
-        await Navigator.push(
-            context,
-            SlideInRoute(
-                page: const Resource(arguments: {'keyword': ''}),
-                routeName: '/resource'));
+      onTap: () {
+        context.push('/resource');
       },
       child: MouseRegion(
         onEnter: ((value) => setState(() => cardSelected = true)),
@@ -202,13 +199,8 @@ class _CardBigState extends State<CardBig> {
                                     Colors.orange.shade300),
                                 elevation: const MaterialStatePropertyAll(0),
                               ),
-                              onPressed: () async {
-                                await Navigator.push(
-                                    context,
-                                    SlideInRoute(
-                                        page: const Resource(
-                                            arguments: {'keyword': ''}),
-                                        routeName: '/resource'));
+                              onPressed: () {
+                                context.push('/resource');
                               },
                               child: Text("Get Started",
                                   style: GoogleFonts.roboto(
@@ -339,7 +331,7 @@ Widget cardUpdateLog() {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6)),
                       label: Text(
-                        '0.0.1+5',
+                        '0.0.2+0',
                         style: GoogleFonts.roboto(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
@@ -705,7 +697,7 @@ class _CardCommentState extends State<CardComment> {
                                 onPressed: () {},
                                 child: const Text('Add Reaction')))
                         : IconButton(
-                            tooltip: 'Reply',
+                            tooltip: 'Add Reaction',
                             onPressed: () {},
                             icon: const Icon(Icons.add_reaction,
                                 color: Colors.black54, size: 22)),

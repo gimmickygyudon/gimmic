@@ -279,6 +279,48 @@ class _ListBigResourceState extends State<ListBigResource> {
                                         ),
                                       ),
                                     ),
+                                    const PopupMenuDivider(),
+                                    PopupMenuItem(
+                                      value: 4,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 0),
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.not_interested_outlined,
+                                                color: Colors.yellow.shade800),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text("Not Interested",
+                                                style: GoogleFonts.roboto(
+                                                    fontWeight: FontWeight.w500,
+                                                    color:
+                                                        Colors.yellow.shade800))
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      value: 5,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 0),
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.flag,
+                                                color: Colors.red.shade800),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text("Report Item",
+                                                style: GoogleFonts.roboto(
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Colors.red.shade800))
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 )
                               ],

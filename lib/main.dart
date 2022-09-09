@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -5,18 +7,16 @@ import 'firebase_options.dart';
 
 import 'package:gimmic/assets/label.dart';
 import 'package:gimmic/src/homebase.dart';
-
 import 'package:gimmic/src/page/details.dart';
 import 'package:gimmic/src/page/resource.dart';
-import 'package:gimmic/src/page/unity_viewer.dart';
-import 'package:gimmic/src/plugins/url_strategy.dart';
 
+import 'package:go_router/go_router.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 // default runApp (only for testing 7 developing)
 /* void main() {
-  usePathUrlStrategy();
-  runApp(const Gimmic());
+  GoRouter.setUrlPathStrategy(UrlPathStrategy.path);
+  runApp(Gimmic());
 } */
 
 Future<void> main() async {
@@ -25,8 +25,8 @@ Future<void> main() async {
     // options: DefaultFirebaseOptions.currentPlatform,
     options: DefaultFirebaseOptions.web,
   );
-  usePathUrlStrategy();
-  runApp(const Gimmic());
+  GoRouter.setUrlPathStrategy(UrlPathStrategy.path);
+  runApp(Gimmic());
 }
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
@@ -40,7 +40,46 @@ class MyCustomScrollBehavior extends MaterialScrollBehavior {
 }
 
 class Gimmic extends StatelessWidget {
-  const Gimmic({super.key});
+  Gimmic({super.key});
+
+  final _router = GoRouter(
+    routes: [
+      GoRoute(
+          path: '/',
+          builder: (context, state) =>
+              const HomeBase(title: StringResource.title),
+          routes: <GoRoute>[
+            GoRoute(
+                path: 'resource',
+                builder: (context, state) {
+                  final search = state.queryParams['search'];
+                  return Resource(arguments: search);
+                },
+                routes: <GoRoute>[
+                  GoRoute(
+                    name: 'details',
+                    path: ':name',
+                    pageBuilder: (context, state) {
+                      final name = state.params['name'];
+                      var object = state.extra;
+                      object ??= {
+                        "name": "default",
+                        "hero": "default",
+                        "index": "0"
+                      };
+
+                      var arguments = jsonEncode(object);
+                      debugPrint(arguments);
+                      Map valueMap = jsonDecode(arguments);
+
+                      return MaterialPage(child: Details(arguments: valueMap));
+                    },
+                  )
+                ]),
+          ]),
+    ],
+    // errorBuilder: (context, state) => ErrorScreen(state.error),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -49,10 +88,13 @@ class Gimmic extends StatelessWidget {
         FocusScopeNode currentFocus = FocusScope.of(context);
 
         if (!currentFocus.hasPrimaryFocus) {
-          currentFocus.unfocus();
+          FocusManager.instance.primaryFocus?.unfocus();
         }
       },
-      child: MaterialApp(
+      child: MaterialApp.router(
+        routeInformationProvider: _router.routeInformationProvider,
+        routeInformationParser: _router.routeInformationParser,
+        routerDelegate: _router.routerDelegate,
         builder: (context, child) => ResponsiveWrapper.builder(
           child,
           maxWidth: 16000,
@@ -67,15 +109,6 @@ class Gimmic extends StatelessWidget {
         ),
         debugShowCheckedModeBanner: false,
         title: StringResource.title,
-        initialRoute: '/',
-        routes: {
-          '/': (context) => const HomeBase(title: StringResource.title),
-          '/resource': (context) => Resource(
-              arguments: ModalRoute.of(context)?.settings.arguments as Map),
-          '/resource/detail': (context) => Details(
-              arguments: ModalRoute.of(context)?.settings.arguments as Map),
-          '/resource/detail/view': (context) => const UnityViewer(),
-        },
         theme: ThemeData(
           visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
           useMaterial3: true,
