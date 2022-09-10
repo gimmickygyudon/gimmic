@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_unity_widget/flutter_unity_widget.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
+import 'package:go_router/go_router.dart';
 
 class UnityViewer extends StatefulWidget {
   const UnityViewer({super.key});
@@ -43,10 +44,12 @@ class _UnityViewerState extends State<UnityViewer> {
           child: Stack(
             children: [
               UnityWidget(
+                printSetupLog: true,
+                runImmediately: false,
                 onUnityCreated: _onUnityCreated,
                 onUnityMessage: onUnityMessage,
                 onUnitySceneLoaded: onUnitySceneLoaded,
-                useAndroidViewSurface: true,
+                useAndroidViewSurface: false,
                 borderRadius: const BorderRadius.all(Radius.circular(70)),
               ),
               PointerInterceptor(
@@ -92,17 +95,18 @@ class _UnityViewerState extends State<UnityViewer> {
   }
 
   void onUnityMessage(message) {
-    // print('Received message from unity: ${message.toString()}');
+    debugPrint('Received message from unity: ${message.toString()}');
   }
 
   void onUnitySceneLoaded(scene) {
-    // print('Received scene loaded from unity: ${scene.name}');
-    // print('Received scene loaded from unity buildIndex: ${scene.buildIndex}');
+    debugPrint('Received scene loaded from unity: ${scene.name}');
+    debugPrint(
+        'Received scene loaded from unity buildIndex: ${scene.buildIndex}');
   }
 
   // Callback that connects the created controller to the unity controller
   void _onUnityCreated(controller) {
     controller.resume();
-    this._unityWidgetController = controller;
+    _unityWidgetController = controller;
   }
 }

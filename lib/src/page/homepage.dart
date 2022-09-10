@@ -9,8 +9,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../assets/functions/platform.dart';
-import '../../assets/functions/route.dart';
-import '../../src/page/resource.dart' as resource;
 
 class Resource {
   const Resource({
@@ -386,11 +384,13 @@ class _SearchBarMainState extends State<SearchBarMain> {
                       visible: notFound ? false : true,
                       child: InkWell(
                         onTap: () async {
-                          await Navigator.pushNamed(context, '/resource/detail',
-                              arguments: {
-                                'hero': option.hero,
-                                'index': option.index
-                              });
+                          context.pushNamed('details', params: {
+                            'name': searchKeyword.toLowerCase(),
+                          }, extra: {
+                            "name": "{$searchKeyword}",
+                            "hero": "{$searchHero}",
+                            "index": '$searchIndex'
+                          });
                         },
                         onHover: (value) {},
                         child: ListTile(

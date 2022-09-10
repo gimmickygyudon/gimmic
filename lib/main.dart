@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:gimmic/src/page/unity_viewer.dart';
 import 'firebase_options.dart';
 
 import 'package:gimmic/assets/label.dart';
@@ -43,6 +44,8 @@ class Gimmic extends StatelessWidget {
   Gimmic({super.key});
 
   final _router = GoRouter(
+    debugLogDiagnostics: false,
+    initialLocation: '/',
     routes: [
       GoRoute(
           path: '/',
@@ -57,24 +60,31 @@ class Gimmic extends StatelessWidget {
                 },
                 routes: <GoRoute>[
                   GoRoute(
-                    name: 'details',
-                    path: ':name',
-                    pageBuilder: (context, state) {
-                      final name = state.params['name'];
-                      var object = state.extra;
-                      object ??= {
-                        "name": "default",
-                        "hero": "default",
-                        "index": "0"
-                      };
+                      name: 'details',
+                      path: ':name',
+                      pageBuilder: (context, state) {
+                        final name = state.params['name'];
+                        var object = state.extra;
+                        object ??= {
+                          "name": "default",
+                          "hero": "default",
+                          "index": "0"
+                        };
 
-                      var arguments = jsonEncode(object);
-                      debugPrint(arguments);
-                      Map valueMap = jsonDecode(arguments);
+                        var arguments = jsonEncode(object);
+                        debugPrint(arguments);
+                        Map valueMap = jsonDecode(arguments);
 
-                      return MaterialPage(child: Details(arguments: valueMap));
-                    },
-                  )
+                        return MaterialPage(
+                            child: Details(arguments: valueMap));
+                      },
+                      routes: <GoRoute>[
+                        GoRoute(
+                            name: 'viewer',
+                            path: 'viewer',
+                            pageBuilder: (context, state) =>
+                                const MaterialPage(child: UnityViewer())),
+                      ])
                 ]),
           ]),
     ],

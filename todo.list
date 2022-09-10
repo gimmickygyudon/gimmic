@@ -2,7 +2,8 @@ Changelog 0.0.2+
  - Items Card Revamped
  - New 2 items on popup menu
  - Image indicators added
- - Added ability to navigate url/page easily
+ - Added ability to retain url history
+ - Navigation rail added
 
 Changelog 0.0.2+0
  - Dragging or scrolling in description and comments section now will expand it
@@ -21,8 +22,12 @@ Changelog 0.0.1+4
  - Search function in homepage is working for now
 
 ToDo
+ x fix homepage padding for ipad and surfe display
+ - add GoRoute listener for back and forward button for search query
  - add DisplayFeature like hinge, fold, cutout
-
+ 
+ - move or remove image indicator if thumbnails is shown
+ - Trim search space on url replace
  - Animate slide page to details page
  - Add button search in google when no result found
  - Up and down point comment and share reply text button

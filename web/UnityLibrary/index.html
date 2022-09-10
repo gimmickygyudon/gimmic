@@ -34,10 +34,10 @@
     <script>
         var mainUnityInstance;
 
-        window['handleUnityMessage'] = function (params) {
+        window['handleUnityMessage'] = function (any) {
         window.parent.postMessage({
             name: 'onUnityMessage',
-            data: params,
+            data: any,
             }, '*');
         };
 

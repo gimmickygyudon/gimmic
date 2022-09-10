@@ -7,6 +7,7 @@ import 'package:gimmic/src/view/list.dart';
 import 'package:gimmic/src/view/list_big.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../assets/functions/route.dart';
 
 class Resource extends StatefulWidget {
   const Resource({Key? key, this.arguments}) : super(key: key);
@@ -24,6 +25,7 @@ class _ResourceState extends State<Resource> {
   bool _showAppbar = true;
   bool _loading = true;
   bool isScrollingDown = false;
+  bool initated = false;
 
   // This holds a list of fiction users
   //// You can use data fetched from a database or a server as well
@@ -69,14 +71,13 @@ class _ResourceState extends State<Resource> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.arguments == null) {
-        _foundResource = _allResource; // at the beginning, all users are shown
-      } else {
-        _searchController.text = widget.arguments!;
-        _runFilter(widget.arguments!);
-      }
-    });
+    if (widget.arguments == null) {
+      _foundResource = _allResource; // at the beginning, all users are shown
+    } else {
+      _searchController.text = widget.arguments!;
+      _runFilter(widget.arguments!);
+    }
+    initated = true;
 
     _scrollGridViewController = ScrollController();
     _scrollGridViewController.addListener(() {
@@ -143,7 +144,7 @@ class _ResourceState extends State<Resource> {
       // if the search field is empty or only contains white-space, we'll display all users
       results = _allResource;
 
-      GoRouter.of(context).replace('/resource');
+      if (initated) GoRouter.of(context).replace('/resource');
     } else {
       final name = _allResource
           .where((name) => name["name"]
@@ -161,7 +162,11 @@ class _ResourceState extends State<Resource> {
       results = results.toSet().toList();
       // we use the toLowerCase() method to make it case-insensitive
 
-      GoRouter.of(context).replace('/resource?search=$enteredKeyword');
+      if (initated && enteredKeyword.trim().isNotEmpty) {
+        GoRouter.of(context)
+            .replace('/resource?search=${enteredKeyword.trim()}');
+      }
+
       if (results.isEmpty) {
         Timer(const Duration(seconds: 1), () {
           setState(() {

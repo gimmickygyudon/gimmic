@@ -8,6 +8,7 @@ import 'package:gimmic/assets/functions/platform.dart';
 import 'package:gimmic/assets/icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../assets/widgets/button.dart';
 import '../../assets/widgets/card.dart';
@@ -103,6 +104,8 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
   @override
   void dispose() {
     sink.close();
+    _scrollViewController.dispose();
+    _tabController.dispose();
     _pageController.dispose();
     controller.dispose();
     controllerComment.dispose();
@@ -118,9 +121,9 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
     return List<Widget>.generate(imagesLength, (index) {
       return GestureDetector(
         onTap: () => _pageController.animateToPage(index,
-            duration: const Duration(milliseconds: 400), curve: Curves.ease),
+            duration: const Duration(milliseconds: 300), curve: Curves.ease),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 400),
+          duration: const Duration(milliseconds: 300),
           margin: const EdgeInsets.all(3),
           width: currentIndex == index ? 30 : 10,
           height: 6,
@@ -1131,7 +1134,10 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                       alignment: Alignment.bottomRight,
                                       child: Padding(
                                           padding: const EdgeInsets.all(16),
-                                          child: buttonView3D(context))),
+                                          child: buttonView3D(
+                                              context,
+                                              arguments['name']
+                                                  .toLowerCase()))),
                                   Align(
                                     alignment: Alignment.bottomCenter,
                                     child: Padding(
@@ -1264,12 +1270,12 @@ class _IgnorePointerSignalRenderObject extends RenderProxyBox {
   @override
   bool hitTest(BoxHitTestResult result, {required Offset position}) {
     final res = super.hitTest(result, position: position);
-    result.path.forEach((item) {
+    for (var item in result.path) {
       final target = item.target;
       if (target is RenderPointerListener) {
         target.onPointerSignal = null;
       }
-    });
+    }
     return res;
   }
 }

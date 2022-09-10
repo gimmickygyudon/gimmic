@@ -4,6 +4,7 @@ import 'package:gimmic/assets/functions/platform.dart';
 import 'package:gimmic/assets/functions/url.dart';
 import 'package:gimmic/assets/widgets/dialog.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 
 Widget iconImageDialog(context, images, hero, color) {
   return Row(
@@ -31,51 +32,6 @@ Widget iconImageDialog(context, images, hero, color) {
       ),
       buttonMoreMenu()
     ],
-  );
-}
-
-Widget buttonBigView3D(context, useHorizontalShrink) {
-  return Padding(
-    padding: const EdgeInsets.all(8),
-    child: Tooltip(
-      message: 'Coming Soon',
-      child: AspectRatio(
-        aspectRatio: 1 / 1,
-        child: Container(
-          decoration: BoxDecoration(
-              color: Colors.transparent,
-              border: Border.all(color: Colors.transparent, width: 2),
-              borderRadius: const BorderRadius.all(Radius.circular(20))),
-          child: InkWell(
-            onTap: () {
-              Navigator.pushNamed(context, '/resource/detail/view');
-            },
-            child: FittedBox(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.view_in_ar_rounded,
-                        size: 34, color: Colors.black54),
-                    Visibility(
-                      visible: useHorizontalShrink ? true : false,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 6),
-                        child: Text('View 3D',
-                            style: GoogleFonts.roboto(
-                                color: Colors.black54,
-                                fontWeight: FontWeight.w700)),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    ),
   );
 }
 
@@ -114,7 +70,7 @@ Widget buttonNotification() {
       label: Text('0', style: GoogleFonts.roboto(fontWeight: FontWeight.w500)));
 }
 
-Widget buttonView3DIcon(context) {
+Widget buttonView3DIcon(context, name) {
   return Container(
     padding: const EdgeInsets.all(4),
     decoration: BoxDecoration(
@@ -123,25 +79,23 @@ Widget buttonView3DIcon(context) {
         visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
         tooltip: '3D View',
         hoverColor: Colors.transparent,
-        onPressed: () async => await Navigator.pushNamed(
-              context,
-              '/resource/detail/view',
-            ),
+        onPressed: () => GoRouter.of(context).pushNamed('viewer', params: {
+              'name': name.toLowerCase(),
+            }),
         icon: const Icon(Icons.view_in_ar_rounded, color: Colors.white)),
   );
 }
 
-Widget buttonView3D(context) {
+Widget buttonView3D(context, name) {
   return ElevatedButton.icon(
       style: const ButtonStyle(
           visualDensity: VisualDensity(horizontal: -2, vertical: -2),
           backgroundColor: MaterialStatePropertyAll(Colors.black45),
           elevation: MaterialStatePropertyAll(0),
           padding: MaterialStatePropertyAll(EdgeInsets.all(16))),
-      onPressed: () async => await Navigator.pushNamed(
-            context,
-            '/resource/detail/view',
-          ),
+      onPressed: () => GoRouter.of(context).pushNamed('viewer', params: {
+            'name': name.toLowerCase(),
+          }),
       icon: Icon(Icons.view_in_ar_rounded, color: Colors.blue.shade100),
       label: Text(
         '3D View',

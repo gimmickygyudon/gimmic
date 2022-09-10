@@ -5,9 +5,7 @@ import 'package:intl/intl.dart';
 
 import 'package:gimmic/assets/widgets/builder.dart';
 import 'package:gimmic/assets/widgets/button.dart';
-import '../../src/page/resource.dart';
 import '../functions/platform.dart';
-import '../functions/route.dart';
 
 class CardBig extends StatefulWidget {
   final BoxConstraints rowConstraints;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gimmic/assets/functions/platform.dart';
 import 'package:gimmic/assets/widgets/chip.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -56,11 +57,13 @@ class _ListBigResourceState extends State<ListBigResource> {
                   maxWidth: double.infinity),
               child: InkWell(
                 onHover: ((value) => setState(() => selectedIndex = index)),
-                onTap: () => Navigator.pushNamed(context, '/resource/detail',
-                    arguments: {
-                      'hero': widget.foundResource[index]["hero"],
-                      'index': widget.foundResource[index]["index"]
-                    }),
+                onTap: () => context.pushNamed('details', params: {
+                  'name': widget.foundResource[index]['name'].toLowerCase(),
+                }, extra: {
+                  "name": "${widget.foundResource[index]['name']}",
+                  "hero": "${widget.foundResource[index]['hero']}",
+                  "index": '${widget.foundResource[index]['index']}'
+                }),
                 child: Card(
                   margin: widget.layouts
                       ? const EdgeInsets.only(bottom: 10)

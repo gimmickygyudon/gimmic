@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gimmic/assets/functions/platform.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -32,10 +33,12 @@ class _ListResourceState extends State<ListResource> {
           itemBuilder: (context, index) {
             return InkWell(
               onHover: ((value) => setState(() => selectedIndex = index)),
-              onTap: () =>
-                  Navigator.pushNamed(context, '/resource/detail', arguments: {
-                'hero': widget.foundResource[index]["hero"],
-                'index': widget.foundResource[index]["index"]
+              onTap: () => context.pushNamed('details', params: {
+                'name': widget.foundResource[index]['name'].toLowerCase(),
+              }, extra: {
+                "name": "${widget.foundResource[index]['name']}",
+                "hero": "${widget.foundResource[index]['hero']}",
+                "index": '${widget.foundResource[index]['index']}'
               }),
               child: Card(
                   elevation: (selectedIndex == index) ? 1 : 0,
