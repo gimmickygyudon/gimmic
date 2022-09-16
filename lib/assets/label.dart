@@ -1,6 +1,6 @@
 class StringResource {
   static const String title = "Gimmicky Gyudon";
-  static const String version = "0.0.2+0";
+  static const String version = "0.0.2+6";
   static const String header = "Hello";
   static const String paragraph =
       "Welcome, You made it here! let's enjoy our time together";

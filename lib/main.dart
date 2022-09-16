@@ -49,8 +49,7 @@ class Gimmic extends StatelessWidget {
     routes: [
       GoRoute(
           path: '/',
-          builder: (context, state) =>
-              const HomeBase(title: StringResource.title),
+          builder: (context, state) => const HomeBase(),
           routes: <GoRoute>[
             GoRoute(
                 path: 'resource',

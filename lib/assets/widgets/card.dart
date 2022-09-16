@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -5,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import 'package:gimmic/assets/widgets/builder.dart';
 import 'package:gimmic/assets/widgets/button.dart';
+import '../colors.dart';
 import '../functions/platform.dart';
 
 class CardBig extends StatefulWidget {
@@ -106,8 +108,7 @@ class _CardBigState extends State<CardBig> {
                         bottom: 20,
                         left: 20,
                         right: 20,
-                        top: isWebMobile ? 10 : 20),
-                    alignment: Alignment.bottomCenter,
+                        top: isWebMobile ? 10 : 15),
                     decoration: BoxDecoration(
                       border: cardSelected
                           ? const Border(
@@ -116,9 +117,9 @@ class _CardBigState extends State<CardBig> {
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        stops: [0.3, 0.5, cardSelected ? 0.85 : 1.0],
-                        colors: <Color>[
-                          Colors.black.withAlpha(0),
+                        stops: [0, 0.5, cardSelected ? 0.85 : 1.0],
+                        colors: const <Color>[
+                          Colors.transparent,
                           Colors.black12,
                           Colors.black87
                         ],
@@ -329,11 +330,93 @@ Widget cardUpdateLog() {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6)),
                       label: Text(
-                        '0.0.2+0',
+                        '0.0.2+6',
                         style: GoogleFonts.roboto(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                             color: isWebMobile ? Colors.blue : Colors.blue),
+                      )),
+                  title: Tooltip(
+                    message: "Go to detail's page",
+                    child: Text(
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      'New palette color mode',
+                      style: GoogleFonts.roboto(
+                          fontWeight: FontWeight.w400,
+                          fontSize: constraints.maxWidth > 460 ? null : 14),
+                    ),
+                  ),
+                  subtitle: Text(
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    'Using url path strategy to retain history',
+                    style: GoogleFonts.roboto(
+                        color: Colors.black54,
+                        fontSize: constraints.maxWidth > 460 ? null : 12),
+                  ),
+                  trailing: Chip(
+                      backgroundColor: Colors.grey.shade50,
+                      label: Text(
+                        constraints.maxWidth > 460 ? 'September 12' : 'Sep 12',
+                        style: GoogleFonts.roboto(
+                            fontSize: 12, color: Colors.black54),
+                      )),
+                  children: <Widget>[
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text('Items Card Revamped',
+                            style: GoogleFonts.roboto(fontSize: 14))),
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text('New 2 items on popup menu',
+                            style: GoogleFonts.roboto(fontSize: 14))),
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text('Image indicators added',
+                            style: GoogleFonts.roboto(fontSize: 14))),
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text('Added ability to retain url history',
+                            style: GoogleFonts.roboto(fontSize: 14))),
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text('Navigation rail added',
+                            style: GoogleFonts.roboto(fontSize: 14))),
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text(
+                            'Detail page environment color now match selected image',
+                            style: GoogleFonts.roboto(fontSize: 14)))
+                  ],
+                ),
+                ExpansionTile(
+                  tilePadding:
+                      constraints.maxWidth > 600 ? null : EdgeInsets.zero,
+                  childrenPadding: EdgeInsets.zero,
+                  leading: Chip(
+                      backgroundColor: Colors.grey.shade100,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6)),
+                      label: Text(
+                        '0.0.2+0',
+                        style: GoogleFonts.roboto(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color:
+                                isWebMobile ? Colors.black54 : Colors.black54),
                       )),
                   title: Text(
                     maxLines: 2,
@@ -480,16 +563,25 @@ Widget cardUpdateLog() {
   });
 }
 
-Widget cardYoutube(thumbnails) {
+Widget cardYoutube(thumbnails, palettecolor, dominantcolor, colorindex) {
   return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
     return Card(
-      color: Colors.grey.shade100,
+      color: palettecolor.isEmpty
+          ? Colors.grey.shade100
+          : colorLuminance(.95, lighten, palettecolor[colorindex].color,
+              kIsWeb ? .275 : .225),
       elevation: 0,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        hoverColor: Colors.grey.shade200,
-        splashColor: Colors.grey.shade50,
+        hoverColor: palettecolor.isEmpty
+            ? Colors.grey.shade200
+            : colorLuminance(.9, lighten, palettecolor[colorindex].color,
+                kIsWeb ? .225 : .175),
+        splashColor: palettecolor.isEmpty
+            ? Colors.grey.shade50
+            : colorLuminance(.95, lighten, palettecolor[colorindex].color,
+                kIsWeb ? .15 : .05),
         onTap: () {},
         child: Padding(
           padding: constraints.maxWidth > 320
@@ -613,7 +705,12 @@ Widget cardYoutube(thumbnails) {
 }
 
 class CardComment extends StatefulWidget {
-  const CardComment({super.key});
+  const CardComment(
+      {Key? key, this.palettecolor, this.dominantcolor, this.colorindex})
+      : super(key: key);
+  final List? palettecolor;
+  final List? dominantcolor;
+  final int? colorindex;
 
   @override
   State<CardComment> createState() => _CardCommentState();
@@ -626,11 +723,29 @@ class _CardCommentState extends State<CardComment> {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
-      color: Colors.grey.shade100,
+      color: widget.palettecolor == null
+          ? Colors.grey.shade100
+          : colorLuminance(
+              .95,
+              lighten,
+              widget.palettecolor![widget.colorindex!].color,
+              kIsWeb ? .275 : .225),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        hoverColor: Colors.grey.shade200,
-        splashColor: Colors.grey.shade50,
+        hoverColor: widget.palettecolor == null
+            ? Colors.grey.shade200
+            : colorLuminance(
+                .9,
+                lighten,
+                widget.palettecolor![widget.colorindex!].color,
+                kIsWeb ? .225 : .175),
+        splashColor: widget.palettecolor == null
+            ? Colors.grey.shade50
+            : colorLuminance(
+                .95,
+                lighten,
+                widget.palettecolor![widget.colorindex!].color,
+                kIsWeb ? .15 : .05),
         onTap: () {
           if (expandComment == false) {
             setState(() {
@@ -649,8 +764,24 @@ class _CardCommentState extends State<CardComment> {
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
               horizontalTitleGap: 10,
-              leading: const CircleAvatar(
-                  maxRadius: 18, child: Icon(Icons.face, size: 36)),
+              leading: CircleAvatar(
+                  foregroundColor: widget.dominantcolor == null
+                      ? null
+                      : lighten(widget.dominantcolor![widget.colorindex!].color,
+                                      .2)
+                                  .computeLuminance() >
+                              0.8
+                          ? darken(
+                              widget.dominantcolor![widget.colorindex!].color,
+                              .5)
+                          : lighten(
+                              widget.dominantcolor![widget.colorindex!].color,
+                              .2),
+                  backgroundColor: widget.palettecolor == null
+                      ? null
+                      : lighten(widget.palettecolor![widget.colorindex!].color),
+                  maxRadius: 18,
+                  child: const Icon(Icons.face, size: 36)),
               title: Text('Comment Bots',
                   style: GoogleFonts.roboto(fontWeight: FontWeight.w600)),
               subtitle: Text('August 30, 7:27PM',

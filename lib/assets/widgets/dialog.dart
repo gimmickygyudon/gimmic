@@ -47,7 +47,6 @@ imageDialogHero(context, images, arguments, pagePosition) {
                             color: Colors.black12,
                             borderRadius: BorderRadius.circular(25.7)),
                         child: IconButton(
-                            constraints: const BoxConstraints(minHeight: 48),
                             onPressed: () => Navigator.pop(context),
                             icon: const Icon(
                               Icons.close,

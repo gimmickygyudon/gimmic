@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gimmic/src/page/homepage.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeBase extends StatefulWidget {
-  const HomeBase({super.key, required this.title});
-  final String title;
+  const HomeBase({super.key});
 
   @override
   State<HomeBase> createState() => _HomeBaseState();
@@ -21,9 +21,8 @@ class _HomeBaseState extends State<HomeBase> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        bool useSmallLayout = constraints.maxHeight > constraints.maxWidth / 2;
-        bool usePhoneLayout = constraints.maxHeight < constraints.maxWidth / 2;
-        bool useVerticalLayout = constraints.maxHeight > constraints.maxWidth;
+        bool useVerticalLayout =
+            constraints.maxWidth < constraints.maxHeight / 1.5;
 
         return Scaffold(
             backgroundColor: Colors.grey.shade200,
@@ -99,24 +98,38 @@ class _HomeBaseState extends State<HomeBase> {
                                   icon: const Icon(Icons.more_horiz_rounded),
                                 )
                               : const SizedBox(),
-                          destinations: const <NavigationRailDestination>[
+                          destinations: <NavigationRailDestination>[
                             NavigationRailDestination(
-                              padding: EdgeInsets.fromLTRB(8, 0, 0, 0),
-                              icon: Icon(Icons.home_outlined),
-                              selectedIcon: Icon(Icons.home),
-                              label: Text('Home'),
+                              padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                              icon: const Icon(Icons.home_outlined),
+                              selectedIcon: const Icon(Icons.home),
+                              label: Text(
+                                'Home',
+                                style: GoogleFonts.roboto(
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                             ),
                             NavigationRailDestination(
-                              padding: EdgeInsets.fromLTRB(8, 0, 0, 0),
-                              icon: Icon(Icons.bookmark_border),
-                              selectedIcon: Icon(Icons.book),
-                              label: Text('Resource'),
+                              padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                              icon: const Icon(Icons.bookmark_border),
+                              selectedIcon: const Icon(Icons.book),
+                              label: Text('Resource',
+                                  style: GoogleFonts.roboto(
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w500,
+                                  )),
                             ),
                             NavigationRailDestination(
-                              padding: EdgeInsets.fromLTRB(8, 0, 0, 0),
-                              icon: Icon(Icons.star_border),
-                              selectedIcon: Icon(Icons.star),
-                              label: Text('Update'),
+                              padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                              icon: const Icon(Icons.star_border),
+                              selectedIcon: const Icon(Icons.star),
+                              label: Text('Update',
+                                  style: GoogleFonts.roboto(
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w500,
+                                  )),
                             ),
                           ],
                         ),

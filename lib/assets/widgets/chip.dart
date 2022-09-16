@@ -22,7 +22,7 @@ Widget chipTag(iconsize, fontsize) {
   );
 }
 
-Widget chipTagOutlined(name, icon, iconsize, fontsize) {
+Widget chipTagOutlined(name, icon, color, iconsize, fontsize) {
   return FilterChip(
       visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
       onSelected: (value) {},
@@ -34,8 +34,8 @@ Widget chipTagOutlined(name, icon, iconsize, fontsize) {
           color: Colors.black54),
       label: Text(name),
       labelPadding: const EdgeInsets.only(left: 0, right: 10),
-      backgroundColor: Colors.transparent,
-      side: const BorderSide(width: 1, color: Colors.black12),
+      backgroundColor: color,
+      side: const BorderSide(color: Colors.black12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       padding: const EdgeInsets.symmetric(horizontal: 4));
 }

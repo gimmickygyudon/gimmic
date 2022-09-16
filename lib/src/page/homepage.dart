@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gimmic/assets/colors.dart';
 import 'package:gimmic/assets/label.dart';
 import 'package:gimmic/assets/widgets/button.dart';
 import 'package:gimmic/assets/widgets/card.dart';
@@ -258,7 +257,7 @@ class _SearchBarMainState extends State<SearchBarMain> {
                               ? const EdgeInsets.only(right: 6)
                               : const EdgeInsets.only(right: 8),
                           child: ButtonLinks(
-                            bgcolor: Colors.lightBlue.shade100,
+                            bgcolor: Colors.red.shade100,
                           )),
             ),
             suffixStyle: GoogleFonts.roboto(
@@ -580,7 +579,7 @@ class LayoutDesktop extends StatelessWidget {
                       child: Text(
                         'Hi',
                         style: TextStyle(
-                          color: ColorsResources.primarytextcolor,
+                          color: Colors.black87,
                           fontSize: 48,
                         ),
                       ),

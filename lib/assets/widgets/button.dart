@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gimmic/assets/colors.dart';
 import 'package:gimmic/assets/functions/platform.dart';
 import 'package:gimmic/assets/functions/url.dart';
 import 'package:gimmic/assets/widgets/dialog.dart';
@@ -70,7 +71,8 @@ Widget buttonNotification() {
       label: Text('0', style: GoogleFonts.roboto(fontWeight: FontWeight.w500)));
 }
 
-Widget buttonView3DIcon(context, name) {
+Widget buttonView3DIcon(
+    context, String name, List palettecolor, int colorindex) {
   return Container(
     padding: const EdgeInsets.all(4),
     decoration: BoxDecoration(
@@ -86,21 +88,28 @@ Widget buttonView3DIcon(context, name) {
   );
 }
 
-Widget buttonView3D(context, name) {
+Widget buttonView3D(context, String name, List palettecolor, int colorindex) {
   return ElevatedButton.icon(
-      style: const ButtonStyle(
-          visualDensity: VisualDensity(horizontal: -2, vertical: -2),
-          backgroundColor: MaterialStatePropertyAll(Colors.black45),
-          elevation: MaterialStatePropertyAll(0),
-          padding: MaterialStatePropertyAll(EdgeInsets.all(16))),
+      style: ButtonStyle(
+          side: const MaterialStatePropertyAll(BorderSide.none),
+          visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
+          backgroundColor: const MaterialStatePropertyAll(Colors.black45),
+          foregroundColor: MaterialStateProperty.resolveWith((states) {
+            return states.contains(MaterialState.hovered)
+                ? Colors.white
+                : palettecolor.isEmpty
+                    ? Colors.blue.shade100
+                    : lightening(palettecolor[colorindex].color, 40);
+          }),
+          elevation: const MaterialStatePropertyAll(0),
+          padding: const MaterialStatePropertyAll(EdgeInsets.all(16))),
       onPressed: () => GoRouter.of(context).pushNamed('viewer', params: {
             'name': name.toLowerCase(),
           }),
-      icon: Icon(Icons.view_in_ar_rounded, color: Colors.blue.shade100),
+      icon: const Icon(Icons.view_in_ar_rounded),
       label: Text(
         '3D View',
-        style: GoogleFonts.roboto(
-            fontWeight: FontWeight.w400, color: Colors.blue.shade100),
+        style: GoogleFonts.roboto(fontWeight: FontWeight.w400),
       ));
 }
 
@@ -215,7 +224,7 @@ Widget buttonMoreMenu() {
 class ButtonLinks extends StatelessWidget {
   ButtonLinks({super.key, required this.bgcolor});
 
-  final bgcolor;
+  final Color bgcolor;
   final List<String> links = [
     "https://www.instagram.com/gimmickygyudon/",
     "https://twitter.com/GimmickyGyudon",
@@ -231,15 +240,15 @@ class ButtonLinks extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
+        visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
+        style: ButtonStyle(
+            padding: const MaterialStatePropertyAll(EdgeInsets.all(6)),
+            shape: const MaterialStatePropertyAll(CircleBorder()),
+            backgroundColor: MaterialStatePropertyAll(bgcolor)),
         tooltip: 'Open Links',
-        icon: Container(
-          decoration: BoxDecoration(
-              color: bgcolor, borderRadius: BorderRadius.circular(25.7)),
-          padding: const EdgeInsets.all(6),
-          child: Icon(
-            Icons.link,
-            color: Colors.grey.shade800,
-          ),
+        icon: Icon(
+          Icons.link,
+          color: Colors.grey.shade800,
         ),
         padding: EdgeInsets.zero,
         onPressed: () {

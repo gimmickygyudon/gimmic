@@ -1,9 +1,10 @@
-Changelog 0.0.2+
+Changelog 0.0.2+6
  - Items Card Revamped
  - New 2 items on popup menu
  - Image indicators added
  - Added ability to retain url history
  - Navigation rail added
+ - Detail page environment color now match selected image
 
 Changelog 0.0.2+0
  - Dragging or scrolling in description and comments section now will expand it
@@ -23,6 +24,7 @@ Changelog 0.0.1+4
 
 ToDo
  x fix homepage padding for ipad and surfe display
+ - trim space search field in homepage
  - add GoRoute listener for back and forward button for search query
  - add DisplayFeature like hinge, fold, cutout
  

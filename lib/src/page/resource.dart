@@ -7,7 +7,6 @@ import 'package:gimmic/src/view/list.dart';
 import 'package:gimmic/src/view/list_big.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../assets/functions/route.dart';
 
 class Resource extends StatefulWidget {
   const Resource({Key? key, this.arguments}) : super(key: key);
