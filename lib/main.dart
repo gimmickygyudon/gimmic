@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:gimmic/src/page/unity_viewer.dart';
+import 'package:squadron/squadron.dart';
 import 'firebase_options.dart';
 
 import 'package:gimmic/assets/label.dart';
@@ -14,21 +16,30 @@ import 'package:gimmic/src/page/resource.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
-// default runApp (only for testing 7 developing)
-/* void main() {
+void initSquadron(String id) {
+  Squadron.setId(id);
+  Squadron.setLogger(ConsoleSquadronLogger());
+  Squadron.logLevel = SquadronLogLevel.debug;
+  Squadron.debugMode = true;
+}
+
+/* default runApp (only for testing and developing) */
+void main() async {
+  kIsWeb ? initSquadron(StringResource.title) : null;
   GoRouter.setUrlPathStrategy(UrlPathStrategy.path);
   runApp(Gimmic());
-} */
+}
 
-Future<void> main() async {
+/* Future<void> main() async {
   await Firebase.initializeApp(
     // linux isn't implemented yet with firebase platform
     // options: DefaultFirebaseOptions.currentPlatform,
     options: DefaultFirebaseOptions.web,
   );
+  (kIsWeb) => initSquadron(StringResource.title);
   GoRouter.setUrlPathStrategy(UrlPathStrategy.path);
   runApp(Gimmic());
-}
+} */
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
   // Override behavior methods and getters like dragDevices

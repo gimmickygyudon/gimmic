@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:gimmic/assets/functions/platform.dart';
 import 'package:gimmic/assets/icons.dart';
 import '../../assets/colors.dart';
+import '../../assets/colors_web.dart';
 import '../../assets/widgets/button.dart';
 import '../../assets/widgets/card.dart';
 import '../../assets/widgets/chip.dart';
@@ -100,7 +101,23 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
       _pageController.animateTo(offset,
           duration: const Duration(milliseconds: 200), curve: Curves.ease);
     });
-    updatePaletteGen(images).whenComplete(() => setState(() {}));
+
+    if (updatePaletteGenCompleter.isCompleted == false && kIsWeb == false) {
+      updatePaletteGen(images).whenComplete(() async {
+        debugPrint('updatePaletteGen Started');
+        await updatePaletteGenCompleter.future.whenComplete(() => setState(() {
+              debugPrint('updatePaletteGenCompleter Complete');
+            }));
+      });
+    } else if (updatePaletteGenWebCompleter.isCompleted == false && kIsWeb) {
+      updatePaletteGenWeb(images).whenComplete(() async {
+        debugPrint('updatePaletteGenWeb(images) Started');
+        await updatePaletteGenWebCompleter.future
+            .whenComplete(() => setState(() {
+                  debugPrint('updatePaletteGenWebCompleter Complete');
+                }));
+      });
+    }
   }
 
   @override
@@ -1197,10 +1214,10 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
             extendBodyBehindAppBar: true,
             body: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              color: paletteVibrantColors.isEmpty
+              color: paletteDominantColors.isEmpty
                   ? Colors.grey.shade200
-                  : colorLuminance(
-                      .95, lighten, paletteVibrantColors[activePage].color, .2),
+                  : colorLuminance(.95, lighten,
+                      paletteDominantColors[activePage].color, .2),
               child: Row(
                 children: [
                   Expanded(
