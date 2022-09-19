@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ui' as ui;
+import 'package:async/async.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:squadron/squadron.dart';
@@ -11,43 +12,41 @@ class PaletteColorWeb {
   PaletteColorWeb(this.color, this.text);
 }
 
-Completer updatePaletteGenWebCompleter = Completer();
-List<PaletteColorWeb> paletteDominantColorsWeb = [];
+Completer updatePaletteGenCompleter = Completer();
+List<PaletteColorWeb> paletteMutedColors = [],
+    paletteVibrantColors = [],
+    paletteDominantColors = [];
 
-// TODO: Need Improvement on Color Sorting, Avarage Color, Computing Luminance
-Future updatePaletteGenWeb(List images, [int noOfPixelsPerAxis = 12]) async {
+bool palettecache = false;
+bool loadingpalette = false;
+final token = CancellationToken();
+final CancelableOperation cancelableFuture = CancelableOperation.fromFuture(
+  updatePaletteGen(list),
+  onCancel: () {
+    token.cancel();
+    Squadron.info('Palette generation canceled... cancelableFuture called()');
+  },
+);
+
+List list = [];
+List<PaletteColorWeb> paletteMuted = [],
+    paletteVibrant = [],
+    paletteDominant = [];
+
+Future updatePaletteGen(List images, [int noOfPixelsPerAxis = 12]) async {
   late ThumbnailWorkerPool? thumbnailWorkerPool;
+  debugPrint('Future #updatePaletteGen passed');
   try {
     thumbnailWorkerPool = ThumbnailWorkerPool(const ConcurrencySettings(
         minWorkers: 1, maxWorkers: 4, maxParallel: 2));
+    thumbnailWorkerPool.start();
+    loadingpalette = true;
+    Squadron.info('thumbnailWorkerPool.start()');
     for (String picture in images) {
       Squadron.info('Loading image #$picture...');
       final sw = Stopwatch()..start();
       Uint8List imageData =
           (await rootBundle.load(picture)).buffer.asUint8List();
-
-      /* THIS DONE IN ISOLATED PROCESS 
-      ui.decodeImageFromList(imageData, (result) async {
-        byteData = await result
-            .toByteData(format: ui.ImageByteFormat.rawStraightRgba)
-            .onError((error, stackTrace) {
-          debugPrint('image to rawStraightRgba $error - $stackTrace');
-          return null;
-        });
-      }); 
-      */
-
-      /* THIS DONE IN ISOLATED PROCESS 
-      final codec = await ui.instantiateImageCodec(imageData);
-      final frame = await codec.getNextFrame();
-      final images = frame.image;
-      final byteData = await images
-          .toByteData(format: ui.ImageByteFormat.rawStraightRgba)
-          .onError((error, stackTrace) {
-        debugPrint('image to rawStraightRgba $error');
-        return null;
-      }); 
-      */
 
       Image image = Image.asset(picture);
       Completer<ui.Image> completer = Completer<ui.Image>();
@@ -59,23 +58,45 @@ Future updatePaletteGenWeb(List images, [int noOfPixelsPerAxis = 12]) async {
       int height = info.height;
 
       final List generator = await thumbnailWorkerPool
-          .getThumbnail(imageData, width, height)
+          .getThumbnail(
+              imagedata: imageData, width: width, height: height, token: token)
           .whenComplete(() => Squadron.info('Worker pool #generator complete'));
       sw.stop();
 
-      final PaletteColorWeb color =
-          PaletteColorWeb(Color(generator.first), Color(generator.last));
-      Squadron.info(
-          '#generator items converted to ${color.color.toString()} and ${color.text.toString()}');
+      final PaletteColorWeb colorDominant =
+          PaletteColorWeb(Color(generator.last), Color(generator.first));
+      // Squadron.info('#generator items converted to #colorDominant ${colorDominant.color.toString()} and ${colorDominant.text.toString()}');
 
-      paletteDominantColorsWeb.add(color);
+      final PaletteColorWeb colorMuted =
+          PaletteColorWeb(Color(generator.first), Color(generator.last));
+      // Squadron.info('#generator items converted to #colorMuted ${colorMuted.color.toString()} and ${colorMuted.text.toString()}');
+
+      final PaletteColorWeb colorVibrant = PaletteColorWeb(
+          Color(generator.elementAt((generator.length / 3.5).round())),
+          Color(generator.last));
+      // Squadron.info('#generator items converted to #colorVibrant ${colorVibrant.color.toString()} and ${colorVibrant.text.toString()}');
+
+      paletteDominant.add(colorDominant);
+      paletteMuted.add(colorMuted);
+      paletteVibrant.add(colorVibrant);
     }
+  } catch (exception) {
+    debugPrint(exception.toString());
   } finally {
-    for (var element in paletteDominantColorsWeb) {
-      debugPrint(element.toString());
+    if (paletteVibrant[0].color.computeLuminance() <
+        paletteDominant[0].color.computeLuminance()) {
+      paletteVibrantColors.addAll(paletteVibrant);
+      paletteDominantColors.addAll(paletteDominant);
+    } else {
+      paletteVibrantColors.addAll(paletteDominant);
+      paletteDominantColors.addAll(paletteVibrant);
     }
+    paletteMutedColors.addAll(paletteMuted);
     thumbnailWorkerPool?.stop();
-    updatePaletteGenWebCompleter.complete();
+    Squadron.info('WorkerPool finished...');
+
+    loadingpalette = false;
+    updatePaletteGenCompleter.complete();
   }
 }
 
@@ -93,8 +114,13 @@ class ThumbnailWorkerPool extends WorkerPool<ThumbnailWorker>
       : super(createWorker, concurrencySettings: concurrencySettings);
 
   @override
-  Future getThumbnail(Uint8List imagedata, int width, int height) =>
-      execute((w) => w.getThumbnail(imagedata, width, height));
+  Future getThumbnail(
+          {required Uint8List imagedata,
+          required int width,
+          required int height,
+          CancellationToken? token}) =>
+      execute((w) => w.getThumbnail(
+          imagedata: imagedata, width: width, height: height, token: token));
 }
 
 // Implementation of ThumbnailService as a Squadron worker
@@ -103,7 +129,11 @@ class ThumbnailWorker extends Worker implements ThumbnailService {
       : super(entryPoint, args: args);
 
   @override
-  Future getThumbnail(Uint8List imagedata, int width, int height) =>
+  Future getThumbnail(
+          {required Uint8List imagedata,
+          required int width,
+          required int height,
+          CancellationToken? token}) =>
       send(ThumbnailService.getThumbnailCommand,
-          args: [imagedata, width, height]);
+          args: [imagedata, width, height], token: token);
 }

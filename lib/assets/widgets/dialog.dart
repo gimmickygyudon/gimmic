@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 imageDialogHero(context, images, arguments, pagePosition) {
   Navigator.of(context).push(PageRouteBuilder(
-      fullscreenDialog: true,
+      fullscreenDialog: false,
       opaque: false,
       barrierDismissible: true,
       barrierColor: Colors.black54,

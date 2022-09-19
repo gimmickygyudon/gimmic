@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gimmic/assets/colors.dart';
+import 'package:gimmic/assets/colors_luminance.dart';
 import 'package:gimmic/assets/functions/platform.dart';
 import 'package:gimmic/assets/functions/url.dart';
 import 'package:gimmic/assets/widgets/dialog.dart';
@@ -59,7 +59,7 @@ Widget buttonGithub() {
   );
 }
 
-Widget buttonNotification() {
+Widget buttonNotification(context) {
   return ElevatedButton.icon(
       style: const ButtonStyle(
               visualDensity: VisualDensity(horizontal: -2, vertical: -2),
@@ -67,7 +67,22 @@ Widget buttonNotification() {
               alignment: Alignment.center)
           .copyWith(elevation: ButtonStyleButton.allOrNull(0)),
       icon: const Icon(Icons.notifications_none_outlined),
-      onPressed: () {},
+      onPressed: () {
+        final snackBar = SnackBar(
+          behavior: SnackBarBehavior.floating,
+          content: const Text('Yay! An Empty Notification!'),
+          action: SnackBarAction(
+            label: 'OK',
+            onPressed: () {
+              // Some code to undo the change.
+            },
+          ),
+        );
+
+        // Find the ScaffoldMessenger in the widget tree
+        // and use it to show a SnackBar.
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      },
       label: Text('0', style: GoogleFonts.roboto(fontWeight: FontWeight.w500)));
 }
 
@@ -99,7 +114,7 @@ Widget buttonView3D(context, String name, List palettecolor, int colorindex) {
                 ? Colors.white
                 : palettecolor.isEmpty
                     ? Colors.blue.shade100
-                    : lightening(palettecolor[colorindex].color, 40);
+                    : lightening(palettecolor[colorindex].color, 50);
           }),
           elevation: const MaterialStatePropertyAll(0),
           padding: const MaterialStatePropertyAll(EdgeInsets.all(16))),

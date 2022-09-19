@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:gimmic/src/page/unity_viewer.dart';
 import 'package:squadron/squadron.dart';
+import 'assets/widgets/snackbar.dart';
 import 'firebase_options.dart';
 
 import 'package:gimmic/assets/label.dart';
@@ -19,27 +20,27 @@ import 'package:responsive_framework/responsive_framework.dart';
 void initSquadron(String id) {
   Squadron.setId(id);
   Squadron.setLogger(ConsoleSquadronLogger());
-  Squadron.logLevel = SquadronLogLevel.debug;
-  Squadron.debugMode = true;
+  Squadron.logLevel = SquadronLogLevel.off;
+  Squadron.debugMode = false;
 }
 
 /* default runApp (only for testing and developing) */
-void main() async {
+/* void main() async {
   kIsWeb ? initSquadron(StringResource.title) : null;
   GoRouter.setUrlPathStrategy(UrlPathStrategy.path);
   runApp(Gimmic());
-}
+} */
 
-/* Future<void> main() async {
+Future<void> main() async {
   await Firebase.initializeApp(
     // linux isn't implemented yet with firebase platform
     // options: DefaultFirebaseOptions.currentPlatform,
     options: DefaultFirebaseOptions.web,
   );
-  (kIsWeb) => initSquadron(StringResource.title);
+  kIsWeb ? initSquadron(StringResource.title) : null;
   GoRouter.setUrlPathStrategy(UrlPathStrategy.path);
   runApp(Gimmic());
-} */
+}
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
   // Override behavior methods and getters like dragDevices
@@ -73,7 +74,7 @@ class Gimmic extends StatelessWidget {
                       name: 'details',
                       path: ':name',
                       pageBuilder: (context, state) {
-                        final name = state.params['name'];
+                        // final name = state.params['name'];
                         var object = state.extra;
                         object ??= {
                           "name": "default",
@@ -82,7 +83,7 @@ class Gimmic extends StatelessWidget {
                         };
 
                         var arguments = jsonEncode(object);
-                        debugPrint(arguments);
+                        debugPrint('go_route:$arguments');
                         Map valueMap = jsonDecode(arguments);
 
                         return MaterialPage(
@@ -115,6 +116,7 @@ class Gimmic extends StatelessWidget {
         routeInformationProvider: _router.routeInformationProvider,
         routeInformationParser: _router.routeInformationParser,
         routerDelegate: _router.routerDelegate,
+        scaffoldMessengerKey: rootScaffoldMessengerKey,
         builder: (context, child) => ResponsiveWrapper.builder(
           child,
           maxWidth: 16000,

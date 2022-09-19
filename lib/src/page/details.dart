@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
@@ -10,12 +9,17 @@ import 'package:intl/intl.dart';
 
 import 'package:gimmic/assets/functions/platform.dart';
 import 'package:gimmic/assets/icons.dart';
-import '../../assets/colors.dart';
-import '../../assets/colors_web.dart';
+import '../../assets/colors.dart'
+    if (dart.library.js) '../../assets/colors_web.dart'
+    if (dart.library.html) '../../assets/colors_web.dart'
+    if (dart.library.io) '../../assets/colors.dart';
+
+import '../../assets/colors_luminance.dart';
 import '../../assets/widgets/button.dart';
 import '../../assets/widgets/card.dart';
 import '../../assets/widgets/chip.dart';
 import '../../assets/widgets/dialog.dart';
+import '../../assets/widgets/snackbar.dart';
 
 class Details extends StatefulWidget {
   const Details({Key? key, this.arguments}) : super(key: key);
@@ -46,6 +50,8 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
 
   @override
   void initState() {
+    palettecache = false;
+
     super.initState();
     if (widget.arguments != null) {
       arguments = widget.arguments!;
@@ -102,26 +108,38 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
           duration: const Duration(milliseconds: 200), curve: Curves.ease);
     });
 
-    if (updatePaletteGenCompleter.isCompleted == false && kIsWeb == false) {
+    if (updatePaletteGenCompleter.isCompleted == false) {
+      if (loadingpalette == false) {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          await rootScaffoldMessengerKey.currentState
+              ?.showSnackBar(
+                  snackbarPaletteLoading('Creating palette color...'))
+              .closed
+              .then((value) {
+            if (updatePaletteGenCompleter.isCompleted) {
+              rootScaffoldMessengerKey.currentState?.showSnackBar(
+                  snackbarPaletteComplete('Palette color created'));
+            }
+          });
+        });
+      }
       updatePaletteGen(images).whenComplete(() async {
         debugPrint('updatePaletteGen Started');
-        await updatePaletteGenCompleter.future.whenComplete(() => setState(() {
+        await updatePaletteGenCompleter.future.whenComplete(() {
+          rootScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+          if (palettecache == false) {
+            setState(() {
               debugPrint('updatePaletteGenCompleter Complete');
-            }));
-      });
-    } else if (updatePaletteGenWebCompleter.isCompleted == false && kIsWeb) {
-      updatePaletteGenWeb(images).whenComplete(() async {
-        debugPrint('updatePaletteGenWeb(images) Started');
-        await updatePaletteGenWebCompleter.future
-            .whenComplete(() => setState(() {
-                  debugPrint('updatePaletteGenWebCompleter Complete');
-                }));
+            });
+          }
+        });
       });
     }
   }
 
   @override
   void dispose() {
+    palettecache = true;
     sink.close();
     _scrollViewController.dispose();
     _tabController.dispose();
@@ -887,8 +905,8 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                     ],
                                   ),
                                   const SizedBox(height: 8),
-                                  cardYoutube(images[0], paletteVibrantColors,
-                                      paletteDominantColors, activePage),
+                                  cardYoutube(images[0], paletteMutedColors,
+                                      activePage),
                                 ]),
                           ),
                         ),
@@ -938,9 +956,9 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                   ScrollViewKeyboardDismissBehavior.onDrag,
                               children: <Widget>[
                                 CardComment(
-                                  palettecolor: paletteVibrantColors.isEmpty
+                                  palettecolor: paletteMutedColors.isEmpty
                                       ? null
-                                      : paletteVibrantColors,
+                                      : paletteMutedColors,
                                   dominantcolor: paletteDominantColors.isEmpty
                                       ? null
                                       : paletteDominantColors,
@@ -989,7 +1007,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                       autocorrect: true,
                       decoration: InputDecoration(
                         contentPadding: isWebMobile
-                            ? const EdgeInsets.symmetric(vertical: 16)
+                            ? const EdgeInsets.symmetric(vertical: 12)
                             : null,
                         isDense: true,
                         filled: true,
@@ -1039,8 +1057,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
               ? Colors.white
               : paletteDominantColors.isEmpty
                   ? Colors.grey.shade700
-                  : colorButtonLuminance(
-                      paletteDominantColors[activePage].color);
+                  : colorDark(paletteDominantColors[activePage].color, 1);
         }),
       ),
     );
@@ -1059,29 +1076,26 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                     ? Colors.white
                     : paletteDominantColors.isEmpty
                         ? Colors.white
-                        : colorLuminance(0.95, lighten,
-                            paletteDominantColors[activePage].color, .85);
+                        : colorLightText(
+                            paletteDominantColors[activePage].color, 1);
               }),
-              backgroundColor: MaterialStateProperty.all(paletteDominantColors
-                      .isEmpty
-                  ? Colors.amber
-                  : lighten(paletteDominantColors[activePage].color, .2)
-                              .computeLuminance() >
-                          0.8
-                      ? darken(paletteDominantColors[activePage].color, .5)
-                      : lighten(paletteDominantColors[activePage].color, .2)),
+              backgroundColor: MaterialStateProperty.all(
+                  paletteDominantColors.isEmpty
+                      ? Colors.amber
+                      : colorLuminance(
+                          paletteDominantColors[activePage].color, .4)),
               elevation: MaterialStateProperty.all(0))
           : ButtonStyle(
               visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
               padding: const MaterialStatePropertyAll(EdgeInsets.all(16)),
-              backgroundColor: MaterialStateProperty.all(
-                  paletteVibrantColors.isEmpty
-                      ? Colors.grey.shade200
-                      : colorLuminance(
-                          .95,
-                          lighten,
-                          paletteVibrantColors[activePage].color,
-                          kIsWeb ? .275 : .15)),
+              foregroundColor: MaterialStateProperty.resolveWith((states) {
+                return states.contains(MaterialState.hovered)
+                    ? Colors.white
+                    : paletteDominantColors.isEmpty
+                        ? Colors.black54
+                        : colorDark(paletteDominantColors[activePage].color, 1);
+              }),
+              backgroundColor: MaterialStateProperty.all(Colors.transparent),
               elevation: MaterialStateProperty.all(0)),
       onPressed: () {
         setState(() {
@@ -1117,12 +1131,8 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                     backgroundColor: MaterialStateProperty.all(
                         paletteDominantColors.isEmpty
                             ? Colors.green.shade100
-                            : lighten(
-                                colorButtonLuminance(
-                                    paletteDominantColors[activePage].color,
-                                    .0,
-                                    .7),
-                                .05)),
+                            : colorLight(
+                                paletteMutedColors[activePage].color, .0)),
                     foregroundColor:
                         MaterialStateProperty.resolveWith((states) {
                       if (states.contains(MaterialState.pressed)) {
@@ -1132,8 +1142,8 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                           ? Colors.white
                           : paletteDominantColors.isEmpty
                               ? Colors.green
-                              : colorButtonLuminance(
-                                  paletteDominantColors[activePage].color);
+                              : colorDark(
+                                  paletteDominantColors[activePage].color, .8);
                     }),
                     overlayColor: MaterialStateProperty.resolveWith(
                       (states) {
@@ -1147,11 +1157,9 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                     isWebMobile ? .05 : .1)
                             : paletteDominantColors.isEmpty
                                 ? Colors.green.shade500
-                                : lighten(
-                                    colorButtonLuminance(
-                                        paletteDominantColors[activePage]
-                                            .color),
-                                    .1);
+                                : colorLuminance(
+                                    paletteDominantColors[activePage].color,
+                                    .5);
                       },
                     ))),
             textSelectionTheme: TextSelectionThemeData(
@@ -1203,21 +1211,18 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                     foregroundColor: MaterialStatePropertyAll(
               paletteDominantColors.isEmpty
                   ? null
-                  : colorButtonLuminance(
-                      paletteDominantColors[activePage].color),
+                  : colorLuminance(paletteDominantColors[activePage].color, .4),
             ))),
             primaryColor: paletteDominantColors.isEmpty
                 ? null
-                : colorButtonLuminance(
-                    paletteDominantColors[activePage].color)),
+                : colorLuminance(paletteDominantColors[activePage].color, .4)),
         child: Scaffold(
             extendBodyBehindAppBar: true,
             body: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               color: paletteDominantColors.isEmpty
                   ? Colors.grey.shade200
-                  : colorLuminance(.95, lighten,
-                      paletteDominantColors[activePage].color, .2),
+                  : colorLight(paletteDominantColors[activePage].color, .45),
               child: Row(
                 children: [
                   Expanded(
@@ -1276,20 +1281,16 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                       ],
                                     )),
                               ),
-                              backgroundColor: paletteVibrantColors.isEmpty
+                              backgroundColor: paletteDominantColors.isEmpty
                                   ? Colors.grey.shade200
-                                  : colorLuminance(
-                                      .95,
-                                      lighten,
-                                      paletteVibrantColors[activePage].color,
-                                      .2),
-                              surfaceTintColor: paletteVibrantColors.isEmpty
+                                  : colorLight(
+                                      paletteDominantColors[activePage].color,
+                                      .45),
+                              surfaceTintColor: paletteDominantColors.isEmpty
                                   ? Colors.grey.shade200
-                                  : colorLuminance(
-                                      .95,
-                                      lighten,
-                                      paletteVibrantColors[activePage].color,
-                                      .2),
+                                  : colorLight(
+                                      paletteDominantColors[activePage].color,
+                                      .45),
                               expandedHeight: useVerticalLayout
                                   ? constraints.maxHeight - 150
                                   : usePhoneLayout
@@ -1298,13 +1299,11 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                           ? constraints.maxHeight - 485
                                           : constraints.maxHeight - 325,
                               flexibleSpace: AnimatedContainer(
-                                color: paletteVibrantColors.isEmpty
+                                color: paletteDominantColors.isEmpty
                                     ? Colors.grey.shade200
-                                    : colorLuminance(
-                                        .95,
-                                        lighten,
-                                        paletteVibrantColors[activePage].color,
-                                        .2),
+                                    : colorLight(
+                                        paletteDominantColors[activePage].color,
+                                        .45),
                                 duration: const Duration(milliseconds: 200),
                                 child: AnimatedPadding(
                                   duration: const Duration(milliseconds: 300),
@@ -1331,7 +1330,10 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                                   context,
                                                   arguments['name']
                                                       .toLowerCase(),
-                                                  paletteVibrantColors,
+                                                  paletteDominantColors.isEmpty
+                                                      ? paletteDominantColors =
+                                                          []
+                                                      : paletteDominantColors,
                                                   activePage))),
                                       Align(
                                         alignment: Alignment.bottomCenter,

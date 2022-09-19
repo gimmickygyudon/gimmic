@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,7 +5,7 @@ import 'package:intl/intl.dart';
 
 import 'package:gimmic/assets/widgets/builder.dart';
 import 'package:gimmic/assets/widgets/button.dart';
-import '../colors.dart';
+import '../colors_luminance.dart';
 import '../functions/platform.dart';
 
 class CardBig extends StatefulWidget {
@@ -78,8 +77,9 @@ class _CardBigState extends State<CardBig> {
                     crossFadeState: widget.useVHideDetails
                         ? CrossFadeState.showFirst
                         : CrossFadeState.showSecond,
-                    firstChild: Image(
-                      image: const AssetImage("images/hellocat1.jpg"),
+                    firstChild: Image.network(
+                      'https://source.unsplash.com/random',
+                      // image: const AssetImage("images/hellocat1.jpg"),
                       fit: BoxFit.cover,
                       frameBuilder: (BuildContext context, Widget child,
                               int? frame, bool wasSynchronouslyLoaded) =>
@@ -89,8 +89,9 @@ class _CardBigState extends State<CardBig> {
                               ImageChunkEvent? loadingProgress) =>
                           imageLoadingBuilder(child, loadingProgress),
                     ),
-                    secondChild: Image(
-                      image: const AssetImage("images/hellocat.jpg"),
+                    secondChild: Image.network(
+                      'https://source.unsplash.com/random',
+                      // image: const AssetImage("images/hellocat.jpg"),
                       fit: BoxFit.cover,
                       frameBuilder: (BuildContext context, Widget child,
                               int? frame, bool wasSynchronouslyLoaded) =>
@@ -172,6 +173,12 @@ class _CardBigState extends State<CardBig> {
                                     child: Text(
                                       'Updated · $timecard',
                                       style: GoogleFonts.roboto(
+                                          shadows: [
+                                            const Shadow(
+                                                color: Colors.black45,
+                                                offset: Offset(1, 1),
+                                                blurRadius: 2),
+                                          ],
                                           fontSize:
                                               widget.useVHideDetails ? 14 : 12,
                                           fontWeight: FontWeight.w300,
@@ -238,6 +245,12 @@ class _CardBigState extends State<CardBig> {
                                               child: Text(
                                                 'Updated · $timecard',
                                                 style: GoogleFonts.roboto(
+                                                    shadows: [
+                                                      const Shadow(
+                                                          color: Colors.black45,
+                                                          offset: Offset(1, 1),
+                                                          blurRadius: 2),
+                                                    ],
                                                     fontSize:
                                                         widget.useVHideDetails
                                                             ? 14
@@ -358,7 +371,7 @@ Widget cardUpdateLog() {
                   trailing: Chip(
                       backgroundColor: Colors.grey.shade50,
                       label: Text(
-                        constraints.maxWidth > 460 ? 'September 12' : 'Sep 12',
+                        constraints.maxWidth > 460 ? 'September 19' : 'Sep 19',
                         style: GoogleFonts.roboto(
                             fontSize: 12, color: Colors.black54),
                       )),
@@ -563,25 +576,22 @@ Widget cardUpdateLog() {
   });
 }
 
-Widget cardYoutube(thumbnails, palettecolor, dominantcolor, colorindex) {
+Widget cardYoutube(thumbnails, palettecolor, colorindex) {
   return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
     return Card(
       color: palettecolor.isEmpty
           ? Colors.grey.shade100
-          : colorLuminance(.95, lighten, palettecolor[colorindex].color,
-              kIsWeb ? .275 : .225),
+          : colorLight(palettecolor[colorindex].color, .1),
       elevation: 0,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         hoverColor: palettecolor.isEmpty
             ? Colors.grey.shade200
-            : colorLuminance(.9, lighten, palettecolor[colorindex].color,
-                kIsWeb ? .225 : .175),
+            : colorLight(palettecolor[colorindex].color, .0),
         splashColor: palettecolor.isEmpty
             ? Colors.grey.shade50
-            : colorLuminance(.95, lighten, palettecolor[colorindex].color,
-                kIsWeb ? .15 : .05),
+            : colorLightText(palettecolor[colorindex].color, .2),
         onTap: () {},
         child: Padding(
           padding: constraints.maxWidth > 320
@@ -725,27 +735,16 @@ class _CardCommentState extends State<CardComment> {
       elevation: 0,
       color: widget.palettecolor == null
           ? Colors.grey.shade100
-          : colorLuminance(
-              .95,
-              lighten,
-              widget.palettecolor![widget.colorindex!].color,
-              kIsWeb ? .275 : .225),
+          : colorLight(widget.palettecolor![widget.colorindex!].color, .2),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         hoverColor: widget.palettecolor == null
             ? Colors.grey.shade200
-            : colorLuminance(
-                .9,
-                lighten,
-                widget.palettecolor![widget.colorindex!].color,
-                kIsWeb ? .225 : .175),
+            : colorLight(widget.palettecolor![widget.colorindex!].color, .0),
         splashColor: widget.palettecolor == null
             ? Colors.grey.shade50
-            : colorLuminance(
-                .95,
-                lighten,
-                widget.palettecolor![widget.colorindex!].color,
-                kIsWeb ? .15 : .05),
+            : colorLightText(
+                widget.palettecolor![widget.colorindex!].color, .1),
         onTap: () {
           if (expandComment == false) {
             setState(() {
@@ -767,19 +766,12 @@ class _CardCommentState extends State<CardComment> {
               leading: CircleAvatar(
                   foregroundColor: widget.dominantcolor == null
                       ? null
-                      : lighten(widget.dominantcolor![widget.colorindex!].color,
-                                      .2)
-                                  .computeLuminance() >
-                              0.8
-                          ? darken(
-                              widget.dominantcolor![widget.colorindex!].color,
-                              .5)
-                          : lighten(
-                              widget.dominantcolor![widget.colorindex!].color,
-                              .2),
+                      : colorDark(
+                          widget.dominantcolor![widget.colorindex!].color, .8),
                   backgroundColor: widget.palettecolor == null
                       ? null
-                      : lighten(widget.palettecolor![widget.colorindex!].color),
+                      : colorLight(
+                          widget.palettecolor![widget.colorindex!].color),
                   maxRadius: 18,
                   child: const Icon(Icons.face, size: 36)),
               title: Text('Comment Bots',

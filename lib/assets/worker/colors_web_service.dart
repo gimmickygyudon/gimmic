@@ -10,7 +10,11 @@ import 'package:image/image.dart' as imagelib;
 // in this example, there is only one functionality: given an image represented by imageData,
 // compute a thumbnail of size (thumbWidth, thumbHeight)
 abstract class ThumbnailService {
-  Future getThumbnail(Uint8List imagedata, int width, int height);
+  Future getThumbnail(
+      {required Uint8List imagedata,
+      required int width,
+      required int height,
+      CancellationToken? token});
 
   // this constant is used to identify the method to call when communicating with isolates / web workers
   static const getThumbnailCommand = 1;
@@ -19,11 +23,17 @@ abstract class ThumbnailService {
 // this class is the actual implementation of the service defined above
 class ThumbnailServiceImpl implements ThumbnailService, WorkerService {
   @override
-  Future getThumbnail(Uint8List imagedata, int width, int height) async {
+  Future getThumbnail(
+      {required Uint8List imagedata,
+      required int width,
+      required int height,
+      CancellationToken? token}) async {
+    token?.isCancelled(throwIfCancelled: true);
+
     imagelib.Image? image;
     List colors = [];
     int noOfPixelsPerAxis = 12;
-    int noOfPaletteColors = 10;
+    int noOfPaletteColors = 4;
 
     int abgrToArgb(int argbColor) {
       int r = (argbColor >> 16) & 0xFF;
@@ -111,7 +121,7 @@ class ThumbnailServiceImpl implements ThumbnailService, WorkerService {
       Random random = Random();
 
       colors.addAll(sortColors(params));
-      noOfPaletteColors = random.nextInt(noOfPaletteColors) + 2;
+      noOfPaletteColors = random.nextInt(noOfPaletteColors) + 6;
 
       int noOfItems = noOfPaletteColors;
 
@@ -136,8 +146,11 @@ class ThumbnailServiceImpl implements ThumbnailService, WorkerService {
   @override
   late final Map<int, CommandHandler> operations = {
     ThumbnailService.getThumbnailCommand: (WorkerRequest r) {
-      Squadron.info('Received getThumbnailCommand in ${r.travelTime} µs');
-      return getThumbnail(r.args[0], r.args[1], r.args[2]);
+      return getThumbnail(
+          imagedata: r.args[0],
+          width: r.args[1],
+          height: r.args[2],
+          token: r.cancelToken);
     }
   };
 }

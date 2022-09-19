@@ -165,8 +165,8 @@ class _SearchBarMainState extends State<SearchBarMain> {
               context.pushNamed('details', params: {
                 'name': searchKeyword.toLowerCase(),
               }, extra: {
-                "name": "{$searchKeyword}",
-                "hero": "{$searchHero}",
+                "name": searchKeyword,
+                "hero": searchHero,
                 "index": '$searchIndex'
               });
             }
@@ -249,7 +249,7 @@ class _SearchBarMainState extends State<SearchBarMain> {
                                     ),
                             ),
                             const SizedBox(width: 6),
-                            buttonNotification(),
+                            buttonNotification(context),
                           ],
                         )
                       : Padding(
@@ -384,11 +384,11 @@ class _SearchBarMainState extends State<SearchBarMain> {
                       child: InkWell(
                         onTap: () async {
                           context.pushNamed('details', params: {
-                            'name': searchKeyword.toLowerCase(),
+                            'name': option.name.toLowerCase(),
                           }, extra: {
-                            "name": "{$searchKeyword}",
-                            "hero": "{$searchHero}",
-                            "index": '$searchIndex'
+                            "name": option.name,
+                            "hero": option.hero,
+                            "index": '${option.index}'
                           });
                         },
                         onHover: (value) {},
@@ -399,15 +399,18 @@ class _SearchBarMainState extends State<SearchBarMain> {
                               : null,
                           selectedColor: Colors.lightBlue.shade900,
                           dense: true,
-                          leading: AspectRatio(
-                            aspectRatio: 1 / 1,
-                            child: Container(
-                                height: 36,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    image: DecorationImage(
-                                        fit: BoxFit.cover,
-                                        image: AssetImage(option.image)))),
+                          leading: Hero(
+                            tag: option.hero + option.index.toString(),
+                            child: AspectRatio(
+                              aspectRatio: 1 / 1,
+                              child: Container(
+                                  height: 36,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      image: DecorationImage(
+                                          fit: BoxFit.cover,
+                                          image: AssetImage(option.image)))),
+                            ),
                           ),
                           trailing: selectedIndex == index
                               ? const Icon(Icons.chevron_right)

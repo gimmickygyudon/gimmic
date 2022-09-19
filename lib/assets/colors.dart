@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:isolate';
 import 'dart:ui' as ui;
 
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:palette_generator/palette_generator.dart';
@@ -10,6 +11,16 @@ Completer updatePaletteGenCompleter = Completer();
 List paletteMutedColors = [],
     paletteVibrantColors = [],
     paletteDominantColors = [];
+
+List list = [];
+bool palettecache = false;
+bool loadingpalette = false;
+CancelableOperation cancelableFuture = CancelableOperation.fromFuture(
+  updatePaletteGen(list),
+  onCancel: () {
+    debugPrint('Palette generation canceled... cancelableFuture called()');
+  },
+);
 
 Future updatePaletteGen(List images) async {
   /// Where I listen to the message from isolate's port
@@ -60,6 +71,7 @@ Future updatePaletteGen(List images) async {
     ]);
   }
 
+  List paletteMuted = [], paletteVibrant = [], paletteDominant = [];
   isolatePaletteReceivePort.listen((message) {
     if (message == 'complete') {
       debugPrint('complete');
@@ -67,17 +79,21 @@ Future updatePaletteGen(List images) async {
     } else {
       final PaletteGenerator generator = message;
 
-      paletteMutedColors.add(generator.lightMutedColor);
+      paletteMuted.add(generator.lightMutedColor);
 
       generator.lightVibrantColor != null
-          ? paletteVibrantColors.add(generator.lightVibrantColor)
-          : paletteVibrantColors.add(generator.lightMutedColor);
+          ? paletteVibrant.add(generator.lightVibrantColor)
+          : paletteVibrant.add(generator.lightMutedColor);
 
       generator.dominantColor != null
-          ? paletteDominantColors.add(generator.dominantColor)
-          : paletteDominantColors.add(generator.lightMutedColor);
+          ? paletteDominant.add(generator.dominantColor)
+          : paletteDominant.add(generator.lightMutedColor);
     }
   }).onDone(() {
+    paletteMutedColors.addAll(paletteMuted);
+    paletteVibrantColors.addAll(paletteVibrant);
+    paletteDominantColors.addAll(paletteDominant);
+
     isolate.kill(priority: Isolate.immediate);
     updatePaletteGenCompleter.complete();
   });
@@ -93,7 +109,6 @@ Future<void> createIsolatePalette(SendPort isolateSendPort) async {
   /// Listen to messages sent to isolate's receive port
   int i = 1;
   await for (var message in isolateReceivePort) {
-    Uint8List image = message[0];
     int width = message[1];
     int height = message[2];
     ByteData byteData = message[3];
@@ -115,57 +130,4 @@ Future<void> createIsolatePalette(SendPort isolateSendPort) async {
     }
     i++;
   }
-}
-
-Color colorButtonLuminance(Color color, [darkamount = .5, lightamount = .2]) {
-  final colors = lighten(color, lightamount).computeLuminance() > 0.85
-      ? darken(color, darkamount)
-      : lighten(color, lightamount);
-  return colors;
-}
-
-Color colorLuminance(double amount, luminance, Color color, double percent) {
-  final palette = luminance(color, percent).computeLuminance() > amount
-      ? luminance(color, percent / 2)
-      : luminance(color, percent);
-  return palette;
-}
-
-/// Darken a color by [percent] amount (100 = black)
-// ........................................................
-Color darkening(Color c, [double percent = 10]) {
-  assert(1 <= percent && percent <= 100);
-  var f = 1 - percent / 100;
-  return Color.fromARGB(c.alpha, (c.red * f).round(), (c.green * f).round(),
-      (c.blue * f).round());
-}
-
-/// Lighten a color by [percent] amount (100 = white)
-// ........................................................
-Color lightening(Color c, [double percent = 10]) {
-  assert(1 <= percent && percent <= 100);
-  var p = percent / 100;
-  return Color.fromARGB(
-      c.alpha,
-      c.red + ((255 - c.red) * p).round(),
-      c.green + ((255 - c.green) * p).round(),
-      c.blue + ((255 - c.blue) * p).round());
-}
-
-Color darken(Color color, [double amount = .1]) {
-  assert(amount >= 0 && amount <= 1);
-
-  final hsl = HSLColor.fromColor(color);
-  final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
-
-  return hslDark.toColor();
-}
-
-Color lighten(Color color, [double amount = .1]) {
-  assert(amount >= 0 && amount <= 1);
-
-  final hsl = HSLColor.fromColor(color);
-  final hslLight = hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
-
-  return hslLight.toColor();
 }

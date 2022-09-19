@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_unity_widget/flutter_unity_widget.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
-import 'package:go_router/go_router.dart';
 
 class UnityViewer extends StatefulWidget {
   const UnityViewer({super.key});

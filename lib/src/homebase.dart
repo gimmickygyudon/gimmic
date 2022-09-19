@@ -23,7 +23,6 @@ class _HomeBaseState extends State<HomeBase> {
       builder: (context, constraints) {
         bool useVerticalLayout =
             constraints.maxWidth < constraints.maxHeight / 1.5;
-
         return Scaffold(
             backgroundColor: Colors.grey.shade200,
             body: Row(
