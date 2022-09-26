@@ -4,8 +4,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:url_strategy/url_strategy.dart';
 import 'package:gimmic/src/page/unity_viewer.dart';
 import 'package:squadron/squadron.dart';
+import 'package:universal_html/html.dart';
 import 'assets/widgets/snackbar.dart';
 import 'firebase_options.dart';
 
@@ -24,21 +26,25 @@ void initSquadron(String id) {
   Squadron.debugMode = false;
 }
 
-/* default runApp (only for testing and developing) */
-/* void main() async {
+/* default runApp (only for testing and developing) */ /* 
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  setPathUrlStrategy();
   kIsWeb ? initSquadron(StringResource.title) : null;
-  GoRouter.setUrlPathStrategy(UrlPathStrategy.path);
   runApp(Gimmic());
 } */
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  setPathUrlStrategy();
+  kIsWeb ? initSquadron(StringResource.title) : null;
+  window.document.onContextMenu.listen((evt) => evt.preventDefault());
+
   await Firebase.initializeApp(
     // linux isn't implemented yet with firebase platform
     // options: DefaultFirebaseOptions.currentPlatform,
     options: DefaultFirebaseOptions.web,
   );
-  kIsWeb ? initSquadron(StringResource.title) : null;
-  GoRouter.setUrlPathStrategy(UrlPathStrategy.path);
   runApp(Gimmic());
 }
 
@@ -61,7 +67,9 @@ class Gimmic extends StatelessWidget {
     routes: [
       GoRoute(
           path: '/',
-          builder: (context, state) => const HomeBase(),
+          builder: (context, state) {
+            return const HomeBase();
+          },
           routes: <GoRoute>[
             GoRoute(
                 path: 'resource',
@@ -74,7 +82,6 @@ class Gimmic extends StatelessWidget {
                       name: 'details',
                       path: ':name',
                       pageBuilder: (context, state) {
-                        // final name = state.params['name'];
                         var object = state.extra;
                         object ??= {
                           "name": "default",
@@ -93,8 +100,9 @@ class Gimmic extends StatelessWidget {
                         GoRoute(
                             name: 'viewer',
                             path: 'viewer',
-                            pageBuilder: (context, state) =>
-                                const MaterialPage(child: UnityViewer())),
+                            pageBuilder: (context, state) {
+                              return const MaterialPage(child: UnityViewer());
+                            }),
                       ])
                 ]),
           ]),
@@ -113,9 +121,7 @@ class Gimmic extends StatelessWidget {
         }
       },
       child: MaterialApp.router(
-        routeInformationProvider: _router.routeInformationProvider,
-        routeInformationParser: _router.routeInformationParser,
-        routerDelegate: _router.routerDelegate,
+        routerConfig: _router,
         scaffoldMessengerKey: rootScaffoldMessengerKey,
         builder: (context, child) => ResponsiveWrapper.builder(
           child,

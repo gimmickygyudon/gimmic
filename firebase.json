@@ -6,22 +6,11 @@
       "**/.*",
       "**/node_modules/**"
     ],
-    "rewrites": [ 
+    "rewrites": [
       {
-      "source": "**",
-      "destination": "/index.html"
-    } 
-  ],
-    "headers": [
-      {
-        "source": "**/*.@(eot|otf|ttf|ttc|woff|font.css|js.gz|jsgz|gz|js)",
-        "headers": [
-          {
-            "key": "Access-Control-Allow-Origin",
-            "value": "*"
-          }
-        ]
-      } 
+        "source": "**",
+        "destination": "/index.html"
+      }
     ]
   }
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gimmic/assets/colors_luminance.dart';
@@ -7,7 +8,9 @@ import 'package:gimmic/assets/widgets/dialog.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 
-Widget iconImageDialog(context, images, hero, color) {
+import 'menu.dart';
+
+Widget iconImageDialog(context, images, hero, color, command) {
   return Row(
     children: [
       Tooltip(
@@ -17,8 +20,8 @@ Widget iconImageDialog(context, images, hero, color) {
                 ? const VisualDensity(horizontal: -2, vertical: -2)
                 : null,
             padding: EdgeInsets.zero,
-            onPressed: () async {
-              await imageDialogHero(context, images, hero, null);
+            onPressed: () {
+              imageDialogHero(context, images, hero, null);
             },
             color: color,
             icon: const Icon(
@@ -31,7 +34,7 @@ Widget iconImageDialog(context, images, hero, color) {
               ],
             )),
       ),
-      buttonMoreMenu()
+      buttonMoreMenu(currentUrl(context, 'resource'), images, hero, command)
     ],
   );
 }
@@ -71,6 +74,7 @@ Widget buttonNotification(context) {
         final snackBar = SnackBar(
           behavior: SnackBarBehavior.floating,
           content: const Text('Yay! An Empty Notification!'),
+          width: 350,
           action: SnackBarAction(
             label: 'OK',
             onPressed: () {
@@ -114,7 +118,8 @@ Widget buttonView3D(context, String name, List palettecolor, int colorindex) {
                 ? Colors.white
                 : palettecolor.isEmpty
                     ? Colors.blue.shade100
-                    : lightening(palettecolor[colorindex].color, 50);
+                    : lightening(
+                        palettecolor[colorindex].color, kIsWeb ? 50 : 90);
           }),
           elevation: const MaterialStatePropertyAll(0),
           padding: const MaterialStatePropertyAll(EdgeInsets.all(16))),
@@ -128,112 +133,24 @@ Widget buttonView3D(context, String name, List palettecolor, int colorindex) {
       ));
 }
 
-Widget buttonMoreMenu() {
+Widget buttonMoreMenu(String url, String image, String hero, command) {
   return PopupMenuButton<int>(
-    elevation: 1,
-    padding: EdgeInsets.zero,
-    shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(6),
-        side: const BorderSide(width: 1, color: Colors.black12)),
-    icon: const Icon(
-      Icons.more_vert,
-      color: Colors.white,
-      shadows: [
-        Shadow(color: Colors.black26, offset: Offset(1, 1), blurRadius: 2),
-      ],
-    ),
-    iconSize: 20,
-    itemBuilder: (context) => [
-      PopupMenuItem(
-        value: 1,
-        child: Padding(
-          padding: const EdgeInsets.only(left: 8, right: 8, top: 0, bottom: 0),
-          child: Row(
-            children: [
-              const Icon(Icons.favorite_border, color: Colors.black54),
-              const SizedBox(
-                width: 10,
-              ),
-              Text("Add to Favorites",
-                  style: GoogleFonts.roboto(
-                      fontWeight: FontWeight.w500, color: Colors.grey.shade800))
-            ],
-          ),
-        ),
+      padding: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+      icon: const Icon(
+        Icons.more_vert,
+        color: Colors.white,
+        shadows: [
+          Shadow(color: Colors.black26, offset: Offset(1, 1), blurRadius: 2),
+        ],
       ),
-      PopupMenuItem(
-        value: 2,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-          child: Row(
-            children: [
-              const Icon(Icons.share_outlined, color: Colors.black54),
-              const SizedBox(
-                width: 10,
-              ),
-              Text("Share",
-                  style: GoogleFonts.roboto(
-                      fontWeight: FontWeight.w500, color: Colors.grey.shade800))
-            ],
-          ),
-        ),
-      ),
-      PopupMenuItem(
-        value: 3,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-          child: Row(
-            children: [
-              const Icon(Icons.link_outlined, color: Colors.black54),
-              const SizedBox(
-                width: 10,
-              ),
-              Text("Copy Link",
-                  style: GoogleFonts.roboto(
-                      fontWeight: FontWeight.w500, color: Colors.grey.shade800))
-            ],
-          ),
-        ),
-      ),
-      const PopupMenuDivider(),
-      PopupMenuItem(
-        value: 4,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-          child: Row(
-            children: [
-              Icon(Icons.not_interested_outlined,
-                  color: Colors.yellow.shade800),
-              const SizedBox(
-                width: 10,
-              ),
-              Text("Not Interested",
-                  style: GoogleFonts.roboto(
-                      fontWeight: FontWeight.w500,
-                      color: Colors.yellow.shade800))
-            ],
-          ),
-        ),
-      ),
-      PopupMenuItem(
-        value: 5,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-          child: Row(
-            children: [
-              Icon(Icons.flag, color: Colors.red.shade800),
-              const SizedBox(
-                width: 10,
-              ),
-              Text("Report Item",
-                  style: GoogleFonts.roboto(
-                      fontWeight: FontWeight.w500, color: Colors.red.shade800))
-            ],
-          ),
-        ),
-      ),
-    ],
-  );
+      iconSize: 20,
+      itemBuilder: (context) {
+        return openPopMenu(context, url, command) +
+            openImagePopMenu(context, image, hero) +
+            openDividerMenu +
+            openItemMenu(context, url);
+      });
 }
 
 class ButtonLinks extends StatelessWidget {

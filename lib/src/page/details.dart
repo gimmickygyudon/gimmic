@@ -15,10 +15,12 @@ import '../../assets/colors.dart'
     if (dart.library.io) '../../assets/colors.dart';
 
 import '../../assets/colors_luminance.dart';
+import '../../assets/functions/url.dart';
 import '../../assets/widgets/button.dart';
 import '../../assets/widgets/card.dart';
 import '../../assets/widgets/chip.dart';
 import '../../assets/widgets/dialog.dart';
+import '../../assets/widgets/menu.dart';
 import '../../assets/widgets/snackbar.dart';
 
 class Details extends StatefulWidget {
@@ -35,6 +37,10 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
   late TabController _tabController;
   late ScrollController _scrollViewController;
   bool isScrollingDown = false;
+
+  final GlobalKey<ScaffoldState> detailScaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
 
   final String timenow = DateFormat("EEEEE, MMMM dd").format(DateTime.now());
   final ScrollController controller = ScrollController();
@@ -128,8 +134,10 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
         await updatePaletteGenCompleter.future.whenComplete(() {
           rootScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
           if (palettecache == false) {
-            setState(() {
-              debugPrint('updatePaletteGenCompleter Complete');
+            detailScaffoldKey.currentState?.setState(() {
+              setState(() {
+                debugPrint('updatePaletteGenCompleter Complete');
+              });
             });
           }
         });
@@ -198,7 +206,8 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
               child: InkWell(
                 onTap: () async {
                   if (currentIndex == index) {
-                    await imageDialogHero(context, images, arguments, index);
+                    await imageDialogHero(
+                        context, images[index], arguments, index);
                   }
                   _pageController.animateToPage(index,
                       duration: const Duration(milliseconds: 200),
@@ -267,10 +276,18 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                       });
                     },
                     itemBuilder: (context, pagePosition) {
+                      void push() => imageDialogHero(context,
+                          images[pagePosition], arguments, pagePosition);
+
                       return GestureDetector(
-                        onTap: () async {
-                          await imageDialogHero(
-                              context, images, arguments, pagePosition);
+                        onSecondaryTapDown: (details) =>
+                            onRightClickImageMainMenu(
+                                context, images[pagePosition], push, details),
+                        onLongPress: () => onRightClickImageMainMenu(
+                            context, images[pagePosition], push),
+                        onTapDown: (details) => onTapPosition(details),
+                        onTap: () {
+                          push();
                         },
                         child: Hero(
                           tag: arguments['hero'] + pagePosition.toString(),
@@ -436,126 +453,24 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                 : const EdgeInsets.only(
                                     top: 6, left: 6, right: 0, bottom: 6),
                             child: PopupMenuButton<int>(
-                              elevation: 1,
-                              color: paletteMutedColors.isEmpty
-                                  ? Colors.grey.shade50
-                                  : lighten(
-                                      paletteMutedColors[activePage].color,
-                                      .15),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(6),
-                                  side: const BorderSide(
-                                      width: 1, color: Colors.black12)),
-                              icon: const Icon(
-                                Icons.more_vert,
-                                color: Colors.black54,
-                              ),
-                              iconSize: 22,
-                              padding: EdgeInsets.zero,
-                              itemBuilder: (context) => [
-                                PopupMenuItem(
-                                  value: 1,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 8, right: 8, top: 0, bottom: 0),
-                                    child: Row(
-                                      children: [
-                                        const Icon(Icons.favorite_border,
-                                            color: Colors.black54),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        Text("Add to Favorites",
-                                            style: GoogleFonts.roboto(
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.grey.shade800))
-                                      ],
-                                    ),
-                                  ),
+                                elevation: 4,
+                                color: paletteMutedColors.isEmpty
+                                    ? Colors.grey.shade50
+                                    : lighten(
+                                        paletteMutedColors[activePage].color,
+                                        .15),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(6)),
+                                icon: const Icon(
+                                  Icons.more_vert,
+                                  color: Colors.black54,
                                 ),
-                                PopupMenuItem(
-                                  value: 2,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 0),
-                                    child: Row(
-                                      children: [
-                                        const Icon(Icons.share_outlined,
-                                            color: Colors.black54),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        Text("Share",
-                                            style: GoogleFonts.roboto(
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.grey.shade800))
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                PopupMenuItem(
-                                  value: 3,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 0),
-                                    child: Row(
-                                      children: [
-                                        const Icon(Icons.link_outlined,
-                                            color: Colors.black54),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        Text("Copy Link",
-                                            style: GoogleFonts.roboto(
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.grey.shade800))
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                const PopupMenuDivider(),
-                                PopupMenuItem(
-                                  value: 4,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 0),
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.block,
-                                            color: Colors.yellow.shade800),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        Text("Not Interested",
-                                            style: GoogleFonts.roboto(
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.yellow.shade800))
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                PopupMenuItem(
-                                  value: 5,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 0),
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.flag,
-                                            color: Colors.red.shade800),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        Text("Report Item",
-                                            style: GoogleFonts.roboto(
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.red.shade800))
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                                iconSize: 22,
+                                padding: EdgeInsets.zero,
+                                itemBuilder: (context) {
+                                  return openItemMenu(
+                                      context, currentUrl(context));
+                                }),
                           )
                         ],
                       ),
@@ -1167,9 +1082,6 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                   ? null
                   : colorButtonLuminance(
                       paletteDominantColors[activePage].color),
-              selectionColor: paletteMutedColors.isEmpty
-                  ? Colors.grey.shade200
-                  : paletteVibrantColors[activePage].color,
               selectionHandleColor: paletteDominantColors.isEmpty
                   ? null
                   : colorButtonLuminance(
@@ -1216,240 +1128,268 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
             primaryColor: paletteDominantColors.isEmpty
                 ? null
                 : colorLuminance(paletteDominantColors[activePage].color, .4)),
-        child: Scaffold(
-            extendBodyBehindAppBar: true,
-            body: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              color: paletteDominantColors.isEmpty
-                  ? Colors.grey.shade200
-                  : colorLight(paletteDominantColors[activePage].color, .45),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 5,
-                    child: AnimatedPadding(
-                      curve: Curves.fastOutSlowIn,
-                      duration: const Duration(milliseconds: 200),
-                      padding: useVerticalLayout
-                          ? useSmallLayout
-                              ? const EdgeInsets.only(
-                                  top: 12, left: 12, right: 0, bottom: 12)
-                              : const EdgeInsets.only(
-                                  top: 12, left: 24, right: 0, bottom: 12)
-                          : EdgeInsets.zero,
-                      child: CustomScrollView(
-                          controller: _scrollViewController,
-                          physics: useVerticalLayout
-                              ? const NeverScrollableScrollPhysics()
-                              : null,
-                          slivers: [
-                            SliverAppBar(
-                              elevation: 10,
-                              toolbarHeight: 75,
-                              leadingWidth: 120,
-                              leading: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: IconButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(),
-                                    icon: Row(
-                                      children: const [
-                                        SizedBox(width: 6),
-                                        Icon(
-                                          color: Colors.white,
-                                          Icons.arrow_back,
-                                          shadows: [
-                                            Shadow(
-                                                color: Colors.black26,
-                                                offset: Offset(1, 1),
-                                                blurRadius: 2),
+        child: GestureDetector(
+          onLongPressDown: (details) => onTapPosition(details),
+          onLongPress: () =>
+              onRightClickPageMenu(context, _refreshIndicatorKey),
+          onSecondaryTapDown: (details) =>
+              onRightClickPageMenu(context, _refreshIndicatorKey, details),
+          child: Scaffold(
+              key: detailScaffoldKey,
+              extendBodyBehindAppBar: true,
+              body: RefreshIndicator(
+                key: _refreshIndicatorKey,
+                onRefresh: () async {
+                  return Future<void>.delayed(const Duration(seconds: 1));
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  color: paletteDominantColors.isEmpty
+                      ? Colors.grey.shade200
+                      : colorLight(
+                          paletteDominantColors[activePage].color, .45),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 5,
+                        child: AnimatedPadding(
+                          curve: Curves.fastOutSlowIn,
+                          duration: const Duration(milliseconds: 200),
+                          padding: useVerticalLayout
+                              ? useSmallLayout
+                                  ? const EdgeInsets.only(
+                                      top: 12, left: 12, right: 0, bottom: 12)
+                                  : const EdgeInsets.only(
+                                      top: 12, left: 24, right: 0, bottom: 12)
+                              : EdgeInsets.zero,
+                          child: CustomScrollView(
+                              controller: _scrollViewController,
+                              physics: useVerticalLayout
+                                  ? const NeverScrollableScrollPhysics()
+                                  : null,
+                              slivers: [
+                                SliverAppBar(
+                                  elevation: 10,
+                                  toolbarHeight: 75,
+                                  leadingWidth: 120,
+                                  leading: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: IconButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(),
+                                        icon: Row(
+                                          children: const [
+                                            SizedBox(width: 6),
+                                            Icon(
+                                              color: Colors.white,
+                                              Icons.arrow_back,
+                                              shadows: [
+                                                Shadow(
+                                                    color: Colors.black26,
+                                                    offset: Offset(1, 1),
+                                                    blurRadius: 2),
+                                              ],
+                                            ),
+                                            SizedBox(width: 6),
+                                            Text(
+                                              'Back',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                shadows: [
+                                                  Shadow(
+                                                      color: Colors.black26,
+                                                      offset: Offset(1, 1),
+                                                      blurRadius: 2),
+                                                ],
+                                              ),
+                                            )
                                           ],
-                                        ),
-                                        SizedBox(width: 6),
-                                        Text(
-                                          'Back',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            shadows: [
-                                              Shadow(
-                                                  color: Colors.black26,
-                                                  offset: Offset(1, 1),
-                                                  blurRadius: 2),
-                                            ],
-                                          ),
-                                        )
-                                      ],
-                                    )),
-                              ),
-                              backgroundColor: paletteDominantColors.isEmpty
-                                  ? Colors.grey.shade200
-                                  : colorLight(
-                                      paletteDominantColors[activePage].color,
-                                      .45),
-                              surfaceTintColor: paletteDominantColors.isEmpty
-                                  ? Colors.grey.shade200
-                                  : colorLight(
-                                      paletteDominantColors[activePage].color,
-                                      .45),
-                              expandedHeight: useVerticalLayout
-                                  ? constraints.maxHeight - 150
-                                  : usePhoneLayout
-                                      ? constraints.maxHeight - 205 - 118
-                                      : constraints.maxHeight > 600
-                                          ? constraints.maxHeight - 485
-                                          : constraints.maxHeight - 325,
-                              flexibleSpace: AnimatedContainer(
-                                color: paletteDominantColors.isEmpty
-                                    ? Colors.grey.shade200
-                                    : colorLight(
-                                        paletteDominantColors[activePage].color,
-                                        .45),
-                                duration: const Duration(milliseconds: 200),
-                                child: AnimatedPadding(
-                                  duration: const Duration(milliseconds: 300),
-                                  padding: useVerticalLayout
-                                      ? const EdgeInsets.all(6)
-                                      : const EdgeInsets.only(bottom: 6),
-                                  child: ClipRRect(
-                                    borderRadius: useVerticalLayout
-                                        ? BorderRadius.circular(20)
-                                        : const BorderRadius.only(
-                                            bottomLeft: Radius.circular(12),
-                                            bottomRight: Radius.circular(12)),
-                                    child: Stack(children: [
-                                      FlexibleSpaceBar(
-                                        title: null,
-                                        background:
-                                            imageMain(context, arguments),
-                                      ),
-                                      Align(
-                                          alignment: Alignment.bottomRight,
-                                          child: Padding(
-                                              padding: const EdgeInsets.all(16),
-                                              child: buttonView3D(
-                                                  context,
-                                                  arguments['name']
-                                                      .toLowerCase(),
-                                                  paletteDominantColors.isEmpty
-                                                      ? paletteDominantColors =
-                                                          []
-                                                      : paletteDominantColors,
-                                                  activePage))),
-                                      Align(
-                                        alignment: Alignment.bottomCenter,
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 16),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: imageIndicators(
-                                                images.length,
-                                                activePage,
-                                                useVerticalLayout),
-                                          ),
-                                        ),
-                                      )
-                                    ]),
+                                        )),
                                   ),
-                                ),
-                              ),
-                            ),
-                            SliverFillRemaining(
-                              hasScrollBody: useVerticalLayout ? false : true,
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  AnimatedSize(
-                                    duration: const Duration(milliseconds: 800),
-                                    curve: Curves.fastOutSlowIn,
-                                    child: AnimatedContainer(
+                                  backgroundColor: paletteDominantColors.isEmpty
+                                      ? Colors.grey.shade200
+                                      : colorLight(
+                                          paletteDominantColors[activePage]
+                                              .color,
+                                          .45),
+                                  surfaceTintColor:
+                                      paletteDominantColors.isEmpty
+                                          ? Colors.grey.shade200
+                                          : colorLight(
+                                              paletteDominantColors[activePage]
+                                                  .color,
+                                              .45),
+                                  expandedHeight: useVerticalLayout
+                                      ? constraints.maxHeight - 150
+                                      : usePhoneLayout
+                                          ? constraints.maxHeight - 205 - 118
+                                          : constraints.maxHeight > 600
+                                              ? constraints.maxHeight - 485
+                                              : constraints.maxHeight - 325,
+                                  flexibleSpace: AnimatedContainer(
+                                    color: paletteDominantColors.isEmpty
+                                        ? Colors.grey.shade200
+                                        : colorLight(
+                                            paletteDominantColors[activePage]
+                                                .color,
+                                            .45),
+                                    duration: const Duration(milliseconds: 200),
+                                    child: AnimatedPadding(
                                       duration:
-                                          const Duration(milliseconds: 200),
-                                      height: useVerticalLayout
-                                          ? null
-                                          : toogleThumbnail
-                                              ? null
-                                              : 0,
-                                      margin: toogleThumbnail
-                                          ? const EdgeInsets.all(4)
-                                          : useVerticalLayout
-                                              ? const EdgeInsets.only(
-                                                  top: 4,
-                                                  left: 4,
-                                                  right: 6,
-                                                  bottom: 6)
-                                              : null,
-                                      decoration: BoxDecoration(
-                                          color: paletteMutedColors.isEmpty
-                                              ? Colors.grey.shade50
-                                              : lighten(
-                                                  paletteMutedColors[activePage]
-                                                      .color,
-                                                  .15),
-                                          borderRadius:
-                                              BorderRadius.circular(16)),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: imageThumbnails(
-                                                images.length,
-                                                arguments,
-                                                activePage,
-                                                useVerticalLayout),
+                                          const Duration(milliseconds: 300),
+                                      padding: useVerticalLayout
+                                          ? const EdgeInsets.all(6)
+                                          : const EdgeInsets.only(bottom: 6),
+                                      child: ClipRRect(
+                                        borderRadius: useVerticalLayout
+                                            ? BorderRadius.circular(20)
+                                            : const BorderRadius.only(
+                                                bottomLeft: Radius.circular(12),
+                                                bottomRight:
+                                                    Radius.circular(12)),
+                                        child: Stack(children: [
+                                          FlexibleSpaceBar(
+                                            title: null,
+                                            background:
+                                                imageMain(context, arguments),
                                           ),
-                                        ],
+                                          Align(
+                                              alignment: Alignment.bottomRight,
+                                              child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(16),
+                                                  child: buttonView3D(
+                                                      context,
+                                                      arguments['name']
+                                                          .toLowerCase(),
+                                                      paletteDominantColors
+                                                              .isEmpty
+                                                          ? paletteDominantColors =
+                                                              []
+                                                          : paletteDominantColors,
+                                                      activePage))),
+                                          Align(
+                                            alignment: Alignment.bottomCenter,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 16),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: imageIndicators(
+                                                    images.length,
+                                                    activePage,
+                                                    useVerticalLayout),
+                                              ),
+                                            ),
+                                          )
+                                        ]),
                                       ),
                                     ),
                                   ),
-                                  Visibility(
-                                    visible: useVerticalLayout ? false : true,
-                                    child: Flexible(
-                                        flex: 6,
-                                        child: detailCard(
-                                          context,
-                                          useSmallLayout,
-                                          useVerticalLayout,
-                                          usePhoneLayout,
-                                        )),
-                                  )
-                                ],
+                                ),
+                                SliverFillRemaining(
+                                  hasScrollBody:
+                                      useVerticalLayout ? false : true,
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      AnimatedSize(
+                                        duration:
+                                            const Duration(milliseconds: 800),
+                                        curve: Curves.fastOutSlowIn,
+                                        child: AnimatedContainer(
+                                          duration:
+                                              const Duration(milliseconds: 200),
+                                          height: useVerticalLayout
+                                              ? null
+                                              : toogleThumbnail
+                                                  ? null
+                                                  : 0,
+                                          margin: toogleThumbnail
+                                              ? const EdgeInsets.all(4)
+                                              : useVerticalLayout
+                                                  ? const EdgeInsets.only(
+                                                      top: 4,
+                                                      left: 4,
+                                                      right: 6,
+                                                      bottom: 6)
+                                                  : null,
+                                          decoration: BoxDecoration(
+                                              color: paletteMutedColors.isEmpty
+                                                  ? Colors.grey.shade50
+                                                  : lighten(
+                                                      paletteMutedColors[
+                                                              activePage]
+                                                          .color,
+                                                      .15),
+                                              borderRadius:
+                                                  BorderRadius.circular(16)),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: imageThumbnails(
+                                                    images.length,
+                                                    arguments,
+                                                    activePage,
+                                                    useVerticalLayout),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible:
+                                            useVerticalLayout ? false : true,
+                                        child: Flexible(
+                                            flex: 6,
+                                            child: detailCard(
+                                              context,
+                                              useSmallLayout,
+                                              useVerticalLayout,
+                                              usePhoneLayout,
+                                            )),
+                                      )
+                                    ],
+                                  ),
+                                )
+                              ]),
+                        ),
+                      ),
+                      AnimatedSize(
+                          duration: const Duration(milliseconds: 200),
+                          child: SizedBox(width: useSmallLayout ? 0 : 8)),
+                      Visibility(
+                        visible: useVerticalLayout ? true : false,
+                        child: Expanded(
+                            flex: 3,
+                            child: AnimatedPadding(
+                              curve: Curves.fastOutSlowIn,
+                              duration: const Duration(milliseconds: 600),
+                              padding: useSmallLayout
+                                  ? const EdgeInsets.only(
+                                      top: 14, left: 0, right: 12, bottom: 14)
+                                  : const EdgeInsets.only(
+                                      top: 12, left: 0, right: 24, bottom: 12),
+                              child: detailCard(
+                                context,
+                                useSmallLayout,
+                                useVerticalLayout,
+                                usePhoneLayout,
                               ),
-                            )
-                          ]),
-                    ),
+                            )),
+                      )
+                    ],
                   ),
-                  AnimatedSize(
-                      duration: const Duration(milliseconds: 200),
-                      child: SizedBox(width: useSmallLayout ? 0 : 8)),
-                  Visibility(
-                    visible: useVerticalLayout ? true : false,
-                    child: Expanded(
-                        flex: 3,
-                        child: AnimatedPadding(
-                          curve: Curves.fastOutSlowIn,
-                          duration: const Duration(milliseconds: 600),
-                          padding: useSmallLayout
-                              ? const EdgeInsets.only(
-                                  top: 14, left: 0, right: 12, bottom: 14)
-                              : const EdgeInsets.only(
-                                  top: 12, left: 0, right: 24, bottom: 12),
-                          child: detailCard(
-                            context,
-                            useSmallLayout,
-                            useVerticalLayout,
-                            usePhoneLayout,
-                          ),
-                        )),
-                  )
-                ],
-              ),
-            )),
+                ),
+              )),
+        ),
       );
     });
   }

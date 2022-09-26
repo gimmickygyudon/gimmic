@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../assets/functions/platform.dart';
+import '../../assets/widgets/dialog.dart';
 
 class Resource {
   const Resource({
@@ -237,6 +238,10 @@ class _SearchBarMainState extends State<SearchBarMain> {
                               child: _focusNode.hasFocus
                                   ? null
                                   : Chip(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(25.7)),
+                                      side: BorderSide.none,
                                       backgroundColor:
                                           Colors.black.withOpacity(0.025),
                                       labelStyle: GoogleFonts.roboto(
@@ -353,7 +358,7 @@ class _SearchBarMainState extends State<SearchBarMain> {
                                 : null,
                             title: RichText(
                                 text: TextSpan(
-                                    text: _textEditingController.text,
+                                    text: _textEditingController.text.trim(),
                                     style: GoogleFonts.roboto(
                                         color: Colors.black87,
                                         fontWeight: FontWeight.w500),
@@ -457,24 +462,24 @@ class _SearchBarMainState extends State<SearchBarMain> {
         final suggestionsName = resource
             .where((Resource resource) => resource.name
                 .toLowerCase()
-                .contains(textEditingValue.text.toLowerCase()))
+                .contains(textEditingValue.text.trim().toLowerCase()))
             .toList();
 
         final suggestionsSubName = resource
             .where((Resource resource) => resource.subname
                 .toLowerCase()
-                .contains(textEditingValue.text.toLowerCase()))
+                .contains(textEditingValue.text.trim().toLowerCase()))
             .toList();
 
         var finalSuggestionsName = suggestionsName..addAll(suggestionsSubName);
         finalSuggestionsName = finalSuggestionsName.toSet().toList();
         if (finalSuggestionsName.isEmpty) {
           finalSuggestionsName.add(Resource(
-            name: textEditingValue.text,
-            subname: textEditingValue.text,
-            image: textEditingValue.text,
+            name: textEditingValue.text.trim(),
+            subname: textEditingValue.text.trim(),
+            image: textEditingValue.text.trim(),
             index: 0,
-            hero: textEditingValue.text,
+            hero: textEditingValue.text.trim(),
           ));
         }
 
@@ -509,59 +514,55 @@ class LayoutDesktop extends StatelessWidget {
               curve: Curves.fastOutSlowIn,
               duration: const Duration(milliseconds: 600),
               padding: EdgeInsets.only(left: usePhoneLayout ? 0 : 20),
-              child: Builder(builder: (context) {
-                return Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Tooltip(
-                        message: StringResource.version,
-                        child: Text(StringResource.title,
-                            style: GoogleFonts.raleway(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black87)),
-                      ),
-                      const SizedBox(width: 8),
-                    ]);
-              }),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Tooltip(
+                      message: StringResource.version,
+                      child: Text(StringResource.title,
+                          style: GoogleFonts.raleway(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87)),
+                    ),
+                    const SizedBox(width: 8),
+                  ]),
             ),
             actions: [
-              Builder(builder: (context) {
-                return AnimatedPadding(
-                  curve: Curves.fastOutSlowIn,
-                  duration: const Duration(milliseconds: 600),
-                  padding:
-                      EdgeInsets.only(right: usePhoneLayout ? 40 : 20, top: 5),
-                  child: Row(
-                    children: [
-                      Row(
-                        children: [
-                          AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 200),
-                              child: usePhoneLayout
-                                  ? TextButton.icon(
-                                      icon: const Icon(Icons.light_mode_rounded,
-                                          size: 20),
-                                      onPressed: null,
-                                      label: Text(
-                                        'Light Mode',
-                                        style: GoogleFonts.roboto(
-                                          fontWeight: FontWeight.w500,
-                                        ),
+              AnimatedPadding(
+                curve: Curves.fastOutSlowIn,
+                duration: const Duration(milliseconds: 600),
+                padding:
+                    EdgeInsets.only(right: usePhoneLayout ? 40 : 20, top: 5),
+                child: Row(
+                  children: [
+                    Row(
+                      children: [
+                        AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 200),
+                            child: usePhoneLayout
+                                ? TextButton.icon(
+                                    icon: const Icon(Icons.light_mode_rounded,
+                                        size: 20),
+                                    onPressed: null,
+                                    label: Text(
+                                      'Light Mode',
+                                      style: GoogleFonts.roboto(
+                                        fontWeight: FontWeight.w500,
                                       ),
-                                    )
-                                  : null),
-                          const IconButton(
-                            icon: Icon(Icons.settings_outlined),
-                            onPressed: null,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              })
+                                    ),
+                                  )
+                                : null),
+                        const IconButton(
+                          icon: Icon(Icons.settings_outlined),
+                          onPressed: null,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              )
             ],
           ),
           body: SingleChildScrollView(

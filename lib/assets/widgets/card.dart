@@ -7,6 +7,8 @@ import 'package:gimmic/assets/widgets/builder.dart';
 import 'package:gimmic/assets/widgets/button.dart';
 import '../colors_luminance.dart';
 import '../functions/platform.dart';
+import '../functions/url.dart';
+import 'menu.dart';
 
 class CardBig extends StatefulWidget {
   final BoxConstraints rowConstraints;
@@ -31,10 +33,28 @@ class _CardBigState extends State<CardBig> {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        context.push('/resource');
-      },
+    void push() => context.push('/resource');
+
+    return GestureDetector(
+      onSecondaryTapDown: (details) => onRightClickMenu(
+          context,
+          currentUrl(context, 'resource'),
+          widget.useVHideDetails
+              ? "images/hellocat1.jpg"
+              : "images/hellocat.jpg",
+          'catHello',
+          push,
+          details),
+      onLongPress: () => onRightClickMenu(
+          context,
+          currentUrl(context, 'resource'),
+          widget.useVHideDetails
+              ? "images/hellocat1.jpg"
+              : "images/hellocat.jpg",
+          'catHello',
+          push),
+      onTapDown: (details) => onTapPosition(details),
+      onTap: () => push(),
       child: MouseRegion(
         onEnter: ((value) => setState(() => cardSelected = true)),
         onExit: ((value) => setState(() => cardSelected = false)),
@@ -167,7 +187,8 @@ class _CardBigState extends State<CardBig> {
                                           ? "images/hellocat1.jpg"
                                           : "images/hellocat.jpg",
                                       'catHello',
-                                      Colors.grey.shade200),
+                                      Colors.grey.shade200,
+                                      push),
                                   secondChild: Padding(
                                     padding: const EdgeInsets.only(left: 6),
                                     child: Text(
@@ -181,7 +202,7 @@ class _CardBigState extends State<CardBig> {
                                           ],
                                           fontSize:
                                               widget.useVHideDetails ? 14 : 12,
-                                          fontWeight: FontWeight.w300,
+                                          fontWeight: FontWeight.w400,
                                           color: Colors.grey.shade200),
                                     ),
                                   ),
@@ -255,7 +276,7 @@ class _CardBigState extends State<CardBig> {
                                                         widget.useVHideDetails
                                                             ? 14
                                                             : 12,
-                                                    fontWeight: FontWeight.w300,
+                                                    fontWeight: FontWeight.w400,
                                                     color:
                                                         Colors.grey.shade300),
                                               ),
@@ -272,7 +293,8 @@ class _CardBigState extends State<CardBig> {
                                                 ? "images/hellocat1.jpg"
                                                 : "images/hellocat.jpg",
                                             'catHello',
-                                            Colors.grey.shade200)
+                                            Colors.grey.shade200,
+                                            push)
                                         : null),
                               ],
                             ),
@@ -339,7 +361,78 @@ Widget cardUpdateLog() {
                       constraints.maxWidth > 600 ? null : EdgeInsets.zero,
                   childrenPadding: EdgeInsets.zero,
                   leading: Chip(
+                      side: BorderSide.none,
                       backgroundColor: Colors.blue.shade50,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6)),
+                      label: Text(
+                        '0.0.3+0',
+                        style: GoogleFonts.roboto(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: isWebMobile ? Colors.blue : Colors.blue),
+                      )),
+                  title: Tooltip(
+                    message: "Try the new right click menu!!",
+                    child: Text(
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      'New Right Click UI and Snackbar',
+                      style: GoogleFonts.roboto(
+                          fontWeight: FontWeight.w400,
+                          fontSize: constraints.maxWidth > 460 ? null : 14),
+                    ),
+                  ),
+                  subtitle: Text(
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    'Added a nice notification snackbar',
+                    style: GoogleFonts.roboto(
+                        color: Colors.black54,
+                        fontSize: constraints.maxWidth > 460 ? null : 12),
+                  ),
+                  trailing: Chip(
+                      side: BorderSide.none,
+                      backgroundColor: Colors.grey.shade50,
+                      label: Text(
+                        constraints.maxWidth > 460 ? 'September 24' : 'Sep 24',
+                        style: GoogleFonts.roboto(
+                            fontSize: 12, color: Colors.black54),
+                      )),
+                  children: <Widget>[
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text('New Notification for Link copy ',
+                            style: GoogleFonts.roboto(fontSize: 14))),
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text('Indicator for creating palette color',
+                            style: GoogleFonts.roboto(fontSize: 14))),
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text('Update url route method',
+                            style: GoogleFonts.roboto(fontSize: 14))),
+                    ListTile(
+                        horizontalTitleGap: 6,
+                        dense: true,
+                        leading: const Icon(Icons.arrow_right),
+                        title: Text('Add right click menu',
+                            style: GoogleFonts.roboto(fontSize: 14))),
+                  ],
+                ),
+                ExpansionTile(
+                  tilePadding:
+                      constraints.maxWidth > 600 ? null : EdgeInsets.zero,
+                  childrenPadding: EdgeInsets.zero,
+                  leading: Chip(
+                      side: BorderSide.none,
+                      backgroundColor: Colors.grey.shade50,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6)),
                       label: Text(
@@ -347,7 +440,8 @@ Widget cardUpdateLog() {
                         style: GoogleFonts.roboto(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: isWebMobile ? Colors.blue : Colors.blue),
+                            color:
+                                isWebMobile ? Colors.black54 : Colors.black54),
                       )),
                   title: Tooltip(
                     message: "Go to detail's page",
@@ -369,6 +463,7 @@ Widget cardUpdateLog() {
                         fontSize: constraints.maxWidth > 460 ? null : 12),
                   ),
                   trailing: Chip(
+                      side: BorderSide.none,
                       backgroundColor: Colors.grey.shade50,
                       label: Text(
                         constraints.maxWidth > 460 ? 'September 19' : 'Sep 19',
@@ -420,6 +515,7 @@ Widget cardUpdateLog() {
                       constraints.maxWidth > 600 ? null : EdgeInsets.zero,
                   childrenPadding: EdgeInsets.zero,
                   leading: Chip(
+                      side: BorderSide.none,
                       backgroundColor: Colors.grey.shade100,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6)),
@@ -495,6 +591,7 @@ Widget cardUpdateLog() {
                       constraints.maxWidth > 600 ? null : EdgeInsets.zero,
                   childrenPadding: EdgeInsets.zero,
                   leading: Chip(
+                      side: BorderSide.none,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(4)),
                       backgroundColor: Colors.grey.shade100,
@@ -523,6 +620,7 @@ Widget cardUpdateLog() {
                         fontSize: constraints.maxWidth > 460 ? null : 12),
                   ),
                   trailing: Chip(
+                      side: BorderSide.none,
                       backgroundColor: Colors.grey.shade50,
                       label: Text(
                         constraints.maxWidth > 460 ? 'August 29' : 'Aug 29',

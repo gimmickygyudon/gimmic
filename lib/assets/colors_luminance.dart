@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 Color colorButtonLuminance(Color color,
@@ -12,11 +13,11 @@ Color colorLuminance(Color color, [double amount = .1, double percent = .5]) {
   final luminance = lighten(color, amount).computeLuminance();
 
   final palette = luminance > percent
-      ? lighten(color, amount).computeLuminance() < .95
-          ? darken(color, amount / 1.5)
-          : darken(color, amount / 1.5)
-      : lighten(color, amount).computeLuminance() > .95
-          ? darken(color, amount / 1.5)
+      ? lighten(color, amount).computeLuminance() > .95
+          ? darken(color, amount / (amount * 3))
+          : darken(color, amount / (amount * 30))
+      : darken(color, amount).computeLuminance() < .05
+          ? lighten(color, amount / (amount * 10))
           : lighten(color, amount * luminance);
   return palette;
 }
@@ -40,7 +41,7 @@ Color colorLight(Color color, [double amount = .1, double percent = .5]) {
   final palette = luminance > percent
       ? lighten(color, amount).computeLuminance() < .95
           ? lighten(color, amount)
-          : lighten(color, .05)
+          : lighten(color, kIsWeb ? .05 : .075)
       : lighten(color, amount).computeLuminance() > .95
           ? lighten(color, amount / (amount * 1.25))
           : darken(color, amount);

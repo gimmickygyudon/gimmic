@@ -5,8 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../../assets/functions/url.dart';
 import '../../assets/widgets/builder.dart';
 import '../../assets/widgets/button.dart';
+import '../../assets/widgets/menu.dart';
 
 class GridResource extends StatefulWidget {
   final bool useVerticalLayout;
@@ -133,185 +135,219 @@ class _GridResourceState extends State<GridResource> {
               crossAxisSpacing: widget.useVerticalLayout ? 20 : 10,
               mainAxisSpacing: 0),
           itemBuilder: (context, index) {
+            String name = widget.foundResource[index]['name'];
+            String hero = widget.foundResource[index]['hero'];
+            int i = widget.foundResource[index]["index"];
+
+            void pushNamed() {
+              context.pushNamed('details', params: {
+                'name': name.toLowerCase(),
+              }, extra: {
+                "name": name,
+                "hero": hero,
+                "index": '$i'
+              });
+            }
+
             return Padding(
               padding: const EdgeInsets.only(bottom: 20),
-              child: InkWell(
-                onHover: ((value) => setState(() => selectedIndex = index)),
-                onTap: () => context.pushNamed('details', params: {
-                  'name': widget.foundResource[index]['name'].toLowerCase(),
-                }, extra: {
-                  "name": "${widget.foundResource[index]['name']}",
-                  "hero": "${widget.foundResource[index]['hero']}",
-                  "index": '${widget.foundResource[index]['index']}'
-                }),
-                child: Hero(
-                  tag: widget.foundResource[index]["hero"] +
-                      widget.foundResource[index]["index"].toString(),
-                  child: Card(
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                      elevation: (selectedIndex == index) ? 10 : 0,
-                      shadowColor: Colors.black,
-                      color: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(
-                              width: 3,
-                              color: (selectedIndex == index)
-                                  ? Colors.green
-                                  : Colors.transparent)),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 400),
-                        color: (selectedIndex == index)
-                            ? Colors.lightGreen.shade50
-                            : Colors.white,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              flex: 3,
-                              child: AnimatedContainer(
-                                curve: Curves.fastOutSlowIn,
-                                duration: const Duration(milliseconds: 300),
-                                foregroundDecoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        stops: selectedIndex == index
-                                            ? [0.3, 0.95, 1.0]
-                                            : [0.3, 0.9, 1.0],
-                                        colors: [
-                                      Colors.transparent,
-                                      Colors.white38,
-                                      selectedIndex == index
-                                          ? Colors.green.shade50
-                                          : Colors.white
-                                    ])),
-                                child: Stack(fit: StackFit.expand, children: [
-                                  Image(
-                                    image: AssetImage(images[index]),
-                                    fit: BoxFit.cover,
-                                    frameBuilder: (BuildContext context,
-                                            Widget child,
-                                            int? frame,
-                                            bool wasSynchronouslyLoaded) =>
-                                        imageFrameBulilder(child, frame,
-                                            wasSynchronouslyLoaded),
-                                    loadingBuilder: (BuildContext context,
-                                            Widget child,
-                                            ImageChunkEvent? loadingProgress) =>
-                                        imageLoadingBuilder(
-                                            child, loadingProgress),
-                                  ),
-                                  Align(
-                                      alignment: Alignment.topRight,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8),
-                                        child: buttonMoreMenu(),
-                                      )),
-                                ]),
+              child: GestureDetector(
+                onSecondaryTapDown: (details) => onRightClickMenu(
+                    context,
+                    currentUrl(context, "/${name.toLowerCase()}"),
+                    images[index],
+                    hero + i.toString(),
+                    pushNamed,
+                    details),
+                onLongPress: () => onRightClickMenu(
+                    context,
+                    currentUrl(context, "/${name.toLowerCase()}"),
+                    images[index],
+                    hero + i.toString(),
+                    pushNamed),
+                onTapDown: (details) => onTapPosition(details),
+                child: InkWell(
+                  onHover: ((value) => setState(() => selectedIndex = index)),
+                  onTap: () => pushNamed(),
+                  child: Hero(
+                    tag: hero + i.toString(),
+                    child: Card(
+                        clipBehavior: Clip.antiAliasWithSaveLayer,
+                        elevation: (selectedIndex == index) ? 10 : 0,
+                        shadowColor: Colors.black,
+                        color: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(
+                                width: 3,
+                                color: (selectedIndex == index)
+                                    ? Colors.green
+                                    : Colors.transparent)),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 400),
+                          color: (selectedIndex == index)
+                              ? Colors.lightGreen.shade50
+                              : Colors.white,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: AnimatedContainer(
+                                  curve: Curves.fastOutSlowIn,
+                                  duration: const Duration(milliseconds: 300),
+                                  foregroundDecoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          stops: selectedIndex == index
+                                              ? [0.3, 0.95, 1.0]
+                                              : [0.3, 0.9, 1.0],
+                                          colors: [
+                                        Colors.transparent,
+                                        Colors.white38,
+                                        selectedIndex == index
+                                            ? Colors.green.shade50
+                                            : Colors.white
+                                      ])),
+                                  child: Stack(fit: StackFit.expand, children: [
+                                    Image(
+                                      image: AssetImage(images[index]),
+                                      fit: BoxFit.cover,
+                                      frameBuilder: (BuildContext context,
+                                              Widget child,
+                                              int? frame,
+                                              bool wasSynchronouslyLoaded) =>
+                                          imageFrameBulilder(child, frame,
+                                              wasSynchronouslyLoaded),
+                                      loadingBuilder: (BuildContext context,
+                                              Widget child,
+                                              ImageChunkEvent?
+                                                  loadingProgress) =>
+                                          imageLoadingBuilder(
+                                              child, loadingProgress),
+                                    ),
+                                    Align(
+                                        alignment: Alignment.topRight,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8),
+                                          child: buttonMoreMenu(
+                                              currentUrl(context,
+                                                  "/${name.toLowerCase()}"),
+                                              images[index],
+                                              hero + i.toString(),
+                                              pushNamed),
+                                        )),
+                                  ]),
+                                ),
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 6),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Theme(
-                                    data: ThemeData(useMaterial3: true)
-                                        .copyWith(
-                                            dividerColor: Colors.transparent),
-                                    child: ListTileTheme(
-                                      iconColor: Colors.green,
-                                      textColor: Colors.green,
-                                      dense: true,
-                                      horizontalTitleGap: 0,
-                                      child: ExpansionTile(
-                                        controlAffinity:
-                                            ListTileControlAffinity.leading,
-                                        title: Text(
-                                            widget.foundResource[index]["name"],
-                                            style: TextStyle(
-                                                color: Colors.black87,
-                                                fontSize:
-                                                    widget.useVerticalLayout2x
-                                                        ? 20
-                                                        : 16,
-                                                fontWeight: FontWeight.w400,
-                                                letterSpacing: -1)),
-                                        subtitle: Text(
-                                            widget.foundResource[index]
-                                                ["subname"],
-                                            style: GoogleFonts.roboto(
-                                                height: 1,
-                                                color: Colors.black54,
-                                                fontSize:
-                                                    widget.useVerticalLayout2x
-                                                        ? 14
-                                                        : 12,
-                                                fontWeight: FontWeight.w500,
-                                                letterSpacing: 0)),
-                                        trailing: IconButton(
-                                            visualDensity: const VisualDensity(
-                                                horizontal: -2, vertical: -2),
-                                            color: selectedIndex == index
-                                                ? Colors.black87
-                                                : Colors.black54,
-                                            onPressed: () {},
-                                            iconSize: 20,
-                                            icon: const Icon(
-                                                Icons.favorite_border)),
-                                        children: <Widget>[
-                                          const SizedBox(height: 16),
-                                          AnimatedPadding(
-                                            duration: const Duration(
-                                                milliseconds: 400),
-                                            padding: isWebMobile
-                                                ? const EdgeInsets.symmetric(
-                                                    horizontal: 10, vertical: 5)
-                                                : selectedIndex == index
-                                                    ? const EdgeInsets.only(
-                                                        left: 10,
-                                                        right: 10,
-                                                        bottom: 5)
-                                                    : const EdgeInsets.only(
-                                                        left: 10, right: 10),
-                                            child: ButtonBar(
-                                              alignment: MainAxisAlignment
-                                                  .spaceBetween,
-                                              buttonPadding: EdgeInsets.zero,
-                                              children: [
-                                                Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 5),
-                                                    child: chipTag(16.0, 12.0)),
-                                                Padding(
-                                                  padding: selectedIndex ==
-                                                          index
-                                                      ? const EdgeInsets.all(0)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 6),
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Theme(
+                                      data: ThemeData(useMaterial3: true)
+                                          .copyWith(
+                                              dividerColor: Colors.transparent),
+                                      child: ListTileTheme(
+                                        iconColor: Colors.green,
+                                        textColor: Colors.green,
+                                        dense: true,
+                                        horizontalTitleGap: 0,
+                                        child: ExpansionTile(
+                                          controlAffinity:
+                                              ListTileControlAffinity.leading,
+                                          title: Text(name,
+                                              style: TextStyle(
+                                                  color: Colors.black87,
+                                                  fontSize:
+                                                      widget.useVerticalLayout2x
+                                                          ? 20
+                                                          : 16,
+                                                  fontWeight: FontWeight.w400,
+                                                  letterSpacing: -1)),
+                                          subtitle: Text(
+                                              widget.foundResource[index]
+                                                  ["subname"],
+                                              style: GoogleFonts.roboto(
+                                                  height: 1,
+                                                  color: Colors.black54,
+                                                  fontSize:
+                                                      widget.useVerticalLayout2x
+                                                          ? 14
+                                                          : 12,
+                                                  fontWeight: FontWeight.w500,
+                                                  letterSpacing: 0)),
+                                          trailing: IconButton(
+                                              visualDensity:
+                                                  const VisualDensity(
+                                                      horizontal: -2,
+                                                      vertical: -2),
+                                              color: selectedIndex == index
+                                                  ? Colors.black87
+                                                  : Colors.black54,
+                                              onPressed: () {},
+                                              iconSize: 20,
+                                              icon: const Icon(
+                                                  Icons.favorite_border)),
+                                          children: <Widget>[
+                                            const SizedBox(height: 16),
+                                            AnimatedPadding(
+                                              duration: const Duration(
+                                                  milliseconds: 400),
+                                              padding: isWebMobile
+                                                  ? const EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                      vertical: 5)
+                                                  : selectedIndex == index
+                                                      ? const EdgeInsets.only(
+                                                          left: 10,
+                                                          right: 10,
+                                                          bottom: 5)
                                                       : const EdgeInsets.only(
-                                                          right: 5),
-                                                  child: downloadButton(
-                                                      context,
-                                                      selectedIndex,
-                                                      index,
-                                                      widget.foundResource[
-                                                          index]["size"]),
-                                                )
-                                              ],
+                                                          left: 10, right: 10),
+                                              child: ButtonBar(
+                                                alignment: MainAxisAlignment
+                                                    .spaceBetween,
+                                                buttonPadding: EdgeInsets.zero,
+                                                children: [
+                                                  Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 5),
+                                                      child:
+                                                          chipTag(16.0, 12.0)),
+                                                  Padding(
+                                                    padding: selectedIndex ==
+                                                            index
+                                                        ? const EdgeInsets.all(
+                                                            0)
+                                                        : const EdgeInsets.only(
+                                                            right: 5),
+                                                    child: downloadButton(
+                                                        context,
+                                                        selectedIndex,
+                                                        index,
+                                                        widget.foundResource[
+                                                            index]["size"]),
+                                                  )
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      )),
+                            ],
+                          ),
+                        )),
+                  ),
                 ),
               ),
             );

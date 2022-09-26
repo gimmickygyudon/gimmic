@@ -27,6 +27,7 @@ Future updatePaletteGen(List images) async {
   ReceivePort paletteGenReceivePort = ReceivePort();
 
   /// Spawn an isolate, passing my receivePort sendPort
+  loadingpalette = true;
   final isolate = await Isolate.spawn<SendPort>(
       createIsolatePalette, paletteGenReceivePort.sendPort);
 
@@ -114,7 +115,8 @@ Future<void> createIsolatePalette(SendPort isolateSendPort) async {
     ByteData byteData = message[3];
 
     final PaletteGenerator generator = await PaletteGenerator.fromByteData(
-        EncodedImage(byteData, width: width, height: height));
+        EncodedImage(byteData, width: width, height: height),
+        maximumColorCount: 8);
 
     /// Get isolate's response sendPort
     final SendPort isolatePaletteSendPort = message[4];
