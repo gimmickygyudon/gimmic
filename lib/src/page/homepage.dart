@@ -8,7 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../assets/functions/platform.dart';
-import '../../assets/widgets/dialog.dart';
+import '../../assets/widgets/appbar.dart';
 
 class Resource {
   const Resource({
@@ -176,8 +176,11 @@ class _SearchBarMainState extends State<SearchBarMain> {
           decoration: InputDecoration(
             isDense: false,
             filled: true,
-            fillColor: Colors.white,
-            prefixIcon: searching ? null : const Icon(Icons.search),
+            fillColor: Colors.white70,
+            hoverColor: Colors.white,
+            prefixIcon: searching
+                ? null
+                : const Icon(Icons.search, color: Colors.black54),
             prefixIconConstraints: const BoxConstraints(minWidth: 55),
             suffixIcon: Padding(
               padding: EdgeInsets.only(
@@ -262,7 +265,7 @@ class _SearchBarMainState extends State<SearchBarMain> {
                               ? const EdgeInsets.only(right: 6)
                               : const EdgeInsets.only(right: 8),
                           child: ButtonLinks(
-                            bgcolor: Colors.red.shade100,
+                            bgcolor: Colors.blue.shade50,
                           )),
             ),
             suffixStyle: GoogleFonts.roboto(
@@ -523,7 +526,7 @@ class LayoutDesktop extends StatelessWidget {
                       child: Text(StringResource.title,
                           style: GoogleFonts.raleway(
                               fontSize: 20,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w500,
                               color: Colors.black87)),
                     ),
                     const SizedBox(width: 8),
@@ -536,31 +539,7 @@ class LayoutDesktop extends StatelessWidget {
                 padding:
                     EdgeInsets.only(right: usePhoneLayout ? 40 : 20, top: 5),
                 child: Row(
-                  children: [
-                    Row(
-                      children: [
-                        AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 200),
-                            child: usePhoneLayout
-                                ? TextButton.icon(
-                                    icon: const Icon(Icons.light_mode_rounded,
-                                        size: 20),
-                                    onPressed: null,
-                                    label: Text(
-                                      'Light Mode',
-                                      style: GoogleFonts.roboto(
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  )
-                                : null),
-                        const IconButton(
-                          icon: Icon(Icons.settings_outlined),
-                          onPressed: null,
-                        ),
-                      ],
-                    ),
-                  ],
+                  children: [appbarSetting(usePhoneLayout)],
                 ),
               )
             ],
@@ -637,9 +616,21 @@ class LayoutDesktop extends StatelessWidget {
                                 ],
                               ),
                               Flexible(
+                                  child: Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: CardResource(
+                                  image: 'images/hellocat1.jpg',
+                                  name: 'Aragon Malay',
+                                  subname: 'Cross Code',
+                                  tag: 'Animal',
+                                  icon: Icons.cruelty_free,
+                                  layouts: useVHideDetails,
+                                  smalllayouts: usePhoneLayout,
+                                ),
+                              )),
+                              Flexible(
                                 child: Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 8),
+                                    padding: const EdgeInsets.only(top: 8),
                                     child: cardUpdateLog()),
                               ),
                             ],
@@ -663,7 +654,7 @@ class LayoutDesktop extends StatelessWidget {
                                 child: Container(
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(24),
-                                    color: Colors.blue.shade100,
+                                    color: Colors.red.shade100,
                                   ),
                                   child: Padding(
                                     padding: isWebMobile
@@ -676,7 +667,7 @@ class LayoutDesktop extends StatelessWidget {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Row(children: [
-                                          buttonGithub(),
+                                          buttonGithub(context),
                                         ]),
                                         Row(
                                           children: [

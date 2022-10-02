@@ -14,11 +14,14 @@ class GridResource extends StatefulWidget {
   final bool useVerticalLayout;
   final bool useVerticalLayout2x;
   final bool useVerticalLayout3x;
+
+  final List<bool> layouts;
   final int gridRowCount;
   final ScrollController scrollViewController;
   final List<Map<String, dynamic>> foundResource;
   const GridResource(
       {super.key,
+      required this.layouts,
       required this.useVerticalLayout,
       required this.gridRowCount,
       required this.useVerticalLayout2x,
@@ -41,73 +44,148 @@ List<String> images = [
   "images/hellocat1.jpg"
 ];
 
-Widget downloadButton(context, selectedIndex, index, size) {
-  return Tooltip(
-    message: "Download 'Legends of Zelda'",
-    child: ElevatedButton.icon(
-      onPressed: () {},
-      label: Text(size,
-          style: GoogleFonts.roboto(
-            fontWeight: FontWeight.w700,
-          )),
-      icon: const Icon(
-        Icons.file_download_outlined,
-        size: 22,
-      ),
-      style: ButtonStyle(
-        visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
-        padding: selectedIndex == index
-            ? null
-            : const MaterialStatePropertyAll(EdgeInsets.zero),
-        backgroundColor: MaterialStateProperty.all(
-            selectedIndex == index ? Colors.green : Colors.transparent),
-        foregroundColor: selectedIndex == index
-            ? MaterialStateProperty.resolveWith((states) {
-                return states.contains(MaterialState.hovered)
-                    ? Colors.white
-                    : Colors.white;
-              })
-            : MaterialStateProperty.resolveWith((states) {
-                return states.contains(MaterialState.hovered)
-                    ? Colors.white
-                    : Colors.green;
-              }),
-        elevation: const MaterialStatePropertyAll(0),
-        overlayColor: MaterialStateProperty.resolveWith(
-          (states) {
-            return states.contains(MaterialState.pressed)
-                ? Colors.green.shade700
-                : Colors.green.shade500;
-          },
-        ),
-      ),
-    ),
-  );
-}
-
-Widget downloadButtonIcon(context) {
-  return Visibility(
-    visible: context ? true : false,
-    child: IconButton(
-      onPressed: () {},
-      icon: const Icon(
-        Icons.file_download_outlined,
-        size: 22,
-      ),
-      style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(Colors.green.shade100),
-        foregroundColor: MaterialStateProperty.resolveWith((states) {
-          return states.contains(MaterialState.hovered)
-              ? Colors.white
-              : Colors.green;
-        }),
-        elevation: const MaterialStatePropertyAll(0),
-        overlayColor: MaterialStateProperty.resolveWith(
-          (states) {
-            return states.contains(MaterialState.pressed)
-                ? Colors.green.shade700
-                : Colors.green.shade500;
-          },
+bool isTileSelected = false;
+Widget gridDescription(
+    context, setState, layouts, name, widget, selectedIndex, index) {
+  return AnimatedSize(
+    duration: const Duration(milliseconds: 300),
+    curve: Curves.ease,
+    child: SizedBox(
+      height: layouts[0] ? 0 : null, // TODO: Use this for minimal mode
+      child: Visibility(
+        maintainAnimation: true,
+        maintainState: true,
+        visible: layouts[0] ? false : true,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: StatefulBuilder(
+            builder: (context, setState) => Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Theme(
+                  data: ThemeData(useMaterial3: true)
+                      .copyWith(dividerColor: Colors.transparent),
+                  child: ListTileTheme(
+                    iconColor: Colors.green,
+                    textColor: Colors.green,
+                    dense: true,
+                    horizontalTitleGap: 0,
+                    child: ExpansionTile(
+                      maintainState: true,
+                      title: MouseRegion(
+                        onEnter: (event) =>
+                            setState(() => isTileSelected = true),
+                        onExit: (event) =>
+                            setState(() => isTileSelected = false),
+                        child: Text(name,
+                            style: TextStyle(
+                                color: Colors.black87,
+                                fontSize: widget.useVerticalLayout2x ? 20 : 16,
+                                fontWeight: FontWeight.w400,
+                                letterSpacing: -1)),
+                      ),
+                      subtitle: MouseRegion(
+                        onEnter: (event) =>
+                            setState(() => isTileSelected = true),
+                        onExit: (event) =>
+                            setState(() => isTileSelected = false),
+                        child: Text(widget.foundResource[index]["subname"],
+                            style: GoogleFonts.roboto(
+                                height: 1,
+                                color: Colors.black54,
+                                fontSize: widget.useVerticalLayout2x ? 14 : 12,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 0)),
+                      ),
+                      trailing: MouseRegion(
+                        onEnter: (event) =>
+                            setState(() => isTileSelected = true),
+                        onExit: (event) =>
+                            setState(() => isTileSelected = false),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                                tooltip: 'Add to Favorites',
+                                visualDensity: const VisualDensity(
+                                    horizontal: -2, vertical: -2),
+                                color: selectedIndex == index
+                                    ? Colors.black87
+                                    : Colors.black54,
+                                onPressed: () {},
+                                icon: const Icon(Icons.favorite_border)),
+                            const SizedBox(width: 6),
+                            SizedBox(
+                                child: selectedIndex == index
+                                    ? isTileSelected
+                                        ? Icon(Icons.expand_circle_down,
+                                            color: Colors.green.shade600)
+                                        : const Icon(
+                                            Icons.expand_circle_down_outlined,
+                                            color: Colors.black87)
+                                    : const Icon(
+                                        Icons.expand_circle_down_outlined,
+                                        color: Colors.black54)),
+                          ],
+                        ),
+                      ),
+                      children: <Widget>[
+                        AnimatedPadding(
+                          duration: const Duration(milliseconds: 400),
+                          padding: isWebMobile
+                              ? const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5)
+                              : selectedIndex == index
+                                  ? const EdgeInsets.only(left: 10, right: 10)
+                                  : const EdgeInsets.only(left: 10, right: 10),
+                          child: Column(
+                            children: [
+                              AnimatedSize(
+                                curve: Curves.fastOutSlowIn,
+                                duration: const Duration(milliseconds: 400),
+                                child: SizedBox(
+                                    height:
+                                        selectedIndex == index || isWebMobile
+                                            ? null
+                                            : 10,
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(8),
+                                      child: SelectableText(
+                                          'A cat is a furry animal that has a long tail and sharp claws. Cats are often kept as pets. Cats are lions, tigers, and other wild animals in the same family.'),
+                                    )),
+                              ),
+                              const SizedBox(height: 10),
+                              ButtonBar(
+                                alignment: MainAxisAlignment.spaceBetween,
+                                buttonPadding: EdgeInsets.zero,
+                                children: [
+                                  Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 5, bottom: 5),
+                                      child: chipTag(
+                                          16.0, 12.0, selectedIndex, index)),
+                                  Padding(
+                                    padding: selectedIndex == index
+                                        ? const EdgeInsets.all(0)
+                                        : const EdgeInsets.only(right: 5),
+                                    child: downloadButton(
+                                        context,
+                                        selectedIndex,
+                                        index,
+                                        widget.foundResource[index]["size"]),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     ),
@@ -151,202 +229,118 @@ class _GridResourceState extends State<GridResource> {
 
             return Padding(
               padding: const EdgeInsets.only(bottom: 20),
-              child: GestureDetector(
-                onSecondaryTapDown: (details) => onRightClickMenu(
-                    context,
-                    currentUrl(context, "/${name.toLowerCase()}"),
-                    images[index],
-                    hero + i.toString(),
-                    pushNamed,
-                    details),
-                onLongPress: () => onRightClickMenu(
-                    context,
-                    currentUrl(context, "/${name.toLowerCase()}"),
-                    images[index],
-                    hero + i.toString(),
-                    pushNamed),
-                onTapDown: (details) => onTapPosition(details),
-                child: InkWell(
-                  onHover: ((value) => setState(() => selectedIndex = index)),
+              child: StatefulBuilder(
+                builder: (context, setState) => GestureDetector(
+                  onSecondaryTapDown: (details) => onRightClickMenu(
+                      context,
+                      currentUrl(context, "/${name.toLowerCase()}"),
+                      images[index],
+                      hero + i.toString(),
+                      pushNamed,
+                      details),
+                  onLongPress: () => onRightClickMenu(
+                      context,
+                      currentUrl(context, "/${name.toLowerCase()}"),
+                      images[index],
+                      hero + i.toString(),
+                      pushNamed),
+                  onTapDown: (details) => onTapPosition(details),
                   onTap: () => pushNamed(),
-                  child: Hero(
-                    tag: hero + i.toString(),
-                    child: Card(
-                        clipBehavior: Clip.antiAliasWithSaveLayer,
-                        elevation: (selectedIndex == index) ? 10 : 0,
-                        shadowColor: Colors.black,
-                        color: Colors.transparent,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(
-                                width: 3,
-                                color: (selectedIndex == index)
-                                    ? Colors.green
-                                    : Colors.transparent)),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 400),
-                          color: (selectedIndex == index)
-                              ? Colors.lightGreen.shade50
-                              : Colors.white,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                flex: 3,
-                                child: AnimatedContainer(
-                                  curve: Curves.fastOutSlowIn,
-                                  duration: const Duration(milliseconds: 300),
-                                  foregroundDecoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          stops: selectedIndex == index
-                                              ? [0.3, 0.95, 1.0]
-                                              : [0.3, 0.9, 1.0],
-                                          colors: [
-                                        Colors.transparent,
-                                        Colors.white38,
-                                        selectedIndex == index
-                                            ? Colors.green.shade50
-                                            : Colors.white
-                                      ])),
-                                  child: Stack(fit: StackFit.expand, children: [
-                                    Image(
-                                      image: AssetImage(images[index]),
-                                      fit: BoxFit.cover,
-                                      frameBuilder: (BuildContext context,
-                                              Widget child,
-                                              int? frame,
-                                              bool wasSynchronouslyLoaded) =>
-                                          imageFrameBulilder(child, frame,
-                                              wasSynchronouslyLoaded),
-                                      loadingBuilder: (BuildContext context,
-                                              Widget child,
-                                              ImageChunkEvent?
-                                                  loadingProgress) =>
-                                          imageLoadingBuilder(
-                                              child, loadingProgress),
-                                    ),
-                                    Align(
-                                        alignment: Alignment.topRight,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8),
-                                          child: buttonMoreMenu(
-                                              currentUrl(context,
-                                                  "/${name.toLowerCase()}"),
-                                              images[index],
-                                              hero + i.toString(),
-                                              pushNamed),
-                                        )),
-                                  ]),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 6),
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    Theme(
-                                      data: ThemeData(useMaterial3: true)
-                                          .copyWith(
-                                              dividerColor: Colors.transparent),
-                                      child: ListTileTheme(
-                                        iconColor: Colors.green,
-                                        textColor: Colors.green,
-                                        dense: true,
-                                        horizontalTitleGap: 0,
-                                        child: ExpansionTile(
-                                          controlAffinity:
-                                              ListTileControlAffinity.leading,
-                                          title: Text(name,
-                                              style: TextStyle(
-                                                  color: Colors.black87,
-                                                  fontSize:
-                                                      widget.useVerticalLayout2x
-                                                          ? 20
-                                                          : 16,
-                                                  fontWeight: FontWeight.w400,
-                                                  letterSpacing: -1)),
-                                          subtitle: Text(
-                                              widget.foundResource[index]
-                                                  ["subname"],
-                                              style: GoogleFonts.roboto(
-                                                  height: 1,
-                                                  color: Colors.black54,
-                                                  fontSize:
-                                                      widget.useVerticalLayout2x
-                                                          ? 14
-                                                          : 12,
-                                                  fontWeight: FontWeight.w500,
-                                                  letterSpacing: 0)),
-                                          trailing: IconButton(
-                                              visualDensity:
-                                                  const VisualDensity(
-                                                      horizontal: -2,
-                                                      vertical: -2),
-                                              color: selectedIndex == index
-                                                  ? Colors.black87
-                                                  : Colors.black54,
-                                              onPressed: () {},
-                                              iconSize: 20,
-                                              icon: const Icon(
-                                                  Icons.favorite_border)),
-                                          children: <Widget>[
-                                            const SizedBox(height: 16),
-                                            AnimatedPadding(
-                                              duration: const Duration(
-                                                  milliseconds: 400),
-                                              padding: isWebMobile
-                                                  ? const EdgeInsets.symmetric(
-                                                      horizontal: 10,
-                                                      vertical: 5)
-                                                  : selectedIndex == index
-                                                      ? const EdgeInsets.only(
-                                                          left: 10,
-                                                          right: 10,
-                                                          bottom: 5)
-                                                      : const EdgeInsets.only(
-                                                          left: 10, right: 10),
-                                              child: ButtonBar(
-                                                alignment: MainAxisAlignment
-                                                    .spaceBetween,
-                                                buttonPadding: EdgeInsets.zero,
-                                                children: [
-                                                  Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 5),
-                                                      child:
-                                                          chipTag(16.0, 12.0)),
-                                                  Padding(
-                                                    padding: selectedIndex ==
-                                                            index
-                                                        ? const EdgeInsets.all(
-                                                            0)
-                                                        : const EdgeInsets.only(
-                                                            right: 5),
-                                                    child: downloadButton(
-                                                        context,
-                                                        selectedIndex,
-                                                        index,
-                                                        widget.foundResource[
-                                                            index]["size"]),
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          ],
+                  child: MouseRegion(
+                    onEnter: (event) => setState(() => selectedIndex = index),
+                    onExit: (event) => setState(() => selectedIndex = -1),
+                    child: Hero(
+                      tag: hero + i.toString(),
+                      child: Card(
+                          clipBehavior: Clip.antiAliasWithSaveLayer,
+                          elevation: (selectedIndex == index) ? 10 : 0,
+                          shadowColor:
+                              widget.layouts[0] ? Colors.green : Colors.black,
+                          color: Colors.transparent,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(
+                                  width: 2,
+                                  color: (selectedIndex == index)
+                                      ? Colors.green
+                                      : Colors.transparent)),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 400),
+                            color: (selectedIndex == index)
+                                ? Colors.lightGreen.shade50
+                                : Colors.white,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: AnimatedContainer(
+                                    curve: Curves.fastOutSlowIn,
+                                    duration: const Duration(milliseconds: 300),
+                                    child:
+                                        Stack(fit: StackFit.expand, children: [
+                                      ClipRect(
+                                        child: AnimatedScale(
+                                          curve: Curves.easeOutQuart,
+                                          duration:
+                                              const Duration(milliseconds: 600),
+                                          scale:
+                                              selectedIndex == index ? 1.05 : 1,
+                                          child: Image(
+                                            image: AssetImage(images[index]),
+                                            fit: BoxFit.cover,
+                                            frameBuilder: (BuildContext context,
+                                                    Widget child,
+                                                    int? frame,
+                                                    bool
+                                                        wasSynchronouslyLoaded) =>
+                                                imageFrameBulilder(child, frame,
+                                                    wasSynchronouslyLoaded),
+                                            loadingBuilder:
+                                                (BuildContext context,
+                                                        Widget child,
+                                                        ImageChunkEvent?
+                                                            loadingProgress) =>
+                                                    imageLoadingBuilder(
+                                                        child, loadingProgress),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                      AnimatedOpacity(
+                                        opacity: selectedIndex == index ||
+                                                isWebMobile
+                                            ? 1
+                                            : 0,
+                                        duration:
+                                            const Duration(milliseconds: 200),
+                                        child: Align(
+                                            alignment: Alignment.topRight,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(8),
+                                              child: buttonMoreMenu(
+                                                  currentUrl(context,
+                                                      "/${name.toLowerCase()}"),
+                                                  images[index],
+                                                  hero + i.toString(),
+                                                  pushNamed),
+                                            )),
+                                      ),
+                                    ]),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        )),
+                                gridDescription(
+                                    context,
+                                    setState,
+                                    widget.layouts,
+                                    name,
+                                    widget,
+                                    selectedIndex,
+                                    index)
+                              ],
+                            ),
+                          )),
+                    ),
                   ),
                 ),
               ),

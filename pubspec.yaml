@@ -60,6 +60,7 @@ dependencies:
   async: ^2.9.0
   url_strategy: ^0.2.0
   pasteboard: ^0.2.0
+  firebase_database: ^9.1.6
 
 dev_dependencies:
   flutter_test:

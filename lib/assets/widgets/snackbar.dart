@@ -9,6 +9,28 @@ final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
 bool expandedSnackbar = true;
 
+SnackBar snackbarOpenLoading(String message,
+    [Duration duration = const Duration(seconds: 2)]) {
+  return SnackBar(
+    duration: duration,
+    behavior: SnackBarBehavior.floating,
+    clipBehavior: Clip.antiAlias,
+    content: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Transform.scale(
+            scale: 0.5,
+            child: const CircularProgressIndicator(
+                color: Colors.blue, strokeWidth: 6)),
+        Text(message),
+      ],
+    ),
+    padding: EdgeInsets.zero,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    width: 350,
+  );
+}
+
 SnackBar snackbarPaletteLoading(String message,
     [Duration duration = const Duration(minutes: 15)]) {
   return SnackBar(
@@ -72,7 +94,7 @@ SnackBar snackbarCopyItem(BuildContext context, item,
     [Duration duration = const Duration(seconds: 5)]) {
   return SnackBar(
     duration: duration,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.grey.shade50,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
     padding: EdgeInsets.zero,
     margin:
@@ -97,7 +119,7 @@ SnackBar snackbarCopyItem(BuildContext context, item,
             InkWell(
               mouseCursor: SystemMouseCursors.click,
               onTap: () {
-                urlLink(item);
+                urlLink(context, item);
                 ScaffoldMessenger.of(context).hideCurrentSnackBar();
               },
               child: ListTile(
@@ -111,7 +133,7 @@ SnackBar snackbarCopyItem(BuildContext context, item,
                   trailing: TextButton.icon(
                       icon: const Icon(Icons.open_in_new, size: 18),
                       onPressed: () {
-                        urlLink(item);
+                        urlLink(context, item);
                         ScaffoldMessenger.of(context).hideCurrentSnackBar();
                       },
                       label: const Text('Open'))),
@@ -128,7 +150,7 @@ SnackBar snackbarCopyImage(BuildContext context, image, hero,
     [Duration duration = const Duration(seconds: 5)]) {
   return SnackBar(
     duration: duration,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.grey.shade50,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
     padding: const EdgeInsets.fromLTRB(2, 0, 2, 1),
     clipBehavior: Clip.antiAlias,
@@ -195,7 +217,7 @@ SnackBar snackbarCopyImage(BuildContext context, image, hero,
                               (states) {
                                 if (states.contains(MaterialState.hovered)) {
                                   return hero != null
-                                      ? Colors.lightGreenAccent.shade100
+                                      ? Colors.lightBlue.shade100
                                       : Colors.transparent;
                                 }
                                 return Colors.transparent;
@@ -215,7 +237,7 @@ SnackBar snackbarCopyImage(BuildContext context, image, hero,
                           onPressed: () {
                             if (hero != null) {
                               imageDialogHero(context, image, hero, null);
-                              ScaffoldMessenger.of(context)
+                              return ScaffoldMessenger.of(context)
                                   .hideCurrentSnackBar();
                             }
                           },

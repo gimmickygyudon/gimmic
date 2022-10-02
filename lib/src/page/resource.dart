@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,16 @@ import 'package:gimmic/src/view/list_big.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../assets/label.dart';
+import '../../assets/widgets/appbar.dart';
 import '../../assets/widgets/menu.dart';
+
+class PopupItem {
+  int index;
+  String name;
+  IconData icon;
+  PopupItem(this.index, this.name, this.icon);
+}
 
 class Resource extends StatefulWidget {
   const Resource({Key? key, this.arguments}) : super(key: key);
@@ -20,7 +30,7 @@ class Resource extends StatefulWidget {
   State<Resource> createState() => _ResourceState();
 }
 
-var _searchController = TextEditingController();
+TextEditingController _searchController = TextEditingController();
 
 class _ResourceState extends State<Resource> {
   late ScrollController _scrollGridViewController;
@@ -32,6 +42,13 @@ class _ResourceState extends State<Resource> {
 
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
+
+  final GlobalKey<PopupMenuButtonState> _openTagsMenuKey = GlobalKey();
+  final GlobalKey<PopupMenuButtonState> _openSortMenuKey = GlobalKey();
+  final GlobalKey<PopupMenuButtonState> _openSortMenuOneKey = GlobalKey();
+
+  final FocusNode _buttonTagsFocusNode = FocusNode();
+  final FocusNode _buttonSortFocusNode = FocusNode();
 
   /// This holds a list of fiction users
   /// You can use data fetched from a database or a server as well
@@ -84,6 +101,14 @@ class _ResourceState extends State<Resource> {
         _runFilter(widget.arguments!);
       });
     }
+
+    final random = Random();
+    randomEmoji = emoji[random.nextInt(emoji.length)];
+    Timer.periodic(const Duration(seconds: 45), (Timer timer) {
+      final random = Random();
+      randomEmoji = emoji[random.nextInt(emoji.length)];
+    });
+
     initated = true;
 
     _scrollGridViewController = ScrollController();
@@ -139,6 +164,8 @@ class _ResourceState extends State<Resource> {
     _scrollGridViewController.dispose();
     _scrollListViewController.removeListener(() {});
     _scrollListViewController.dispose();
+    _buttonTagsFocusNode.dispose();
+    _buttonSortFocusNode.dispose();
     super.dispose();
   }
 
@@ -197,10 +224,45 @@ class _ResourceState extends State<Resource> {
     });
   }
 
+  List<bool> checkedTags = [true, false, false];
+  final List<bool> _layouts = [false, true, false];
+  final List<String> emoji = [
+    "(^_^)b",
+    "(>_<)",
+    "(ง'̀-'́)ง",
+    "(•◡•)",
+    "(¬‿¬)",
+    "(•_•)",
+    "~(˘▾˘~)",
+    "(~˘▾˘)~",
+    "(._.)",
+    "(⇀‸↼‶)",
+    "(Ò_Óˇ)",
+    "⚆ _ ⚆",
+    "(｡◕‿‿◕｡)",
+    "(˚▽˚)",
+    ":')",
+    "(ಠ_ಠ)",
+    "(˘⌣˘)",
+    "(¬_¬)",
+    "(~_^)",
+    "(°,,°)"
+  ];
+  String randomEmoji = '';
   String sortbyValue = 'Most Updated';
-  String tagResults = 'All Categories';
 
-  final List<bool> _layouts = [true, false];
+  final List<PopupItem> _listTags = [
+    PopupItem(0, "Any Categories", Icons.grid_view),
+    PopupItem(1, "Animal", Icons.cruelty_free),
+    PopupItem(2, "Sci-fi", Icons.smart_toy_outlined),
+  ];
+
+  final List<PopupItem> _listSort = [
+    PopupItem(0, "Most Popular", Icons.leaderboard),
+    PopupItem(1, "Newest", Icons.new_releases),
+    PopupItem(2, "Name", Icons.sort_by_alpha),
+    PopupItem(3, "Size", Icons.signal_cellular_alt),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -234,35 +296,17 @@ class _ResourceState extends State<Resource> {
                 title: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Resource'),
-                    // TODO: Need an improvement for this search bar
-                    // undecorated search box - currently hidden.
-
-                    Padding(
-                      padding: const EdgeInsets.only(top: 5),
-                      child: Row(
-                        children: [
-                          AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 400),
-                              child: useVerticalLayout3x
-                                  ? TextButton.icon(
-                                      icon: const Icon(Icons.light_mode_rounded,
-                                          size: 20),
-                                      onPressed: null,
-                                      label: Text(
-                                        'Light Mode',
-                                        style: GoogleFonts.roboto(
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    )
-                                  : null),
-                          const IconButton(
-                            icon: Icon(Icons.settings_outlined),
-                            onPressed: null,
-                          ),
-                        ],
-                      ),
+                    Tooltip(
+                      message: StringResource.version,
+                      child: Text(StringResource.title,
+                          style: GoogleFonts.raleway(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87)),
                     ),
+                    Padding(
+                        padding: const EdgeInsets.only(top: 5),
+                        child: appbarSetting(useVerticalLayout2x)),
                   ],
                 )),
             body: RefreshIndicator(
@@ -287,9 +331,9 @@ class _ResourceState extends State<Resource> {
                           duration: const Duration(milliseconds: 600),
                           padding: useVerticalLayout
                               ? const EdgeInsets.only(
-                                  top: 12, bottom: 12, left: 48, right: 48)
+                                  top: 12, bottom: 8, left: 48, right: 48)
                               : const EdgeInsets.only(
-                                  top: 12, bottom: 12, left: 24, right: 24),
+                                  top: 12, bottom: 8, left: 24, right: 24),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -303,8 +347,10 @@ class _ResourceState extends State<Resource> {
                                   decoration: InputDecoration(
                                     isDense: false,
                                     filled: true,
-                                    fillColor: Colors.white,
-                                    prefixIcon: const Icon(Icons.search),
+                                    fillColor: Colors.white70,
+                                    hoverColor: Colors.white,
+                                    prefixIcon: const Icon(Icons.search,
+                                        color: Colors.black54),
                                     prefixIconConstraints:
                                         const BoxConstraints(minWidth: 55),
                                     suffixIcon: _searchController.text.isEmpty
@@ -362,7 +408,7 @@ class _ResourceState extends State<Resource> {
                                   vertical: 0, horizontal: 48)
                           : _showAppbar
                               ? const EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 16)
+                                  vertical: 8, horizontal: 24)
                               : useVerticalLayout3x
                                   ? const EdgeInsets.only(
                                       top: 8, right: 24, left: 24)
@@ -372,66 +418,99 @@ class _ResourceState extends State<Resource> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              IntrinsicWidth(
-                                child: DropdownButtonFormField(
-                                  isDense: true,
-                                  decoration: InputDecoration(
-                                      contentPadding: const EdgeInsets.only(
-                                          top: 8, bottom: 8, right: 4, left: 0),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderSide: const BorderSide(
-                                            color: Colors.transparent,
-                                            width: 2),
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      border: OutlineInputBorder(
-                                        borderSide: const BorderSide(
-                                            color: Colors.transparent,
-                                            width: 2),
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      filled: false,
-                                      fillColor: Colors.white,
-                                      isDense: true,
-                                      prefixIcon: const Icon(
-                                        Icons.interests_outlined,
-                                        size: 20,
-                                        color: Colors.black87,
-                                      )),
-                                  style: GoogleFonts.roboto(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16,
-                                      color: Colors.black87),
-                                  value: tagResults,
-                                  elevation: 1,
-                                  borderRadius: BorderRadius.circular(6),
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      tagResults = newValue!;
-                                    });
+                              PopupMenuButton(
+                                  tooltip: '',
+                                  key: _openTagsMenuKey,
+                                  enabled: true,
+                                  elevation: 4,
+                                  offset: const Offset(0, 45),
+                                  color: Colors.grey.shade50,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
+                                  onSelected: (value) =>
+                                      _buttonTagsFocusNode.requestFocus(),
+                                  onCanceled: () =>
+                                      _buttonTagsFocusNode.requestFocus(),
+                                  itemBuilder: (context) {
+                                    return _listTags.map((PopupItem value) {
+                                          return menuTags(value, checkedTags);
+                                        }).toList() +
+                                        [
+                                          // Reset button
+                                          PopupMenuItem(
+                                              height: 0,
+                                              enabled: false,
+                                              child: Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: TextButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        List.filled(
+                                                            checkedTags.length,
+                                                            false,
+                                                            growable: true);
+                                                      });
+                                                    },
+                                                    child: const Text('Reset')),
+                                              ))
+                                        ];
                                   },
-                                  items: <String>[
-                                    'All Categories',
-                                    'Animal',
-                                    'Sci-fi'
-                                  ].map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
+                                  child: ElevatedButton.icon(
+                                      style: ButtonStyle(
+                                          padding: const MaterialStatePropertyAll(
+                                              EdgeInsets.fromLTRB(
+                                                  12, 16, 8, 16)),
+                                          elevation:
+                                              const MaterialStatePropertyAll(0),
+                                          side:
+                                              MaterialStateProperty.resolveWith(
+                                                  (states) {
+                                            if (states.contains(
+                                                MaterialState.focused)) {
+                                              return const BorderSide(
+                                                  color: Colors.blue, width: 2);
+                                            }
+                                            return const BorderSide(
+                                                color: Colors.transparent,
+                                                width: 2);
+                                          }),
+                                          shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(25.7))),
+                                          backgroundColor:
+                                              const MaterialStatePropertyAll(
+                                                  Colors.transparent)),
+                                      onPressed: () {
+                                        dynamic state =
+                                            _openTagsMenuKey.currentState;
+                                        state.showButtonMenu();
+                                      },
+                                      focusNode: _buttonTagsFocusNode,
+                                      icon: const Icon(Icons.grid_view,
+                                          color: Colors.black87, size: 18),
+                                      label: Row(
+                                        children: [
+                                          Text('Any Categories',
+                                              style: GoogleFonts.roboto(
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.black87)),
+                                          const SizedBox(width: 10),
+                                          const Icon(Icons.arrow_drop_down,
+                                              color: Colors.black87),
+                                        ],
+                                      ))),
                               const SizedBox(width: 10),
                               AnimatedSwitcher(
                                   duration: const Duration(milliseconds: 200),
                                   child: useVerticalLayout2x
                                       ? Text(
-                                          'About ${_foundResource.toList().length} Results')
+                                          'About ${_foundResource.toList().length} Results',
+                                          style: GoogleFonts.roboto(
+                                              fontWeight: FontWeight.w500),
+                                        )
                                       : null)
                             ],
                           ),
@@ -439,74 +518,80 @@ class _ResourceState extends State<Resource> {
                             children: [
                               AnimatedSwitcher(
                                   duration: const Duration(milliseconds: 200),
-                                  child: useVerticalLayout3x
-                                      ? IntrinsicWidth(
-                                          child: DropdownButtonFormField(
-                                            isDense: true,
-                                            elevation: 1,
-                                            decoration: InputDecoration(
-                                                contentPadding:
-                                                    const EdgeInsets.only(
-                                                        top: 8,
-                                                        bottom: 8,
-                                                        right: 4,
-                                                        left: 12),
-                                                enabledBorder:
-                                                    OutlineInputBorder(
-                                                  borderSide: const BorderSide(
-                                                      color: Colors.transparent,
-                                                      width: 2),
-                                                  borderRadius:
-                                                      BorderRadius.circular(6),
-                                                ),
-                                                border: OutlineInputBorder(
-                                                  borderSide: const BorderSide(
-                                                      color: Colors.transparent,
-                                                      width: 2),
-                                                  borderRadius:
-                                                      BorderRadius.circular(6),
-                                                ),
-                                                filled: false,
-                                                fillColor: Colors.white,
-                                                isDense: true,
-                                                labelText: useVerticalLayout3x
-                                                    ? null
-                                                    : 'Sort By',
-                                                labelStyle: GoogleFonts.roboto(
-                                                  fontWeight: FontWeight.w400,
-                                                ),
-                                                prefixText: useVerticalLayout2x
-                                                    ? 'Sort By: '
-                                                    : null,
-                                                prefixStyle: GoogleFonts.roboto(
-                                                    fontWeight: FontWeight.w400,
-                                                    color:
-                                                        Colors.grey.shade600)),
-                                            style: GoogleFonts.roboto(
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.black87),
-                                            borderRadius:
-                                                BorderRadius.circular(6),
-                                            dropdownColor: Colors.white,
-                                            value: sortbyValue,
-                                            onChanged: (String? newValue) {
-                                              setState(() {
-                                                sortbyValue = newValue!;
-                                              });
-                                            },
-                                            items: <String>[
-                                              'Most Updated',
-                                              'Name',
-                                              'Upload',
-                                              'Size'
-                                            ].map<DropdownMenuItem<String>>(
-                                                (String value) {
-                                              return DropdownMenuItem<String>(
-                                                value: value,
-                                                child: Text(value),
-                                              );
-                                            }).toList(),
-                                          ),
+                                  child: useVerticalLayout2x
+                                      ? PopupMenuButton(
+                                          tooltip: '',
+                                          key: _openSortMenuKey,
+                                          enabled: true,
+                                          elevation: 4,
+                                          offset: const Offset(0, 45),
+                                          color: Colors.grey.shade50,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12)),
+                                          onSelected: (value) =>
+                                              _buttonSortFocusNode
+                                                  .requestFocus(),
+                                          onCanceled: () => _buttonSortFocusNode
+                                              .requestFocus(),
+                                          itemBuilder: (context) {
+                                            return _listSort
+                                                .map((PopupItem value) {
+                                              return menuSort(value);
+                                            }).toList();
+                                          },
+                                          child: ElevatedButton.icon(
+                                              style: ButtonStyle(
+                                                  padding: const MaterialStatePropertyAll(
+                                                      EdgeInsets.fromLTRB(
+                                                          16, 16, 8, 16)),
+                                                  elevation: const MaterialStatePropertyAll(
+                                                      0),
+                                                  side: MaterialStateProperty.resolveWith(
+                                                      (states) {
+                                                    if (states.contains(
+                                                        MaterialState
+                                                            .focused)) {
+                                                      return const BorderSide(
+                                                          color: Colors.blue,
+                                                          width: 2);
+                                                    }
+                                                    return const BorderSide(
+                                                        color:
+                                                            Colors.transparent,
+                                                        width: 2);
+                                                  }),
+                                                  shape: MaterialStatePropertyAll(
+                                                      RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                  25.7))),
+                                                  backgroundColor:
+                                                      const MaterialStatePropertyAll(
+                                                          Colors.transparent)),
+                                              onPressed: () {
+                                                dynamic state = _openSortMenuKey
+                                                    .currentState;
+                                                state.showButtonMenu();
+                                              },
+                                              focusNode: _buttonSortFocusNode,
+                                              icon: const Icon(Icons.sort,
+                                                  color: Colors.black87,
+                                                  size: 18),
+                                              label: Row(
+                                                children: [
+                                                  Text('Sort by: Most Popular',
+                                                      style: GoogleFonts.roboto(
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color:
+                                                              Colors.black87)),
+                                                  const SizedBox(width: 10),
+                                                  const Icon(
+                                                      Icons.arrow_drop_down,
+                                                      color: Colors.black87),
+                                                ],
+                                              )),
                                         )
                                       : null),
                               const SizedBox(width: 10),
@@ -533,6 +618,9 @@ class _ResourceState extends State<Resource> {
                                 isSelected: _layouts,
                                 children: const <Widget>[
                                   Tooltip(
+                                      message: 'Minimal Mode',
+                                      child: Icon(Icons.web_asset)),
+                                  Tooltip(
                                       message: 'Grid Mode',
                                       child: Icon(Icons.view_module_outlined)),
                                   Tooltip(
@@ -552,84 +640,85 @@ class _ResourceState extends State<Resource> {
                       duration: const Duration(milliseconds: 400),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 4),
+                            horizontal: 32, vertical: 0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                                 'About ${_foundResource.toList().length} Results',
                                 style: GoogleFonts.roboto(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
+                                  fontWeight: FontWeight.w500,
                                 )),
                             AnimatedSwitcher(
                               duration: const Duration(milliseconds: 400),
-                              child: useVerticalLayout3x
+                              child: useVerticalLayout2x
                                   ? null
-                                  : SizedBox(
-                                      width: useVerticalLayout3x ? 145 : 100,
-                                      child: DropdownButtonFormField(
-                                        isDense: true,
-                                        elevation: 1,
-                                        decoration: InputDecoration(
-                                            contentPadding:
-                                                const EdgeInsets.only(
-                                                    top: 8,
-                                                    bottom: 8,
-                                                    right: 4,
-                                                    left: 12),
-                                            enabledBorder: OutlineInputBorder(
-                                              borderSide: const BorderSide(
-                                                  color: Colors.transparent,
-                                                  width: 2),
-                                              borderRadius:
-                                                  BorderRadius.circular(6),
-                                            ),
-                                            border: OutlineInputBorder(
-                                              borderSide: const BorderSide(
-                                                  color: Colors.transparent,
-                                                  width: 2),
-                                              borderRadius:
-                                                  BorderRadius.circular(6),
-                                            ),
-                                            filled: false,
-                                            fillColor: Colors.white,
-                                            isDense: true,
-                                            labelText: useVerticalLayout3x
-                                                ? null
-                                                : 'Sort By',
-                                            labelStyle: GoogleFonts.roboto(
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                            prefixText: useVerticalLayout3x
-                                                ? 'Sort By: '
-                                                : null,
-                                            prefixStyle: GoogleFonts.roboto(
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.grey.shade600)),
-                                        style: GoogleFonts.roboto(
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.black87),
-                                        borderRadius: BorderRadius.circular(8),
-                                        dropdownColor: Colors.white,
-                                        value: sortbyValue,
-                                        onChanged: (String? newValue) {
-                                          setState(() {
-                                            sortbyValue = newValue!;
-                                          });
-                                        },
-                                        items: <String>[
-                                          'Name',
-                                          'Upload',
-                                          'Size'
-                                        ].map<DropdownMenuItem<String>>(
-                                            (String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(value),
-                                          );
-                                        }).toList(),
-                                      ),
+                                  : PopupMenuButton(
+                                      tooltip: '',
+                                      key: _openSortMenuOneKey,
+                                      enabled: true,
+                                      elevation: 4,
+                                      offset: const Offset(0, 35),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12)),
+                                      onSelected: (value) =>
+                                          _buttonSortFocusNode.requestFocus(),
+                                      onCanceled: () =>
+                                          _buttonSortFocusNode.requestFocus(),
+                                      itemBuilder: (context) {
+                                        return _listSort.map((PopupItem value) {
+                                          return menuSort(value);
+                                        }).toList();
+                                      },
+                                      child: ElevatedButton.icon(
+                                          style: ButtonStyle(
+                                              padding: const MaterialStatePropertyAll(
+                                                  EdgeInsets.fromLTRB(
+                                                      16, 14, 8, 14)),
+                                              elevation:
+                                                  const MaterialStatePropertyAll(
+                                                      0),
+                                              side: MaterialStateProperty.resolveWith(
+                                                  (states) {
+                                                if (states.contains(
+                                                    MaterialState.focused)) {
+                                                  return const BorderSide(
+                                                      color: Colors.blue,
+                                                      width: 2);
+                                                }
+                                                return const BorderSide(
+                                                    color: Colors.transparent,
+                                                    width: 2);
+                                              }),
+                                              shape: MaterialStatePropertyAll(
+                                                  RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              25.7))),
+                                              backgroundColor:
+                                                  const MaterialStatePropertyAll(
+                                                      Colors.transparent)),
+                                          onPressed: () {
+                                            dynamic state = _openSortMenuOneKey
+                                                .currentState;
+                                            state.showButtonMenu();
+                                          },
+                                          focusNode: _buttonSortFocusNode,
+                                          icon: const Icon(Icons.sort,
+                                              color: Colors.black87, size: 18),
+                                          label: Row(
+                                            children: [
+                                              Text('Sort by: Most Popular',
+                                                  style: GoogleFonts.roboto(
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Colors.black87)),
+                                              const SizedBox(width: 10),
+                                              const Icon(Icons.arrow_drop_down,
+                                                  color: Colors.black87),
+                                            ],
+                                          )),
                                     ),
                             ),
                           ],
@@ -652,8 +741,9 @@ class _ResourceState extends State<Resource> {
                           );
                         },
                         child: _foundResource.isNotEmpty
-                            ? _layouts[0]
+                            ? _layouts[0] || _layouts[1]
                                 ? GridResource(
+                                    layouts: _layouts,
                                     useVerticalLayout: useVerticalLayout,
                                     useVerticalLayout2x: useVerticalLayout2x,
                                     useVerticalLayout3x: useVerticalLayout3x,
@@ -715,6 +805,7 @@ class _ResourceState extends State<Resource> {
                                             strokeWidth: 2)),
                                   ),
                                   secondChild: Column(children: [
+                                    const SizedBox(height: 12),
                                     Text(
                                       "No results found for '${_searchController.text.trim()}'",
                                       style: GoogleFonts.roboto(
@@ -724,7 +815,7 @@ class _ResourceState extends State<Resource> {
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
-                                    Text('(>_<)',
+                                    SelectableText(randomEmoji,
                                         style: GoogleFonts.robotoMono(
                                             fontSize: 124,
                                             color: Colors.black54,
@@ -733,7 +824,7 @@ class _ResourceState extends State<Resource> {
                                     OutlinedButton(
                                         style: OutlinedButton.styleFrom(
                                             padding: const EdgeInsets.symmetric(
-                                                horizontal: 24),
+                                                horizontal: 24, vertical: 15),
                                             side: const BorderSide(
                                                 color: Colors.blue),
                                             shape: RoundedRectangleBorder(

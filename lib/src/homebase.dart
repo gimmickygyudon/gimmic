@@ -85,8 +85,8 @@ class _HomeBaseState extends State<HomeBase> {
                                                   }
                                                 });
                                               },
-                                              icon: const Icon(Icons.menu_open),
-                                              label: const Text('Side Menu'))
+                                              icon: const Icon(Icons.menu),
+                                              label: const Text('Menu'))
                                           : IconButton(
                                               tooltip: 'Show Menu',
                                               onPressed: () {
@@ -120,8 +120,9 @@ class _HomeBaseState extends State<HomeBase> {
                                 NavigationRailDestination(
                                   padding:
                                       const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                                  icon: const Icon(Icons.home_outlined),
-                                  selectedIcon: const Icon(Icons.home),
+                                  icon: const Icon(Icons.house_outlined,
+                                      color: Colors.black54),
+                                  selectedIcon: const Icon(Icons.house),
                                   label: Text(
                                     'Home',
                                     style: GoogleFonts.roboto(
@@ -133,8 +134,10 @@ class _HomeBaseState extends State<HomeBase> {
                                 NavigationRailDestination(
                                   padding:
                                       const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                                  icon: const Icon(Icons.bookmark_border),
-                                  selectedIcon: const Icon(Icons.book),
+                                  icon: const Icon(Icons.view_in_ar,
+                                      color: Colors.black54),
+                                  selectedIcon:
+                                      const Icon(Icons.view_in_ar_outlined),
                                   label: Text('Resource',
                                       style: GoogleFonts.roboto(
                                         color: Colors.black87,
@@ -144,8 +147,9 @@ class _HomeBaseState extends State<HomeBase> {
                                 NavigationRailDestination(
                                   padding:
                                       const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                                  icon: const Icon(Icons.star_border),
-                                  selectedIcon: const Icon(Icons.star),
+                                  icon: const Icon(Icons.logo_dev_outlined,
+                                      color: Colors.black54),
+                                  selectedIcon: const Icon(Icons.logo_dev),
                                   label: Text('Update',
                                       style: GoogleFonts.roboto(
                                         color: Colors.black87,

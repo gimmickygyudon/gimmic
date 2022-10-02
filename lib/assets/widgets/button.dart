@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gimmic/assets/colors_luminance.dart';
+import 'package:gimmic/assets/functions/colors.dart';
 import 'package:gimmic/assets/functions/platform.dart';
 import 'package:gimmic/assets/functions/url.dart';
 import 'package:gimmic/assets/widgets/dialog.dart';
@@ -39,7 +39,7 @@ Widget iconImageDialog(context, images, hero, color, command) {
   );
 }
 
-Widget buttonGithub() {
+Widget buttonGithub(context) {
   return ElevatedButton.icon(
     style: ButtonStyle(
         visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
@@ -49,7 +49,8 @@ Widget buttonGithub() {
               ? Colors.grey.shade800
               : Colors.grey.shade700;
         }))).copyWith(elevation: ButtonStyleButton.allOrNull(0)),
-    onPressed: () => urlLink('https://github.com/gimmickygyudon/gimmic/'),
+    onPressed: () =>
+        urlLink(context, 'https://github.com/gimmickygyudon/gimmic/'),
     icon: const Icon(
       FontAwesomeIcons.github,
       size: 18,
@@ -160,13 +161,22 @@ class ButtonLinks extends StatelessWidget {
   final List<String> links = [
     "https://www.instagram.com/gimmickygyudon/",
     "https://twitter.com/GimmickyGyudon",
-    "https://github.com/gimmickygyudon/gimmic/"
+    "https://github.com/gimmickygyudon/gimmic/",
+    "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
   ];
-  final List<String> linksName = ["Instagram", "Twitter", "Github"];
+  final List<String> linksName = ["Instagram", "Twitter", "Github", "YouTube"];
   final List linksIcon = [
     FontAwesomeIcons.instagram,
     FontAwesomeIcons.twitter,
-    FontAwesomeIcons.github
+    FontAwesomeIcons.github,
+    FontAwesomeIcons.youtube
+  ];
+
+  final List<Color> linksColor = [
+    Colors.grey.shade800,
+    Colors.blue,
+    Colors.grey.shade800,
+    Colors.red
   ];
 
   @override
@@ -237,7 +247,9 @@ class ButtonLinks extends StatelessWidget {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 20),
                                     child: Tooltip(
-                                      message: links[index],
+                                      message: linksName[index] == "YouTube"
+                                          ? 'https://www.youtube.com/channel/UCuAXFkgsw1L7xaCfnd5JJOw'
+                                          : links[index],
                                       child: IconButton(
                                           padding: const EdgeInsets.only(
                                               top: 14,
@@ -256,7 +268,7 @@ class ButtonLinks extends StatelessWidget {
                                             children: <Widget>[
                                               Icon(
                                                 linksIcon[index],
-                                                color: Colors.grey.shade800,
+                                                color: linksColor[index],
                                               ),
                                               const SizedBox(height: 10),
                                               Text(
@@ -269,7 +281,7 @@ class ButtonLinks extends StatelessWidget {
                                             ],
                                           ),
                                           onPressed: () =>
-                                              urlLink(links[index])),
+                                              urlLink(context, links[index])),
                                     ),
                                   );
                                 }),
@@ -283,4 +295,105 @@ class ButtonLinks extends StatelessWidget {
               });
         });
   }
+}
+
+Widget downloadButton(context, selectedIndex, index, size) {
+  return Tooltip(
+    message: "Download",
+    child: ElevatedButton.icon(
+      onPressed: () {},
+      label: Text(size,
+          style: GoogleFonts.roboto(
+            fontWeight: FontWeight.w700,
+          )),
+      icon: const Icon(
+        Icons.file_download_outlined,
+        size: 22,
+      ),
+      style: ButtonStyle(
+        visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
+        padding: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.hovered) ||
+              states.contains(MaterialState.pressed)) {
+            return null;
+          }
+          return selectedIndex == index
+              ? const EdgeInsets.only(right: 5)
+              : EdgeInsets.zero;
+        }),
+        backgroundColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.hovered) ||
+              states.contains(MaterialState.pressed)) {
+            return Colors.green;
+          }
+          return Colors.transparent;
+        }),
+        foregroundColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.hovered) ||
+              states.contains(MaterialState.pressed)) {
+            return Colors.white;
+          }
+          return Colors.green;
+        }),
+        elevation: const MaterialStatePropertyAll(0),
+        overlayColor: MaterialStateProperty.resolveWith(
+          (states) {
+            return states.contains(MaterialState.pressed)
+                ? Colors.green.shade700
+                : Colors.green.shade500;
+          },
+        ),
+      ),
+    ),
+  );
+}
+
+Widget downloadButtonIcon(context) {
+  return Visibility(
+    visible: context ? true : false,
+    child: IconButton(
+      onPressed: () {},
+      icon: const Icon(
+        Icons.file_download_outlined,
+        size: 22,
+      ),
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(Colors.green.shade100),
+        foregroundColor: MaterialStateProperty.resolveWith((states) {
+          return states.contains(MaterialState.hovered)
+              ? Colors.white
+              : Colors.green;
+        }),
+        elevation: const MaterialStatePropertyAll(0),
+        overlayColor: MaterialStateProperty.resolveWith(
+          (states) {
+            return states.contains(MaterialState.pressed)
+                ? Colors.green.shade700
+                : Colors.green.shade500;
+          },
+        ),
+      ),
+    ),
+  );
+}
+
+Widget buttonResourceItem() {
+  return Row(
+    children: [
+      IconButton(
+          visualDensity: VisualDensity.compact,
+          onPressed: () {},
+          icon: const Icon(Icons.more_horiz, size: 18, color: Colors.black54)),
+      IconButton(
+          visualDensity: VisualDensity.compact,
+          onPressed: () {},
+          icon: const Icon(Icons.photo_library_outlined,
+              size: 18, color: Colors.black54)),
+      IconButton(
+          visualDensity: VisualDensity.compact,
+          onPressed: () {},
+          icon: const Icon(Icons.bookmark_add_outlined,
+              size: 18, color: Colors.black54)),
+    ],
+  );
 }

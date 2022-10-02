@@ -25,6 +25,7 @@ onRightClickImageMainMenu(BuildContext context, image, command, [details]) {
   final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
   details ??= tapPosition;
   showMenu<int>(
+      color: Colors.grey.shade50,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
       context: context,
       items: openImageMainMenu(context, image, command),
@@ -37,6 +38,7 @@ onRightClickImageMenu(BuildContext context, image, [details]) {
   final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
   details ??= tapPosition;
   showMenu<int>(
+      color: Colors.grey.shade50,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
       context: context,
       items: openImageMenu(context, image),
@@ -49,6 +51,7 @@ onRightClickPageMenu(BuildContext context, key, [details]) {
   final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
   details ??= tapPosition;
   showMenu<int>(
+      color: Colors.grey.shade50,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
       context: context,
       items: openPageMenu(context, key),
@@ -61,6 +64,7 @@ onRightClickMenu(BuildContext context, url, image, hero, command, [details]) {
   final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
   details ??= tapPosition;
   showMenu<int>(
+      color: Colors.grey.shade50,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
       context: context,
       items: openPopMenu(context, url, command) +
@@ -232,7 +236,7 @@ List<PopupMenuEntry<int>> openPopMenu(context, String url, command) {
           ),
         )),
     PopupMenuItem(
-        onTap: () => urlLink(url),
+        onTap: () => urlLink(context, url),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
           child: Row(
@@ -719,4 +723,70 @@ class _PopupSubMenuState<T> extends State<PopupSubMenuItem<T>> {
         },
         child: widget.widget);
   }
+}
+
+// Menu Tags
+PopupMenuItem menuTags(item, List<bool> checkedTags) {
+  return PopupMenuItem(
+      height: 0,
+      value: item,
+      child: StatefulBuilder(
+          builder: (context, setState) => ListTile(
+                contentPadding: EdgeInsets.zero,
+                horizontalTitleGap: 0,
+                leading: Icon(item.icon, size: 20, color: Colors.black54),
+                title: Text(item.name,
+                    style: GoogleFonts.roboto(
+                        fontSize: 14, fontWeight: FontWeight.w500)),
+                trailing: Checkbox(
+                  fillColor: const MaterialStatePropertyAll(Colors.lightBlue),
+                  side: const BorderSide(color: Colors.black54, width: 2),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4)),
+                  onChanged: (bool? value) {
+                    setState(() {
+                      checkedTags[item.index] = value!;
+                    });
+                  },
+                  value: checkedTags[item.index],
+                ),
+              )));
+}
+
+// Menu Sort
+PopupMenuItem menuSort(item) {
+  return PopupMenuItem(
+      height: 0,
+      value: item,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Icon(item.icon, size: 22, color: Colors.black54),
+                const SizedBox(
+                  width: 10,
+                ),
+                Text(item.name,
+                    style: GoogleFonts.roboto(
+                        fontSize: 14, fontWeight: FontWeight.w500)),
+              ],
+            ),
+            item.name == 'Newest'
+                ? Chip(
+                    label: Text('4',
+                        style: GoogleFonts.roboto(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.red.shade800)),
+                    padding: EdgeInsets.zero,
+                    shape: const CircleBorder(),
+                    side: BorderSide.none,
+                  )
+                : const SizedBox()
+          ],
+        ),
+      ));
 }

@@ -26,15 +26,15 @@ void initSquadron(String id) {
   Squadron.debugMode = false;
 }
 
-/* default runApp (only for testing and developing) */ /* 
+/* default runApp (only for testing and developing) */
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setPathUrlStrategy();
   kIsWeb ? initSquadron(StringResource.title) : null;
   runApp(Gimmic());
-} */
+}
 
-Future<void> main() async {
+/* Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setPathUrlStrategy();
   kIsWeb ? initSquadron(StringResource.title) : null;
@@ -46,7 +46,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.web,
   );
   runApp(Gimmic());
-}
+} */
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
   // Override behavior methods and getters like dragDevices
