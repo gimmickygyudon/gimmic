@@ -9,6 +9,7 @@
 .history
 .svn/
 migrate_working_dir/
+.directory
 
 # IntelliJ related
 *.iml
@@ -35,6 +36,10 @@ migrate_working_dir/
 .firebase/
 /public/
 /unity/
+# Firebase
+firebase.json
+.firebaserc
+/lib/firebase_options.dart
 
 # Symbolication related
 app.*.symbols

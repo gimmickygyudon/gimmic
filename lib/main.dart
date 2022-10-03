@@ -3,21 +3,23 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+
 import 'package:firebase_core/firebase_core.dart';
-import 'package:url_strategy/url_strategy.dart';
-import 'package:gimmic/src/page/unity_viewer.dart';
-import 'package:squadron/squadron.dart';
-import 'package:universal_html/html.dart';
-import 'assets/widgets/snackbar.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'firebase_options.dart';
 
+import 'package:url_strategy/url_strategy.dart';
+import 'package:squadron/squadron.dart';
+import 'package:go_router/go_router.dart';
+import 'package:responsive_framework/responsive_framework.dart';
+import 'package:universal_html/html.dart';
+
+import 'assets/widgets/snackbar.dart';
 import 'package:gimmic/assets/label.dart';
 import 'package:gimmic/src/homebase.dart';
 import 'package:gimmic/src/page/details.dart';
 import 'package:gimmic/src/page/resource.dart';
-
-import 'package:go_router/go_router.dart';
-import 'package:responsive_framework/responsive_framework.dart';
+import 'package:gimmic/src/page/unity_viewer.dart';
 
 void initSquadron(String id) {
   Squadron.setId(id);
@@ -26,27 +28,25 @@ void initSquadron(String id) {
   Squadron.debugMode = false;
 }
 
-/* default runApp (only for testing and developing) */
-void main() async {
+/* default runApp */
+/* void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setPathUrlStrategy();
   kIsWeb ? initSquadron(StringResource.title) : null;
   runApp(Gimmic());
-}
+} */
 
-/* Future<void> main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setPathUrlStrategy();
   kIsWeb ? initSquadron(StringResource.title) : null;
   window.document.onContextMenu.listen((evt) => evt.preventDefault());
-
-  await Firebase.initializeApp(
-    // linux isn't implemented yet with firebase platform
-    // options: DefaultFirebaseOptions.currentPlatform,
-    options: DefaultFirebaseOptions.web,
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.web);
+  await FirebaseAppCheck.instance.activate(
+    webRecaptchaSiteKey: webRecaptchaSiteKey,
   );
   runApp(Gimmic());
-} */
+}
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
   // Override behavior methods and getters like dragDevices

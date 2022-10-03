@@ -14,6 +14,9 @@ import 'package:flutter/foundation.dart'
 ///   options: DefaultFirebaseOptions.currentPlatform,
 /// );
 /// ```
+
+const String webRecaptchaSiteKey = 'a29kb2tiZWt1NDVAZ21haWwuY29t';
+
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
@@ -67,7 +70,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '525502946293',
     projectId: 'gimmic-gyudon',
     storageBucket: 'gimmic-gyudon.appspot.com',
-    iosClientId: '525502946293-9vkptt776t255qh1sv8vekvmumslf8fj.apps.googleusercontent.com',
+    iosClientId:
+        '525502946293-9vkptt776t255qh1sv8vekvmumslf8fj.apps.googleusercontent.com',
     iosBundleId: 'com.example.gimmic',
   );
 
@@ -77,7 +81,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '525502946293',
     projectId: 'gimmic-gyudon',
     storageBucket: 'gimmic-gyudon.appspot.com',
-    iosClientId: '525502946293-9vkptt776t255qh1sv8vekvmumslf8fj.apps.googleusercontent.com',
+    iosClientId:
+        '525502946293-9vkptt776t255qh1sv8vekvmumslf8fj.apps.googleusercontent.com',
     iosBundleId: 'com.example.gimmic',
   );
 }
