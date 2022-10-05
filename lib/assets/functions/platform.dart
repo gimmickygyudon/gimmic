@@ -1,10 +1,12 @@
-// import 'dart:ui';
 import 'package:flutter/foundation.dart';
-// import 'package:flutter/material.dart';
 
 final isWebMobile = kIsWeb &&
     (defaultTargetPlatform == TargetPlatform.iOS ||
         defaultTargetPlatform == TargetPlatform.android);
+
+final isDesktopApp = defaultTargetPlatform == TargetPlatform.linux ||
+    defaultTargetPlatform == TargetPlatform.macOS ||
+    defaultTargetPlatform == TargetPlatform.windows;
 
 /// Extension method that helps with working with the hinge directly.
 /* extension MediaQueryHinge on MediaQueryData {

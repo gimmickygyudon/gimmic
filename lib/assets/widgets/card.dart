@@ -1,3 +1,7 @@
+import 'dart:typed_data';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -5,8 +9,11 @@ import 'package:intl/intl.dart';
 
 import 'package:gimmic/assets/widgets/builder.dart';
 import 'package:gimmic/assets/widgets/button.dart';
+import 'package:gimmic/assets/functions/icon.dart';
+import 'package:gimmic/assets/functions/string.dart';
 import '../functions/colors.dart';
 import '../functions/platform.dart';
+import '../functions/time.dart';
 import '../functions/url.dart';
 import 'menu.dart';
 
@@ -442,13 +449,116 @@ Widget cardUpdateLog() {
                                                 borderRadius:
                                                     BorderRadius.circular(6)),
                                             label: Text(
-                                              '0.0.3+0',
+                                              '0.0.3+5',
                                               style: GoogleFonts.roboto(
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w500,
                                                   color: isWebMobile
                                                       ? Colors.blue
                                                       : Colors.blue),
+                                            )),
+                                        title: Tooltip(
+                                          message:
+                                              "We will uploading a lots of content soon!",
+                                          child: Text(
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            'New clean UI',
+                                            style: GoogleFonts.roboto(
+                                                fontWeight: FontWeight.w400,
+                                                fontSize:
+                                                    constraints.maxWidth > 460
+                                                        ? null
+                                                        : 14),
+                                          ),
+                                        ),
+                                        subtitle: Text(
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          'With performance improvement',
+                                          style: GoogleFonts.roboto(
+                                              color: Colors.black54,
+                                              fontSize:
+                                                  constraints.maxWidth > 460
+                                                      ? null
+                                                      : 12),
+                                        ),
+                                        trailing: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Icon(Icons.fiber_new_outlined,
+                                                color: Colors.blue, size: 28),
+                                            const SizedBox(width: 8),
+                                            Chip(
+                                                side: BorderSide.none,
+                                                backgroundColor:
+                                                    Colors.grey.shade50,
+                                                label: Text(
+                                                  constraints.maxWidth > 460
+                                                      ? 'October 1'
+                                                      : 'Oct 1',
+                                                  style: GoogleFonts.roboto(
+                                                      fontSize: 12,
+                                                      color: Colors.black54),
+                                                )),
+                                          ],
+                                        ),
+                                        children: <Widget>[
+                                          ListTile(
+                                              horizontalTitleGap: 6,
+                                              dense: true,
+                                              leading:
+                                                  const Icon(Icons.arrow_right),
+                                              title: Text(
+                                                  'Added new minimal mode',
+                                                  style: GoogleFonts.roboto(
+                                                      fontSize: 14))),
+                                          ListTile(
+                                              horizontalTitleGap: 6,
+                                              dense: true,
+                                              leading:
+                                                  const Icon(Icons.arrow_right),
+                                              title: Text('Expandable cards',
+                                                  style: GoogleFonts.roboto(
+                                                      fontSize: 14))),
+                                          ListTile(
+                                              horizontalTitleGap: 6,
+                                              dense: true,
+                                              leading:
+                                                  const Icon(Icons.arrow_right),
+                                              title: Text(
+                                                  'New random emoticons when no results found',
+                                                  style: GoogleFonts.roboto(
+                                                      fontSize: 14))),
+                                          ListTile(
+                                              horizontalTitleGap: 6,
+                                              dense: true,
+                                              leading:
+                                                  const Icon(Icons.arrow_right),
+                                              title: Text(
+                                                  'Start using firestore to uploading content',
+                                                  style: GoogleFonts.roboto(
+                                                      fontSize: 14))),
+                                        ],
+                                      ),
+                                      ExpansionTile(
+                                        tilePadding: constraints.maxWidth > 600
+                                            ? null
+                                            : EdgeInsets.zero,
+                                        childrenPadding: EdgeInsets.zero,
+                                        leading: Chip(
+                                            side: BorderSide.none,
+                                            backgroundColor:
+                                                Colors.grey.shade100,
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(6)),
+                                            label: Text(
+                                              '0.0.3+0',
+                                              style: GoogleFonts.roboto(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.black87),
                                             )),
                                         title: Tooltip(
                                           message:
@@ -479,13 +589,10 @@ Widget cardUpdateLog() {
                                         trailing: Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            const Icon(Icons.fiber_new_outlined,
-                                                color: Colors.blue, size: 28),
-                                            const SizedBox(width: 8),
                                             Chip(
                                                 side: BorderSide.none,
                                                 backgroundColor:
-                                                    Colors.grey.shade50,
+                                                    Colors.grey.shade100,
                                                 label: Text(
                                                   constraints.maxWidth > 460
                                                       ? 'September 24'
@@ -543,7 +650,7 @@ Widget cardUpdateLog() {
                                         leading: Chip(
                                             side: BorderSide.none,
                                             backgroundColor:
-                                                Colors.grey.shade50,
+                                                Colors.grey.shade100,
                                             shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(6)),
@@ -552,9 +659,7 @@ Widget cardUpdateLog() {
                                               style: GoogleFonts.roboto(
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w500,
-                                                  color: isWebMobile
-                                                      ? Colors.black54
-                                                      : Colors.black54),
+                                                  color: Colors.black54),
                                             )),
                                         title: Tooltip(
                                           message: "Go to detail's page",
@@ -1154,9 +1259,10 @@ class _CardCommentState extends State<CardComment> {
   }
 }
 
+var imageData;
 // Resource Tile Card
-bool isListHovered = false;
-Widget cardResourceListTile(widget) {
+Widget cardResourceListTile(index, widget, AsyncSnapshot snapshots) {
+  bool isListHovered = false;
   return StatefulBuilder(
     builder: (context, setState) {
       return SizedBox(
@@ -1169,111 +1275,133 @@ Widget cardResourceListTile(widget) {
             splashColor: Colors.blueGrey.shade50,
             borderRadius: BorderRadius.circular(12),
             child: Padding(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 200),
-                        child: widget.smalllayouts
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: AnimatedScale(
-                                    curve: Curves.easeOutQuart,
-                                    duration: const Duration(milliseconds: 600),
-                                    scale: isListHovered ? 1.05 : 1,
-                                    child:
-                                        Image(image: AssetImage(widget.image))))
-                            : ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: AspectRatio(
-                                  aspectRatio: 1 / 1,
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          child: widget.smalllayouts
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
                                   child: AnimatedScale(
                                     curve: Curves.easeOutQuart,
                                     duration: const Duration(milliseconds: 600),
-                                    scale: isListHovered ? 1.025 : 1,
-                                    child: Image(
-                                        image: AssetImage(widget.image),
-                                        fit: BoxFit.cover),
+                                    scale: isListHovered ? 1.05 : 1,
+                                    child: Image.memory(imageData),
+                                  ))
+                              : ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: AspectRatio(
+                                    aspectRatio: 1 / 0.85,
+                                    child: AnimatedScale(
+                                      curve: Curves.easeOutQuart,
+                                      duration:
+                                          const Duration(milliseconds: 600),
+                                      scale: isListHovered ? 1.025 : 1,
+                                      child: Image.memory(imageData,
+                                          fit: BoxFit.cover),
+                                    ),
                                   ),
                                 ),
-                              ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: widget.smalllayouts ? 2 : 0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  widget.name,
-                                  style: GoogleFonts.roboto(
-                                      letterSpacing: -0.25,
-                                      height: 0.0,
-                                      fontSize: widget.smalllayouts ? 22 : 18,
-                                      color: Colors.black87),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 1),
-                                  child: Text(widget.subname,
-                                      style: GoogleFonts.roboto(
-                                          color: Colors.black54,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500)),
-                                ),
-                              ],
-                            ),
-                            Text(
-                              '${"A cat is a furry animal that has a long tail and sharp claws. Cats are often kept as pets. Cats are lions, tigers, and other wild animals in the same family.".substring(0, widget.layouts ? 45 : 24).trim()}.',
-                              style: GoogleFonts.robotoFlex(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black54),
-                            )
-                          ],
                         ),
-                      ),
-                    ],
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(
+                              widget.smalllayouts && isWebMobile ? 12 : 16,
+                              widget.smalllayouts ? 2 : 0,
+                              0,
+                              widget.smalllayouts ? 2 : 0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 1),
+                                    child: Text(
+                                        snapshots.data[index]['brand']
+                                            .toString()
+                                            .toTitleCase(),
+                                        style: GoogleFonts.roboto(
+                                            color: Colors.black54,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500)),
+                                  ),
+                                  Text(
+                                    snapshots.data[index]['name'],
+                                    style: GoogleFonts.roboto(
+                                        letterSpacing: -0.25,
+                                        height: isWebMobile ? null : 0.0,
+                                        fontSize: widget.smalllayouts ? 22 : 18,
+                                        color: Colors.black87),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                '${"A cat is a furry animal that has a long tail and sharp claws. Cats are often kept as pets. Cats are lions, tigers, and other wild animals in the same family.".substring(0, widget.layouts ? 45 : 24).trim()}.',
+                                style: GoogleFonts.robotoFlex(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.black54),
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Chip(
-                          backgroundColor: Colors.white38,
-                          side: BorderSide.none,
-                          avatar: widget.smalllayouts
-                              ? Icon(widget.icon,
-                                  size: 14,
-                                  color: isListHovered
-                                      ? Colors.black54
-                                      : Colors.black38)
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                        vertical: isWebMobile ? 4 : 8, horizontal: 8),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Chip(
+                            padding: isWebMobile ? EdgeInsets.zero : null,
+                            visualDensity: isWebMobile
+                                ? const VisualDensity(
+                                    horizontal: -4, vertical: -4)
+                                : VisualDensity.compact,
+                            backgroundColor: Colors.white38,
+                            side: BorderSide.none,
+                            avatar: widget.smalllayouts
+                                ? Icon(
+                                    snapshots.data[index]['icon'].first
+                                        .toString()
+                                        .iconParse,
+                                    size: 16,
+                                    color: isListHovered
+                                        ? Colors.black54
+                                        : Colors.black38)
+                                : null,
+                            label: Text(
+                                widget.smalllayouts
+                                    ? '${snapshots.data[index]['category']} · ${snapshots.data[index]['time']}'
+                                    : snapshots.data[index]['time'],
+                                style: GoogleFonts.roboto(
+                                    color: isListHovered
+                                        ? Colors.black54
+                                        : Colors.black38,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12))),
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          child: isWebMobile || isListHovered
+                              ? widget.smalllayouts
+                                  ? buttonResourceItem()
+                                  : buttonResourceItemSmall()
                               : null,
-                          label: Text(
-                              widget.smalllayouts
-                                  ? '${widget.tag} · $date'
-                                  : date,
-                              style: GoogleFonts.roboto(
-                                  color: isListHovered
-                                      ? Colors.black54
-                                      : Colors.black38,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12))),
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 200),
-                        child: isListHovered || isWebMobile
-                            ? buttonResourceItem()
-                            : null,
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -1313,6 +1441,91 @@ bool isHeaderHovered = false;
 bool isTileExpanded = false;
 
 class _CardResourceState extends State<CardResource> {
+  late Future _loadItems;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadItems = loadItems();
+  }
+
+  Future loadItems() async {
+    // Create a storage reference from our app
+    final FirebaseStorage storageRef = FirebaseStorage.instance;
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+
+    // Create a reference with an initial file path and name
+    final Reference pathRef =
+        storageRef.ref().child("images/1965 Mustang_vnode_001.jpg");
+
+    try {
+      const oneMegabyte = 1024 * 1024;
+      final Uint8List? data = await pathRef.getData(oneMegabyte);
+      imageData = data;
+      // Data for "images/island.jpg" is returned, use this as needed.
+    } on FirebaseException catch (e) {
+      print(e);
+      // Handle any errors.
+    }
+
+    List<Map<String, dynamic>> items = [];
+
+    await db.collection('resource').doc('item').get().then(
+        (DocumentSnapshot doc) async {
+      var data = doc.data() as Map<String, dynamic>;
+      for (List element in data.values) {
+        String brand = element.join("");
+        //...
+
+        await db
+            .collection("resource")
+            .doc('item')
+            .collection(brand)
+            .get()
+            .then(
+          (value) async {
+            var result = value.docs.map((e) => e.data()).toList();
+            for (var item in result) {
+              String name = item['name'];
+
+              DateTime timestamp =
+                  DateTime.fromMillisecondsSinceEpoch(item['timestamp'] * 1000);
+              String time = timeAgo(timestamp);
+              print(
+                  ' name: $name \n brand: ${brand.toTitleCase()} \n time: $time');
+              //...
+
+              String categoryId = item['category'];
+              await db.doc("resource/category/$categoryId").get().then((doc) {
+                var data = doc.data() as Map<String, dynamic>;
+                //...
+
+                String category =
+                    categoryId.substring(0, categoryId.indexOf('/'));
+                category = category.toTitleCase();
+                print(' category: $category');
+                print(' icon: ${data['icons'].first}');
+
+                final List<Map<String, dynamic>> snapshots = [
+                  {
+                    "name": name,
+                    "brand": brand,
+                    "time": time,
+                    "category": category,
+                    "icon": data['icons']
+                  }
+                ];
+                items.addAll(snapshots);
+              });
+            }
+          },
+          onError: (e) => debugPrint("Error completing: $e"),
+        );
+      }
+    }, onError: (e) => debugPrint("Error getting document: $e"));
+    return items;
+  }
+
   @override
   Widget build(BuildContext context) {
     return StatefulBuilder(
@@ -1410,51 +1623,70 @@ class _CardResourceState extends State<CardResource> {
                         ),
                       ),
                       children: [
-                        Column(
-                          children: [
-                            ListView(
-                                shrinkWrap: true,
-                                children: [cardResourceListTile(widget)]),
-                            AnimatedSize(
-                              curve: Curves.easeOut,
-                              duration: const Duration(milliseconds: 200),
-                              child: SizedBox(
-                                height: isHovered ? null : 0,
-                                child: Column(
-                                  children: [
-                                    const SizedBox(height: 8),
-                                    ElevatedButton.icon(
-                                        style: ButtonStyle(
-                                            foregroundColor:
-                                                MaterialStateProperty
-                                                    .resolveWith((states) {
-                                              if (states.contains(
-                                                      MaterialState.hovered) ||
-                                                  states.contains(
-                                                      MaterialState.pressed)) {
-                                                return Colors.black54;
-                                              }
-                                              return Colors.black38;
-                                            }),
-                                            backgroundColor:
-                                                MaterialStatePropertyAll(
-                                                    Colors.grey.shade50),
-                                            elevation:
-                                                const MaterialStatePropertyAll(
-                                                    0)),
-                                        onPressed: () =>
-                                            context.push('/resource'),
-                                        icon:
-                                            const Icon(Icons.refresh, size: 14),
-                                        label: Text('Load More',
-                                            style: GoogleFonts.roboto(
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 12))),
-                                  ],
+                        FutureBuilder(
+                          future: _loadItems,
+                          builder: (context, AsyncSnapshot snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                heightFactor: 2,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 3),
+                              );
+                            }
+                            return Column(children: [
+                              ListView.builder(
+                                  physics: const ClampingScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: snapshot.data.length,
+                                  itemBuilder: (context, index) =>
+                                      cardResourceListTile(
+                                          index, widget, snapshot)),
+                              AnimatedSize(
+                                curve: Curves.easeOut,
+                                duration: const Duration(milliseconds: 200),
+                                child: SizedBox(
+                                  height: isHovered || isWebMobile ? null : 0,
+                                  child: Column(
+                                    children: [
+                                      const SizedBox(height: 8),
+                                      ElevatedButton.icon(
+                                          style: ButtonStyle(
+                                              visualDensity:
+                                                  VisualDensity.compact,
+                                              foregroundColor:
+                                                  MaterialStateProperty
+                                                      .resolveWith((states) {
+                                                if (states.contains(
+                                                        MaterialState
+                                                            .hovered) ||
+                                                    states.contains(
+                                                        MaterialState
+                                                            .pressed)) {
+                                                  return Colors.black54;
+                                                }
+                                                return Colors.black38;
+                                              }),
+                                              backgroundColor:
+                                                  MaterialStatePropertyAll(
+                                                      Colors.grey.shade50),
+                                              elevation:
+                                                  const MaterialStatePropertyAll(
+                                                      0)),
+                                          onPressed: () =>
+                                              context.push('/resource'),
+                                          icon: const Icon(Icons.refresh,
+                                              size: 14),
+                                          label: Text('Load More',
+                                              style: GoogleFonts.roboto(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 12))),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ]);
+                          },
                         ),
                       ]),
                 ),

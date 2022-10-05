@@ -1,3 +1,47 @@
+Todos / issues
+ - search bar change it into exclusive mode
+    - move everything into search bar
+ - remove hide url browser bar when scrolling down
+ - make font in grid mode more bigger
+ - change expand button in grid mode with visual feedback pressed on web mobile
+ - fix/remove set state add listener on thumbnails cause lag in details page
+ - recreate groundup set state module to animation builder
+ - bouncing scroll is not enabled in list view
+ - resource animated switch is not animating in web mobile
+ - give indicator selected index ontap in resource page on tap device/web mobile
+ - pages are not animating (try to replace index.html with a new one)
+    - set default transition for go router in flutter
+ - move thumbnails in details page into middle
+    add next item / previous item in both side with grayed image
+ - change copied item to be more compact
+ - scroll when focus on message textinput on mobile
+ - move open image to front in item menu
+ ✗ fix homepage padding for ipad and surface display
+ ✓ trim space search field in homepage
+ - add GoRoute listener for back and forward button for search query
+ - add DisplayFeature like hinge, fold, cutout
+ - move or remove image indicator if thumbnails is shown
+ ✓ Trim search space on url replace
+ - Animate details page
+ - Add button search in google when no result found
+ - Up and down point comment and share reply text button
+ - Add video tutorial link on description page
+ - Add gradient on description scrolling for indication
+ - Add button on comment for upload image and visual button reply
+ ✓ Add compact button layouts in resource page
+ - hover widget popup details
+ - make blender version clickable copy on click with snackbar
+ ✓ dislike button or hide button widget (item, etc)
+ - Download more option
+ - Properly show the 3d button
+
+Changelog 0.0.3+5
+ - Start using firestore to uploading content
+ - New clean UI with performance improvement
+ - Added new minimal mode
+ - Expandable cards
+ - New random emoticons when no results found
+
 Changelog 0.0.3+0
  - New Notification for Link copy 
  - Indicator for creating palette color
@@ -27,25 +71,3 @@ Changelog 0.0.1+4
  - Visual improvement on no search result
  - Apps dependencies updated
  - Search function in homepage is working for now
-
-ToDo
- x fix homepage padding for ipad and surfe display
- - trim space search field in homepage
- - add GoRoute listener for back and forward button for search query
- - add DisplayFeature like hinge, fold, cutout
- 
- - move or remove image indicator if thumbnails is shown
- - Trim search space on url replace
- - Animate slide page to details page
- - Add button search in google when no result found
- - Up and down point comment and share reply text button
- - Add video tutorial link on description page
- - Add gradient on description scrolling for indication
- - Add button on comment for upload image and visual button reply
- - Add compact button layouts
- - hover widget popup details
- - make blender version clickable copy on click with snackbar
- - dislike button or hide button widget (item, etc)
- - Download Option
- - Properly show the 3d button
- - Slide to Right animation on Detail page

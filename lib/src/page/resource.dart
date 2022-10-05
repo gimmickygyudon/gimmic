@@ -246,7 +246,8 @@ class _ResourceState extends State<Resource> {
     "(˘⌣˘)",
     "(¬_¬)",
     "(~_^)",
-    "(°,,°)"
+    "(°,,°)",
+    "(^-^*)"
   ];
   String randomEmoji = '';
   String sortbyValue = 'Most Updated';

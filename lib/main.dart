@@ -41,10 +41,14 @@ Future<void> main() async {
   setPathUrlStrategy();
   kIsWeb ? initSquadron(StringResource.title) : null;
   window.document.onContextMenu.listen((evt) => evt.preventDefault());
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.web);
   await FirebaseAppCheck.instance.activate(
-    webRecaptchaSiteKey: webRecaptchaSiteKey,
+    androidDebugProvider: false,
+    webRecaptchaSiteKey:
+        kReleaseMode ? webRecaptchaSiteKey : webDebugRecaptchaSiteKey,
   );
+
   runApp(Gimmic());
 }
 

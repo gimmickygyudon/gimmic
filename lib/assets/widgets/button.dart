@@ -381,19 +381,42 @@ Widget buttonResourceItem() {
   return Row(
     children: [
       IconButton(
-          visualDensity: VisualDensity.compact,
+          padding: isWebMobile ? EdgeInsets.zero : null,
+          visualDensity: isWebMobile
+              ? const VisualDensity(horizontal: -4, vertical: -4)
+              : VisualDensity.compact,
           onPressed: () {},
           icon: const Icon(Icons.more_horiz, size: 18, color: Colors.black54)),
       IconButton(
-          visualDensity: VisualDensity.compact,
+          padding: isWebMobile ? EdgeInsets.zero : null,
+          visualDensity: isWebMobile
+              ? const VisualDensity(horizontal: -4, vertical: -4)
+              : VisualDensity.compact,
           onPressed: () {},
           icon: const Icon(Icons.photo_library_outlined,
               size: 18, color: Colors.black54)),
       IconButton(
-          visualDensity: VisualDensity.compact,
+          padding: isWebMobile ? EdgeInsets.zero : null,
+          visualDensity: isWebMobile
+              ? const VisualDensity(horizontal: -4, vertical: -4)
+              : VisualDensity.compact,
           onPressed: () {},
           icon: const Icon(Icons.bookmark_add_outlined,
               size: 18, color: Colors.black54)),
+    ],
+  );
+}
+
+Widget buttonResourceItemSmall() {
+  return Row(
+    children: [
+      IconButton(
+          padding: isWebMobile ? EdgeInsets.zero : null,
+          visualDensity: isWebMobile
+              ? const VisualDensity(horizontal: -4, vertical: -4)
+              : VisualDensity.compact,
+          onPressed: () {},
+          icon: const Icon(Icons.more_horiz, size: 18, color: Colors.black54)),
     ],
   );
 }
