@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gimmic/assets/functions/platform.dart';
 import 'package:gimmic/assets/widgets/chip.dart';
@@ -239,18 +240,14 @@ class _ListBigResourceState extends State<ListBigResource> {
                                                     milliseconds: 200),
                                                 opacity: selectedIndex == index
                                                     ? 1
-                                                    : 0,
+                                                    : kIsWeb ? 1 : 0,
                                                 child: Visibility(
                                                   visible:
                                                       widget.useVerticalLayout
                                                           ? true
                                                           : false,
                                                   child: TextButton.icon(
-                                                      style: const ButtonStyle(
-                                                          visualDensity:
-                                                              VisualDensity(
-                                                                  vertical:
-                                                                      -3)),
+                                                      style: const ButtonStyle(visualDensity: VisualDensity(vertical: -3)),
                                                       onPressed: () {
                                                         bool value;
                                                         isTileExpanded

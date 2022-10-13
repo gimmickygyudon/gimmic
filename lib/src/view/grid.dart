@@ -80,7 +80,7 @@ Widget gridDescription(
                         child: Text(name,
                             style: TextStyle(
                                 color: Colors.black87,
-                                fontSize: widget.useVerticalLayout2x ? 20 : 16,
+                                fontSize: isWebMobile ? 22 : 20,
                                 fontWeight: FontWeight.w400,
                                 letterSpacing: -1)),
                       ),
@@ -93,7 +93,7 @@ Widget gridDescription(
                             style: GoogleFonts.roboto(
                                 height: 1,
                                 color: Colors.black54,
-                                fontSize: widget.useVerticalLayout2x ? 14 : 12,
+                                fontSize: isWebMobile ? 16 : 14,
                                 fontWeight: FontWeight.w500,
                                 letterSpacing: 0)),
                       ),

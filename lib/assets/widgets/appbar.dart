@@ -21,17 +21,19 @@ Widget appbarSetting(layout) {
                     ),
                     const VerticalDivider(
                         width: 20,
-                        indent: 9,
-                        endIndent: 9,
+                        indent: 10,
+                        endIndent: 10,
                         color: Colors.black38)
                   ]),
                 )
               : null),
       const IconButton(
+        visualDensity: VisualDensity.compact,
         icon: Icon(Icons.settings_outlined),
         onPressed: null,
       ),
       const IconButton(
+        visualDensity: VisualDensity.compact,
         icon: Icon(Icons.account_circle),
         onPressed: null,
       ),
