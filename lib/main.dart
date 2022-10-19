@@ -1,11 +1,13 @@
 import 'dart:convert';
 
+import 'package:animations/animations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'assets/functions/route.dart';
 import 'firebase_options.dart';
 
 import 'package:url_strategy/url_strategy.dart';
@@ -71,15 +73,20 @@ class Gimmic extends StatelessWidget {
     routes: [
       GoRoute(
           path: '/',
-          builder: (context, state) {
-            return const HomeBase();
+          pageBuilder: (context, state) {
+            return SharedAxisPage(
+              key: state.pageKey,
+              duration: const Duration(milliseconds: 500),
+              transitionType: SharedAxisTransitionType.scaled,
+              child: const HomeBase()
+            );
           },
           routes: <GoRoute>[
             GoRoute(
                 path: 'resource',
-                builder: (context, state) {
+                pageBuilder: (context, state) {
                   final search = state.queryParams['search'];
-                  return Resource(arguments: search);
+                  return FadePage(key: state.pageKey, child: Resource(arguments: search));
                 },
                 routes: <GoRoute>[
                   GoRoute(
@@ -94,10 +101,12 @@ class Gimmic extends StatelessWidget {
                         };
 
                         var arguments = jsonEncode(object);
-                        debugPrint('go_route:$arguments');
                         Map valueMap = jsonDecode(arguments);
 
-                        return MaterialPage(
+                        return SharedAxisPage(
+                            key: state.pageKey,
+                            duration: const Duration(milliseconds: 500),
+                            transitionType: SharedAxisTransitionType.vertical,
                             child: Details(arguments: valueMap));
                       },
                       routes: <GoRoute>[
@@ -105,7 +114,7 @@ class Gimmic extends StatelessWidget {
                             name: 'viewer',
                             path: 'viewer',
                             pageBuilder: (context, state) {
-                              return const MaterialPage(child: UnityViewer());
+                              return FadePage(key: state.pageKey, child: const UnityViewer());
                             }),
                       ])
                 ]),

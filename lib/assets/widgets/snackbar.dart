@@ -25,7 +25,7 @@ SnackBar snackbarOpenLoading(String message,
         Text(message),
       ],
     ),
-    padding: EdgeInsets.zero,
+    padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     width: 350,
   );

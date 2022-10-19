@@ -41,6 +41,8 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> detailScaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
+  final GlobalKey<State<StatefulWidget>> _thumbnailsKey =
+      GlobalKey<State<StatefulWidget>>();
 
   final String timenow = DateFormat("EEEEE, MMMM dd").format(DateTime.now());
   final ScrollController controller = ScrollController();
@@ -80,9 +82,9 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
       if (_scrollViewController.position.userScrollDirection ==
           ScrollDirection.reverse) {
         if (!isScrollingDown) {
-          setState(() {
-            isScrollingDown = true;
-            toogleThumbnail = false;
+          _thumbnailsKey.currentState?.setState(() {
+             isScrollingDown = true;
+            toogleThumbnail = false;           
           });
         }
       }
@@ -90,7 +92,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
       if (_scrollViewController.position.userScrollDirection ==
           ScrollDirection.forward) {
         if (isScrollingDown) {
-          setState(() {
+          _thumbnailsKey.currentState?.setState(() {
             isScrollingDown = false;
             toogleThumbnail = true;
           });
@@ -100,7 +102,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
     controller.addListener(() {
       if (controller.position.userScrollDirection == ScrollDirection.reverse) {
         if (!isScrollingDown) {
-          setState(() {
+          _thumbnailsKey.currentState?.setState(() {
             isScrollingDown = true;
             toogleThumbnail = false;
           });
@@ -109,7 +111,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
 
       if (controller.position.userScrollDirection == ScrollDirection.forward) {
         if (isScrollingDown) {
-          setState(() {
+          _thumbnailsKey.currentState?.setState(() {
             isScrollingDown = false;
             toogleThumbnail = true;
           });
@@ -124,32 +126,38 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
 
     if (updatePaletteGenCompleter.isCompleted == false) {
       if (loadingpalette == false) {
-        WidgetsBinding.instance.addPostFrameCallback((_) async {
-          await rootScaffoldMessengerKey.currentState
-              ?.showSnackBar(
-                  snackbarPaletteLoading('Creating palette color...'))
-              .closed
-              .then((value) {
-            if (updatePaletteGenCompleter.isCompleted) {
-              rootScaffoldMessengerKey.currentState?.showSnackBar(
-                  snackbarPaletteComplete('Palette color created'));
+        Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            await rootScaffoldMessengerKey.currentState
+                ?.showSnackBar(
+                    snackbarPaletteLoading('Creating palette color...'))
+                .closed
+                .then((value) {
+              if (updatePaletteGenCompleter.isCompleted) {
+                rootScaffoldMessengerKey.currentState?.showSnackBar(
+                    snackbarPaletteComplete('Palette color created'));
+              }
+            });
+          }); 
+        });
+      }
+
+
+      Future.delayed(const Duration(milliseconds: 200)).whenComplete(() {
+        updatePaletteGen(images).whenComplete(() async {
+          await updatePaletteGenCompleter.future.whenComplete(() {
+            rootScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+            if (palettecache == false) {
+              detailScaffoldKey.currentState?.setState(() {
+                setState(() {
+                  // debugPrint('updatePaletteGenCompleter Complete');
+                });
+              });
             }
           });
         });
-      }
-      updatePaletteGen(images).whenComplete(() async {
-        debugPrint('updatePaletteGen Started');
-        await updatePaletteGenCompleter.future.whenComplete(() {
-          rootScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
-          if (palettecache == false) {
-            detailScaffoldKey.currentState?.setState(() {
-              setState(() {
-                debugPrint('updatePaletteGenCompleter Complete');
-              });
-            });
-          }
-        });
       });
+
     }
   }
 
@@ -329,7 +337,6 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
         ),
         child: LayoutBuilder(builder: (context, constraints) {
           bool useSmallLayout = constraints.maxWidth < 400;
-          debugPrint(constraints.maxWidth.toString());
           return Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -673,7 +680,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                           ],
                                         ),
                                       ),
-                                      const Divider(height: 20),
+                                      const Divider(height: 20, color: Colors.black12),
                                       const SizedBox(height: 8),
                                       Row(
                                         children: [
@@ -738,7 +745,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                         ],
                                       ),
                                       const SizedBox(height: 8),
-                                      const Divider(height: 20),
+                                      const Divider(height: 20, color: Colors.black12),
                                       Theme(
                                         data: ThemeData(useMaterial3: true)
                                             .copyWith(
@@ -880,7 +887,7 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                           ),
                                           const Expanded(
                                               child: Divider(
-                                                  indent: 12, endIndent: 12)),
+                                                  indent: 12, endIndent: 12, color: Colors.black12)),
                                           const Padding(
                                             padding: EdgeInsets.only(right: 4),
                                             child:
@@ -1419,56 +1426,49 @@ class _DetailsState extends State<Details> with TickerProviderStateMixin {
                                     ),
                                   ),
                                   SliverFillRemaining(
-                                    hasScrollBody:
-                                        useVerticalLayout ? false : true,
+                                    hasScrollBody: useVerticalLayout ? false : true,
                                     child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        AnimatedSize(
-                                          duration:
-                                              const Duration(milliseconds: 800),
-                                          curve: Curves.fastOutSlowIn,
-                                          child: AnimatedContainer(
-                                            duration: const Duration(
-                                                milliseconds: 200),
-                                            height: useVerticalLayout
-                                                ? null
-                                                : toogleThumbnail
-                                                    ? null
-                                                    : 0,
-                                            margin: useVerticalLayout
-                                                ? const EdgeInsets.all(4)
-                                                : toogleThumbnail
-                                                    ? const EdgeInsets.fromLTRB(
-                                                        4, 6, 4, 2)
-                                                    : null,
-                                            decoration: BoxDecoration(
-                                                color:
-                                                    paletteMutedColors.isEmpty
-                                                        ? Colors.grey.shade50
-                                                        : lighten(
-                                                            paletteMutedColors[
-                                                                    activePage]
-                                                                .color,
-                                                            .15),
-                                                borderRadius:
-                                                    BorderRadius.circular(16)),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: imageThumbnails(
-                                                      images.length,
-                                                      arguments,
-                                                      activePage,
-                                                      useVerticalLayout),
+                                        StatefulBuilder(
+                                        key: _thumbnailsKey,
+                                        builder: (context, setState) =>
+                                          AnimatedSize(
+                                            duration: const Duration(milliseconds: 800),
+                                            curve: Curves.fastOutSlowIn,
+                                            child: SizedBox(
+                                            width: double.infinity,
+                                            height: toogleThumbnail || useVerticalLayout
+                                                  ? null
+                                                  : 0,
+                                              child: Visibility(
+                                                visible: toogleThumbnail || useVerticalLayout 
+                                                  ? true
+                                                  : false,
+                                                child: Container(
+                                                  margin: useVerticalLayout
+                                                      ? const EdgeInsets.all(4)
+                                                      : const EdgeInsets.fromLTRB(4, 6, 4, 2),
+                                                  decoration: BoxDecoration(
+                                                      color: paletteMutedColors.isEmpty
+                                                              ? Colors.grey.shade50
+                                                              : lighten(paletteMutedColors[activePage].color, .15),
+                                                      borderRadius: BorderRadius.circular(16)),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: imageThumbnails(
+                                                            images.length,
+                                                            arguments,
+                                                            activePage,
+                                                            useVerticalLayout),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
-                                              ],
+                                              ),
                                             ),
                                           ),
                                         ),

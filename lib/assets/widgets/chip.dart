@@ -7,6 +7,7 @@ Widget chipTag(iconsize, fontsize,
     int index = 0,
     String label = 'Animal',
     IconData icon = Icons.cruelty_free]) {
+
   return FilterChip(
     visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
     onSelected: (value) {},

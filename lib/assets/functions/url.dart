@@ -24,8 +24,11 @@ urlLink(context, link) async {
 }
 
 String currentUrl(context, [String destination = ""]) {
-  String url =
-      '${StringResource.url}${GoRouter.of(context).location}$destination';
+  String currentUrl = GoRouter.of(context).location.toString();
+
+  if (currentUrl.contains('?')) currentUrl = currentUrl.substring(0, currentUrl.indexOf('?'));
+
+  String url = '${StringResource.url}$currentUrl$destination';
   url = Uri.encodeFull(url);
   return url;
 }

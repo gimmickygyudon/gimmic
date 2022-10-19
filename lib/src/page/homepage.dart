@@ -619,11 +619,6 @@ class LayoutDesktop extends StatelessWidget {
                                   child: Padding(
                                 padding: const EdgeInsets.only(top: 8),
                                 child: CardResource(
-                                  image: 'images/hellocat1.jpg',
-                                  name: 'Aragon Malay',
-                                  subname: 'Cross Code',
-                                  tag: 'Animal',
-                                  icon: Icons.cruelty_free,
                                   layouts: useVHideDetails,
                                   smalllayouts: usePhoneLayout,
                                 ),

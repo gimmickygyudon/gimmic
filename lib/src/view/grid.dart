@@ -71,6 +71,12 @@ Widget gridDescription(
                     dense: true,
                     horizontalTitleGap: 0,
                     child: ExpansionTile(
+                      onExpansionChanged: (value) {
+                        if (isWebMobile) {
+                          selectedIndex = index;
+                          setState(() { isTileSelected = value; });
+                        }
+                      },
                       maintainState: true,
                       title: MouseRegion(
                         onEnter: (event) =>
@@ -161,7 +167,7 @@ Widget gridDescription(
                                 children: [
                                   Padding(
                                       padding: const EdgeInsets.only(
-                                          left: 5, bottom: 5),
+                                          left: 5, bottom: 0),
                                       child: chipTag(
                                           16.0, 12.0, selectedIndex, index)),
                                   Padding(
@@ -227,20 +233,21 @@ class _GridResourceState extends State<GridResource> {
               });
             }
 
+            String url = currentUrl(context, "/${name.toLowerCase()}");
             return Padding(
               padding: const EdgeInsets.only(bottom: 20),
               child: StatefulBuilder(
                 builder: (context, setState) => GestureDetector(
                   onSecondaryTapDown: (details) => onRightClickMenu(
                       context,
-                      currentUrl(context, "/${name.toLowerCase()}"),
+                      url,
                       images[index],
                       hero + i.toString(),
                       pushNamed,
                       details),
                   onLongPress: () => onRightClickMenu(
                       context,
-                      currentUrl(context, "/${name.toLowerCase()}"),
+                      url,
                       images[index],
                       hero + i.toString(),
                       pushNamed),
@@ -319,8 +326,7 @@ class _GridResourceState extends State<GridResource> {
                                             child: Padding(
                                               padding: const EdgeInsets.all(8),
                                               child: buttonMoreMenu(
-                                                  currentUrl(context,
-                                                      "/${name.toLowerCase()}"),
+                                                  url,
                                                   images[index],
                                                   hero + i.toString(),
                                                   pushNamed),
@@ -329,14 +335,7 @@ class _GridResourceState extends State<GridResource> {
                                     ]),
                                   ),
                                 ),
-                                gridDescription(
-                                    context,
-                                    setState,
-                                    widget.layouts,
-                                    name,
-                                    widget,
-                                    selectedIndex,
-                                    index)
+                                gridDescription(context, setState, widget.layouts, name, widget, selectedIndex, index)
                               ],
                             ),
                           )),

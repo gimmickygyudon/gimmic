@@ -112,15 +112,19 @@ class _CardBigState extends State<CardBig> {
                         scale: cardSelected ? 1.025 : 1,
                         child: Image.network(
                           'https://source.unsplash.com/random',
-                          // image: const AssetImage("images/hellocat1.jpg"),
                           fit: BoxFit.cover,
-                          frameBuilder: (BuildContext context, Widget child,
-                                  int? frame, bool wasSynchronouslyLoaded) =>
-                              imageFrameBulilder(
-                                  child, frame, wasSynchronouslyLoaded),
-                          loadingBuilder: (BuildContext context, Widget child,
-                                  ImageChunkEvent? loadingProgress) =>
-                              imageLoadingBuilder(child, loadingProgress),
+                          frameBuilder: (BuildContext context, Widget child,int? frame, bool wasSynchronouslyLoaded) {
+                            if (wasSynchronouslyLoaded == true) return child;
+                            return imageFrameBulilder(child, frame, wasSynchronouslyLoaded);
+                          },
+                          loadingBuilder: (BuildContext context, Widget child,ImageChunkEvent? loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Column(
+                                children: [ 
+                                  imageLoadingBuilder(child, loadingProgress)
+                              ] 
+                            );
+                          },
                         ),
                       ),
                     ),
@@ -131,15 +135,20 @@ class _CardBigState extends State<CardBig> {
                         scale: cardSelected ? 1.025 : 1,
                         child: Image.network(
                           'https://source.unsplash.com/random',
-                          // image: const AssetImage("images/hellocat.jpg"),
                           fit: BoxFit.cover,
-                          frameBuilder: (BuildContext context, Widget child,
-                                  int? frame, bool wasSynchronouslyLoaded) =>
-                              imageFrameBulilder(
-                                  child, frame, wasSynchronouslyLoaded),
-                          loadingBuilder: (BuildContext context, Widget child,
-                                  ImageChunkEvent? loadingProgress) =>
-                              imageLoadingBuilder(child, loadingProgress),
+                          frameBuilder: (BuildContext context, Widget child,int? frame, bool wasSynchronouslyLoaded) {
+                            if (wasSynchronouslyLoaded == true) return child;
+                            return imageFrameBulilder(
+                                  child, frame, wasSynchronouslyLoaded);
+                          },
+                          loadingBuilder: (BuildContext context, Widget child,ImageChunkEvent? loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Column(
+                                children: [ 
+                                  imageLoadingBuilder(child, loadingProgress)
+                              ]
+                            );
+                          },
                         ),
                       ),
                     ),
@@ -449,13 +458,92 @@ Widget cardUpdateLog() {
                                                 borderRadius:
                                                     BorderRadius.circular(6)),
                                             label: Text(
-                                              '0.0.3+5',
+                                              '0.0.3+8',
                                               style: GoogleFonts.roboto(
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w500,
                                                   color: isWebMobile
                                                       ? Colors.blue
                                                       : Colors.blue),
+                                            )),
+                                        title: Text(
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          'Small Patch',
+                                          style: GoogleFonts.roboto(
+                                              fontWeight: FontWeight.w400,
+                                              fontSize:
+                                                  constraints.maxWidth > 460
+                                                      ? null
+                                                      : 14),
+                                        ),
+                                        trailing: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Icon(Icons.fiber_new_outlined,
+                                                color: Colors.blue, size: 28),
+                                            const SizedBox(width: 8),
+                                            Chip(
+                                                side: BorderSide.none,
+                                                backgroundColor:
+                                                    Colors.grey.shade100,
+                                                label: Text(
+                                                  constraints.maxWidth > 460
+                                                      ? 'October 18'
+                                                      : 'Oct 18',
+                                                  style: GoogleFonts.roboto(
+                                                      fontSize: 12,
+                                                      color: Colors.black54),
+                                                )),
+                                          ],
+                                        ),
+                                        children: <Widget>[
+                                          ListTile(
+                                              horizontalTitleGap: 6,
+                                              dense: true,
+                                              leading:
+                                                  const Icon(Icons.arrow_right),
+                                              title: Text(
+                                                  'Compact header bar in resource page',
+                                                  style: GoogleFonts.roboto(
+                                                      fontSize: 14))),
+                                          ListTile(
+                                              horizontalTitleGap: 6,
+                                              dense: true,
+                                              leading:
+                                                  const Icon(Icons.arrow_right),
+                                              title: Text('Reduce lag spike while scrolling in resource page',
+                                                  style: GoogleFonts.roboto(
+                                                      fontSize: 14))),
+                                          ListTile(
+                                              horizontalTitleGap: 6,
+                                              dense: true,
+                                              leading:
+                                                  const Icon(Icons.arrow_right),
+                                              title: Text(
+                                                  'New page transition Animations',
+                                                  style: GoogleFonts.roboto(
+                                                      fontSize: 14))),
+                                        ],
+                                      ),
+                                    ExpansionTile(
+                                        tilePadding: constraints.maxWidth > 600
+                                            ? null
+                                            : EdgeInsets.zero,
+                                        childrenPadding: EdgeInsets.zero,
+                                        leading: Chip(
+                                            side: BorderSide.none,
+                                            backgroundColor:
+                                                Colors.grey.shade100,
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(6)),
+                                            label: Text(
+                                              '0.0.3+5',
+                                              style: GoogleFonts.roboto(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.black54),
                                             )),
                                         title: Tooltip(
                                           message:
@@ -486,13 +574,10 @@ Widget cardUpdateLog() {
                                         trailing: Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            const Icon(Icons.fiber_new_outlined,
-                                                color: Colors.blue, size: 28),
-                                            const SizedBox(width: 8),
                                             Chip(
                                                 side: BorderSide.none,
                                                 backgroundColor:
-                                                    Colors.grey.shade50,
+                                                    Colors.grey.shade100,
                                                 label: Text(
                                                   constraints.maxWidth > 460
                                                       ? 'October 1'
@@ -689,7 +774,7 @@ Widget cardUpdateLog() {
                                         trailing: Chip(
                                             side: BorderSide.none,
                                             backgroundColor:
-                                                Colors.grey.shade50,
+                                                Colors.grey.shade100,
                                             label: Text(
                                               constraints.maxWidth > 460
                                                   ? 'September 19'
@@ -800,7 +885,7 @@ Widget cardUpdateLog() {
                                         trailing: Chip(
                                             side: BorderSide.none,
                                             backgroundColor:
-                                                Colors.grey.shade50,
+                                                Colors.grey.shade100,
                                             label: Text(
                                               constraints.maxWidth > 460
                                                   ? 'September 6'
@@ -903,7 +988,7 @@ Widget cardUpdateLog() {
                                         trailing: Chip(
                                             side: BorderSide.none,
                                             backgroundColor:
-                                                Colors.grey.shade50,
+                                                Colors.grey.shade100,
                                             label: Text(
                                               constraints.maxWidth > 460
                                                   ? 'August 29'
@@ -1259,149 +1344,148 @@ class _CardCommentState extends State<CardComment> {
   }
 }
 
-var imageData;
-// Resource Tile Card
-Widget cardResourceListTile(index, widget, AsyncSnapshot snapshots) {
+Widget cardResourceList(index, widget, AsyncSnapshot snapshots, smalllayouts) {
   bool isListHovered = false;
-  return StatefulBuilder(
-    builder: (context, setState) {
-      return SizedBox(
-        height: widget.smalllayouts ? 110 : 90,
-        child: Theme(
-          data: ThemeData(useMaterial3: true),
-          child: InkWell(
-            onHover: (value) => setState(() => isListHovered = value),
-            onTap: () => context.push('/resource'),
-            splashColor: Colors.blueGrey.shade50,
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: const EdgeInsets.all(0),
-              child: Row(
+
+  String name = snapshots.data[index]['name']; 
+  String shorten(String name) {
+    return name = "${name.substring(0, 15)}...";
+  }
+
+  return StatefulBuilder(builder: (context, setState) {
+      return Theme(
+        data: ThemeData(useMaterial3: true),
+        child: InkWell(
+          onHover: (value) => setState(() => isListHovered = value),
+          onTap: () => context.push('/resource'),
+          splashColor: Colors.blueGrey.shade50,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              height: widget.smalllayouts ? 120 : 90,
+              child: Flex(
+                direction: Axis.horizontal,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 200),
-                          child: widget.smalllayouts
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: AnimatedScale(
-                                    curve: Curves.easeOutQuart,
-                                    duration: const Duration(milliseconds: 600),
-                                    scale: isListHovered ? 1.05 : 1,
-                                    child: Image.memory(imageData),
-                                  ))
-                              : ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: AspectRatio(
-                                    aspectRatio: 1 / 0.85,
-                                    child: AnimatedScale(
-                                      curve: Curves.easeOutQuart,
-                                      duration:
-                                          const Duration(milliseconds: 600),
-                                      scale: isListHovered ? 1.025 : 1,
-                                      child: Image.memory(imageData,
-                                          fit: BoxFit.cover),
-                                    ),
-                                  ),
-                                ),
+                  Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: AnimatedScale(
+                          curve: Curves.easeOutQuart,
+                          duration: const Duration(milliseconds: 600),
+                          scale: isListHovered ? 1.05 : 1,
+                          child: AspectRatio(
+                            aspectRatio: smalllayouts ? 1 / 0.7 : 1 / 0.85,
+                            child: Image(
+                              image: MemoryImage(snapshots.data[index]['image']),
+                              frameBuilder: (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
+                                return imageFrameBulilder(child, frame, wasSynchronouslyLoaded);
+                              },
+                              loadingBuilder:(BuildContext context,Widget child,ImageChunkEvent?loadingProgress) {
+                                return imageLoadingBuilder(child, loadingProgress);
+                              },
+                              fit: BoxFit.cover
+                            ),
+                           ),
                         ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(
-                              widget.smalllayouts && isWebMobile ? 12 : 16,
-                              widget.smalllayouts ? 2 : 0,
-                              0,
-                              widget.smalllayouts ? 2 : 0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2, left: 8),
+                        child: Column(
+                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                         crossAxisAlignment: CrossAxisAlignment.start,
+                         children: [
+                           Padding(
+                             padding: const EdgeInsets.only(left: 2),
+                             child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 1),
-                                    child: Text(
-                                        snapshots.data[index]['brand']
-                                            .toString()
-                                            .toTitleCase(),
-                                        style: GoogleFonts.roboto(
-                                            color: Colors.black54,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500)),
-                                  ),
-                                  Text(
-                                    snapshots.data[index]['name'],
-                                    style: GoogleFonts.roboto(
-                                        letterSpacing: -0.25,
-                                        height: isWebMobile ? null : 0.0,
-                                        fontSize: widget.smalllayouts ? 22 : 18,
-                                        color: Colors.black87),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                '${"A cat is a furry animal that has a long tail and sharp claws. Cats are often kept as pets. Cats are lions, tigers, and other wild animals in the same family.".substring(0, widget.layouts ? 45 : 24).trim()}.',
-                                style: GoogleFonts.robotoFlex(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.black54),
-                              )
-                            ],
-                          ),
+                               children: [
+                                 Padding(
+                                   padding: const EdgeInsets.only(left: 1),
+                                   child: Text(
+                                       snapshots.data[index]['brand']
+                                           .toString()
+                                           .toTitleCase(),
+                                       style: GoogleFonts.roboto(
+                                           color: Colors.black54,
+                                           fontSize: smalllayouts ? 14 : 12,
+                                           fontWeight: FontWeight.w500)),
+                                 ),
+                                 Text(
+                                   smalllayouts ? name : shorten(name),
+                                   style: GoogleFonts.roboto(
+                                       letterSpacing: -0.25,
+                                       height: isWebMobile ? null : 0.0,
+                                       fontSize: widget.smalllayouts ? 22 : 16,
+                                       color: Colors.black87),
+                                 ),
+                               ],
+                             ),
+                           ),
+                           Wrap(
+                             spacing: 8,
+                             children: List.generate(smalllayouts ? 4 : 2, (i) {
+                               return FilterChip(
+                                 visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
+                                 padding: smalllayouts ? null : EdgeInsets.zero,
+                                 side: BorderSide.none,
+                                 backgroundColor: isHovered ? Colors.white30 : Colors.grey.shade100,
+                                 onSelected: (value) {},
+                                 label: Text(snapshots.data[index]['tags'][i], 
+                                   style: TextStyle(
+                                     color: Colors.black54,
+                                     fontSize: smalllayouts ? 12 : 10)
+                                   ),
+                                 );
+                               },
+                             ),
+                           )
+                         ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        vertical: isWebMobile ? 4 : 8, horizontal: 8),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Chip(
-                            padding: isWebMobile ? EdgeInsets.zero : null,
-                            visualDensity: isWebMobile
-                                ? const VisualDensity(
-                                    horizontal: -4, vertical: -4)
-                                : VisualDensity.compact,
-                            backgroundColor: Colors.white38,
-                            side: BorderSide.none,
-                            avatar: widget.smalllayouts
-                                ? Icon(
-                                    snapshots.data[index]['icon'].first
-                                        .toString()
-                                        .iconParse,
-                                    size: 16,
-                                    color: isListHovered
-                                        ? Colors.black54
-                                        : Colors.black38)
-                                : null,
-                            label: Text(
-                                widget.smalllayouts
-                                    ? '${snapshots.data[index]['category']} · ${snapshots.data[index]['time']}'
-                                    : snapshots.data[index]['time'],
-                                style: GoogleFonts.roboto(
-                                    color: isListHovered
-                                        ? Colors.black54
-                                        : Colors.black38,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 12))),
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 200),
-                          child: isWebMobile || isListHovered
-                              ? widget.smalllayouts
-                                  ? buttonResourceItem()
-                                  : buttonResourceItemSmall()
-                              : null,
-                        )
-                      ],
-                    ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Chip(
+                        padding: isWebMobile ? EdgeInsets.zero : null,
+                        visualDensity: isWebMobile
+                            ? const VisualDensity(horizontal: -4, vertical: -4)
+                            : VisualDensity.compact,
+                        backgroundColor: Colors.white38,
+                        side: BorderSide.none,
+                        avatar: widget.smalllayouts
+                            ? Icon(
+                                snapshots.data[index]['icon'].first.toString().iconParse,
+                                size: 16,
+                                color: isListHovered
+                                    ? Colors.black54
+                                    : Colors.black38)
+                            : null,
+                        label: Text(
+                            widget.smalllayouts
+                                ? '${snapshots.data[index]['category']} · ${snapshots.data[index]['time']}'
+                                : snapshots.data[index]['time'],
+                            style: GoogleFonts.roboto(
+                                color: isListHovered
+                                    ? Colors.black54
+                                    : Colors.black38,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12))
+                      ),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: isWebMobile || isListHovered
+                          ? widget.smalllayouts
+                              ? buttonResourceItem()
+                              : buttonResourceItemSmall()
+                          : null,
+                      )
+                    ],
                   ),
                 ],
               ),
@@ -1416,18 +1500,8 @@ Widget cardResourceListTile(index, widget, AsyncSnapshot snapshots) {
 class CardResource extends StatefulWidget {
   const CardResource(
       {super.key,
-      required this.image,
-      required this.name,
-      required this.subname,
-      required this.tag,
-      required this.icon,
       required this.layouts,
       required this.smalllayouts});
-  final String image;
-  final String name;
-  final String subname;
-  final String tag;
-  final IconData icon;
   final bool layouts;
   final bool smalllayouts;
 
@@ -1454,27 +1528,13 @@ class _CardResourceState extends State<CardResource> {
     final FirebaseStorage storageRef = FirebaseStorage.instance;
     final FirebaseFirestore db = FirebaseFirestore.instance;
 
-    // Create a reference with an initial file path and name
-    final Reference pathRef =
-        storageRef.ref().child("images/1965 Mustang_vnode_001.jpg");
-
-    try {
-      const oneMegabyte = 1024 * 1024;
-      final Uint8List? data = await pathRef.getData(oneMegabyte);
-      imageData = data;
-      // Data for "images/island.jpg" is returned, use this as needed.
-    } on FirebaseException catch (e) {
-      print(e);
-      // Handle any errors.
-    }
-
     List<Map<String, dynamic>> items = [];
 
-    await db.collection('resource').doc('item').get().then(
-        (DocumentSnapshot doc) async {
+    await db.collection('resource').doc('item').get().then((DocumentSnapshot doc) async {
       var data = doc.data() as Map<String, dynamic>;
       for (List element in data.values) {
-        String brand = element.join("");
+        for (String brand in element) {
+        // print(brand.toString());
         //...
 
         await db
@@ -1488,31 +1548,56 @@ class _CardResourceState extends State<CardResource> {
             for (var item in result) {
               String name = item['name'];
 
-              DateTime timestamp =
-                  DateTime.fromMillisecondsSinceEpoch(item['timestamp'] * 1000);
+              DateTime timestamp = DateTime.fromMillisecondsSinceEpoch(item['timestamp'] * 1000);
               String time = timeAgo(timestamp);
-              print(
-                  ' name: $name \n brand: ${brand.toTitleCase()} \n time: $time');
+              // print(' name: $name \n brand: ${brand.toTitleCase()} \n time: $time');
               //...
 
               String categoryId = item['category'];
+              String imagePath = item['type'];
+              imagePath = imagePath.substring(imagePath.indexOf('/'));
+              // print(imagePath);
+
+              final Reference pathRef = storageRef.ref().child("images$imagePath");
+              final listImage = await pathRef.listAll();
+
+              /* for (var item in listImage.items) {
+                print(item.name.toString());
+              } */
+
+              // Create a reference with an initial file path and name
+              final Reference imageRef = storageRef.ref().child("images$imagePath/${listImage.items.first.name}");
+              // print(imageRef.toString());
+              
+              Uint8List? image;
+              try {
+                const oneMegabyte = 1024 * 1024;
+                final Uint8List? imageData = await imageRef.getData(oneMegabyte);
+                image = imageData;
+              } on FirebaseException catch (e) {
+                debugPrint("$e");
+              }
+
               await db.doc("resource/category/$categoryId").get().then((doc) {
                 var data = doc.data() as Map<String, dynamic>;
                 //...
 
-                String category =
-                    categoryId.substring(0, categoryId.indexOf('/'));
+                String category = categoryId.substring(0, categoryId.indexOf('/'));
                 category = category.toTitleCase();
-                print(' category: $category');
-                print(' icon: ${data['icons'].first}');
+                // print(' category: $category');
+                // print(' icon: ${data['icons'].first}');
+                // print(' tags: ${data['tags']}');
 
                 final List<Map<String, dynamic>> snapshots = [
                   {
+                    "timestamp": timestamp,
                     "name": name,
+                    "image": image,
                     "brand": brand,
                     "time": time,
                     "category": category,
-                    "icon": data['icons']
+                    "icon": data['icons'],
+                    "tags": data['tags'], 
                   }
                 ];
                 items.addAll(snapshots);
@@ -1522,7 +1607,13 @@ class _CardResourceState extends State<CardResource> {
           onError: (e) => debugPrint("Error completing: $e"),
         );
       }
+      }
     }, onError: (e) => debugPrint("Error getting document: $e"));
+    items.sort((a, b) {
+      var atime = a['timestamp'];
+      var btime = b['timestamp'];
+      return btime.compareTo(atime);
+    });
     return items;
   }
 
@@ -1555,6 +1646,8 @@ class _CardResourceState extends State<CardResource> {
                   contentPadding: const EdgeInsets.only(left: 6),
                   dense: true,
                   child: ExpansionTile(
+                      expandedAlignment: Alignment.topLeft,
+                      expandedCrossAxisAlignment: CrossAxisAlignment.start,
                       onExpansionChanged: (value) =>
                           setState(() => isTileExpanded = value),
                       initiallyExpanded: true,
@@ -1634,14 +1727,25 @@ class _CardResourceState extends State<CardResource> {
                                     CircularProgressIndicator(strokeWidth: 3),
                               );
                             }
-                            return Column(children: [
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
                               ListView.builder(
                                   physics: const ClampingScrollPhysics(),
                                   shrinkWrap: true,
                                   itemCount: snapshot.data.length,
-                                  itemBuilder: (context, index) =>
-                                      cardResourceListTile(
-                                          index, widget, snapshot)),
+                                  itemBuilder: (context, index) {
+                                    return Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const SizedBox(height: 8),
+                                        cardResourceList(index, widget, snapshot, widget.smalllayouts),
+                                        const SizedBox(height: 8)
+                                      ],
+                                    );
+                                  }),
                               AnimatedSize(
                                 curve: Curves.easeOut,
                                 duration: const Duration(milliseconds: 200),
@@ -1651,36 +1755,23 @@ class _CardResourceState extends State<CardResource> {
                                     children: [
                                       const SizedBox(height: 8),
                                       ElevatedButton.icon(
-                                          style: ButtonStyle(
-                                              visualDensity:
-                                                  VisualDensity.compact,
-                                              foregroundColor:
-                                                  MaterialStateProperty
-                                                      .resolveWith((states) {
-                                                if (states.contains(
-                                                        MaterialState
-                                                            .hovered) ||
-                                                    states.contains(
-                                                        MaterialState
-                                                            .pressed)) {
+                                          style: ButtonStyle( visualDensity: VisualDensity.compact,
+                                              foregroundColor:MaterialStateProperty.resolveWith((states) {
+                                                if (states.contains(MaterialState.hovered) || states.contains(MaterialState.pressed)) {
                                                   return Colors.black54;
                                                 }
                                                 return Colors.black38;
                                               }),
-                                              backgroundColor:
-                                                  MaterialStatePropertyAll(
-                                                      Colors.grey.shade50),
-                                              elevation:
-                                                  const MaterialStatePropertyAll(
-                                                      0)),
-                                          onPressed: () =>
-                                              context.push('/resource'),
-                                          icon: const Icon(Icons.refresh,
-                                              size: 14),
-                                          label: Text('Load More',
-                                              style: GoogleFonts.roboto(
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 12))),
+                                              backgroundColor: MaterialStatePropertyAll(Colors.grey.shade50),
+                                              elevation: const MaterialStatePropertyAll(0)),
+                                          onPressed: () => context.push('/resource'),
+                                          icon: const Icon(Icons.refresh, size: 14),
+                                          label: Text(
+                                            'Load More', style: GoogleFonts.roboto(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 12),
+                                        )
+                                      ),
                                     ],
                                   ),
                                 ),

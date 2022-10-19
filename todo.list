@@ -2,15 +2,15 @@ Todos / issues
  ✓ search bar change it into exclusive mode
     ✓ move everything into search bar
  - remove hide url browser bar when scrolling down
- - make font in grid mode more bigger
+ ✓ make font in grid mode more bigger
  - change expand button in grid mode with visual feedback pressed on web mobile
- - fix/remove set state add listener on thumbnails cause lag in details page
+ ✓ fix/remove set state add listener on thumbnails cause lag in details page
  - recreate groundup set state module to animation builder
  - bouncing scroll is not enabled in list view
- - resource animated switch is not animating in web mobile
+ ✓ resource animated switch is not animating in web mobile
  - give indicator selected index ontap in resource page on tap device/web mobile
- - pages are not animating (try to replace index.html with a new one)
-    - set default transition for go router in flutter
+ ✓ pages are not animating (try to replace index.html with a new one)
+    ✓ set default transition for go router in flutter
  - move thumbnails in details page into middle
     add next item / previous item in both side with grayed image
  - change copied item to be more compact
@@ -25,15 +25,18 @@ Todos / issues
  - Animate details page
  - Add button search in google when no result found
  - Up and down point comment and share reply text button
- - Add video tutorial link on description page
  - Add gradient on description scrolling for indication
- - Add button on comment for upload image and visual button reply
  ✓ Add compact button layouts in resource page
  - hover widget popup details
  - make blender version clickable copy on click with snackbar
  ✓ dislike button or hide button widget (item, etc)
  - Download more option
  - Properly show the 3d button
+
+Changelog 0.0.3+8
+ - Compact header bar in resource page 
+ - Reduce lag spike while scrolling in resource page
+ - New page transition Animations
 
 Changelog 0.0.3+5
  - Start using firestore to uploading content
