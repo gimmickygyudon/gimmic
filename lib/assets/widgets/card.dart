@@ -13,7 +13,8 @@ import 'package:gimmic/assets/functions/icon.dart';
 import 'package:gimmic/assets/functions/string.dart';
 import '../functions/colors.dart';
 import '../functions/platform.dart';
-import '../functions/time.dart';
+import '../functions/resource.dart';
+import '../functions/scroll.dart';
 import '../functions/url.dart';
 import 'menu.dart';
 
@@ -113,17 +114,18 @@ class _CardBigState extends State<CardBig> {
                         child: Image.network(
                           'https://source.unsplash.com/random',
                           fit: BoxFit.cover,
-                          frameBuilder: (BuildContext context, Widget child,int? frame, bool wasSynchronouslyLoaded) {
+                          frameBuilder: (BuildContext context, Widget child,
+                              int? frame, bool wasSynchronouslyLoaded) {
                             if (wasSynchronouslyLoaded == true) return child;
-                            return imageFrameBulilder(child, frame, wasSynchronouslyLoaded);
+                            return imageFrameBulilder(
+                                child, frame, wasSynchronouslyLoaded);
                           },
-                          loadingBuilder: (BuildContext context, Widget child,ImageChunkEvent? loadingProgress) {
+                          loadingBuilder: (BuildContext context, Widget child,
+                              ImageChunkEvent? loadingProgress) {
                             if (loadingProgress == null) return child;
-                            return Column(
-                                children: [ 
-                                  imageLoadingBuilder(child, loadingProgress)
-                              ] 
-                            );
+                            return Column(children: [
+                              imageLoadingBuilder(child, loadingProgress)
+                            ]);
                           },
                         ),
                       ),
@@ -136,18 +138,18 @@ class _CardBigState extends State<CardBig> {
                         child: Image.network(
                           'https://source.unsplash.com/random',
                           fit: BoxFit.cover,
-                          frameBuilder: (BuildContext context, Widget child,int? frame, bool wasSynchronouslyLoaded) {
+                          frameBuilder: (BuildContext context, Widget child,
+                              int? frame, bool wasSynchronouslyLoaded) {
                             if (wasSynchronouslyLoaded == true) return child;
                             return imageFrameBulilder(
-                                  child, frame, wasSynchronouslyLoaded);
+                                child, frame, wasSynchronouslyLoaded);
                           },
-                          loadingBuilder: (BuildContext context, Widget child,ImageChunkEvent? loadingProgress) {
+                          loadingBuilder: (BuildContext context, Widget child,
+                              ImageChunkEvent? loadingProgress) {
                             if (loadingProgress == null) return child;
-                            return Column(
-                                children: [ 
-                                  imageLoadingBuilder(child, loadingProgress)
-                              ]
-                            );
+                            return Column(children: [
+                              imageLoadingBuilder(child, loadingProgress)
+                            ]);
                           },
                         ),
                       ),
@@ -512,7 +514,8 @@ Widget cardUpdateLog() {
                                               dense: true,
                                               leading:
                                                   const Icon(Icons.arrow_right),
-                                              title: Text('Reduce lag spike while scrolling in resource page',
+                                              title: Text(
+                                                  'Reduce lag spike while scrolling in resource page',
                                                   style: GoogleFonts.roboto(
                                                       fontSize: 14))),
                                           ListTile(
@@ -526,7 +529,7 @@ Widget cardUpdateLog() {
                                                       fontSize: 14))),
                                         ],
                                       ),
-                                    ExpansionTile(
+                                      ExpansionTile(
                                         tilePadding: constraints.maxWidth > 600
                                             ? null
                                             : EdgeInsets.zero,
@@ -1344,16 +1347,60 @@ class _CardCommentState extends State<CardComment> {
   }
 }
 
-Widget cardResourceList(index, widget, AsyncSnapshot snapshots, smalllayouts) {
+class CardResourceList extends StatefulWidget {
+  const CardResourceList({
+    super.key, 
+    required this.index, 
+    required this.smallLayouts, 
+    required this.snapshots
+  });
+
+  final int index;
+  final bool smallLayouts; 
+  final AsyncSnapshot snapshots;
+
+  @override
+  State<CardResourceList> createState() => _CardResourceListState();
+}
+
+class _CardResourceListState extends State<CardResourceList> {
   bool isListHovered = false;
 
-  String name = snapshots.data[index]['name']; 
-  String shorten(String name) {
-    return name = "${name.substring(0, 15)}...";
+  late ScrollController _scrollChipViewController;
+  bool startScroll = false, endScroll = true;
+
+  @override
+  void initState() {
+    _scrollChipViewController = ScrollController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollChipViewController.position.isScrollingNotifier.addListener(() { 
+        if(!_scrollChipViewController.position.isScrollingNotifier.value) {
+          setState(() {
+            startScroll = _scrollChipViewController.position.pixels > 0;
+            endScroll = _scrollChipViewController.position.pixels < _scrollChipViewController.position.maxScrollExtent;
+          });
+        }
+      });
+    });
+    super.initState();
   }
 
-  return StatefulBuilder(builder: (context, setState) {
-      return Theme(
+  @override
+  void dispose() {
+    _scrollChipViewController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String name = widget.snapshots.data[widget.index]['name'];
+    String shorten(String name) {
+      return name = "${name.substring(0, 15)}...";
+    }
+
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return Theme(
         data: ThemeData(useMaterial3: true),
         child: InkWell(
           onHover: (value) => setState(() => isListHovered = value),
@@ -1363,7 +1410,7 @@ Widget cardResourceList(index, widget, AsyncSnapshot snapshots, smalllayouts) {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: SizedBox(
-              height: widget.smalllayouts ? 120 : 90,
+              height: widget.smallLayouts ? 120 : 90,
               child: Flex(
                 direction: Axis.horizontal,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1374,75 +1421,160 @@ Widget cardResourceList(index, widget, AsyncSnapshot snapshots, smalllayouts) {
                         borderRadius: BorderRadius.circular(12),
                         child: AnimatedScale(
                           curve: Curves.easeOutQuart,
-                          duration: const Duration(milliseconds: 600),
+                          duration: const Duration(milliseconds: 800),
                           scale: isListHovered ? 1.05 : 1,
                           child: AspectRatio(
-                            aspectRatio: smalllayouts ? 1 / 0.7 : 1 / 0.85,
+                            aspectRatio: widget.smallLayouts ? 1 / 0.7 : 1 / 0.85,
                             child: Image(
-                              image: MemoryImage(snapshots.data[index]['image']),
-                              frameBuilder: (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
-                                return imageFrameBulilder(child, frame, wasSynchronouslyLoaded);
-                              },
-                              loadingBuilder:(BuildContext context,Widget child,ImageChunkEvent?loadingProgress) {
-                                return imageLoadingBuilder(child, loadingProgress);
-                              },
-                              fit: BoxFit.cover
-                            ),
-                           ),
+                                image:
+                                    MemoryImage(widget.snapshots.data[widget.index]['image']),
+                                frameBuilder: (BuildContext context,
+                                    Widget child,
+                                    int? frame,
+                                    bool wasSynchronouslyLoaded) {
+                                  return imageFrameBulilder(
+                                      child, frame, wasSynchronouslyLoaded);
+                                },
+                                loadingBuilder: (BuildContext context,
+                                    Widget child,
+                                    ImageChunkEvent? loadingProgress) {
+                                  return imageLoadingBuilder(
+                                      child, loadingProgress);
+                                },
+                                fit: BoxFit.cover),
+                          ),
                         ),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 2, left: 8),
                         child: Column(
-                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                         crossAxisAlignment: CrossAxisAlignment.start,
-                         children: [
-                           Padding(
-                             padding: const EdgeInsets.only(left: 2),
-                             child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 2),
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                               children: [
-                                 Padding(
-                                   padding: const EdgeInsets.only(left: 1),
-                                   child: Text(
-                                       snapshots.data[index]['brand']
-                                           .toString()
-                                           .toTitleCase(),
-                                       style: GoogleFonts.roboto(
-                                           color: Colors.black54,
-                                           fontSize: smalllayouts ? 14 : 12,
-                                           fontWeight: FontWeight.w500)),
-                                 ),
-                                 Text(
-                                   smalllayouts ? name : shorten(name),
-                                   style: GoogleFonts.roboto(
-                                       letterSpacing: -0.25,
-                                       height: isWebMobile ? null : 0.0,
-                                       fontSize: widget.smalllayouts ? 22 : 16,
-                                       color: Colors.black87),
-                                 ),
-                               ],
-                             ),
-                           ),
-                           Wrap(
-                             spacing: 8,
-                             children: List.generate(smalllayouts ? 4 : 2, (i) {
-                               return FilterChip(
-                                 visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
-                                 padding: smalllayouts ? null : EdgeInsets.zero,
-                                 side: BorderSide.none,
-                                 backgroundColor: isHovered ? Colors.white30 : Colors.grey.shade100,
-                                 onSelected: (value) {},
-                                 label: Text(snapshots.data[index]['tags'][i], 
-                                   style: TextStyle(
-                                     color: Colors.black54,
-                                     fontSize: smalllayouts ? 12 : 10)
-                                   ),
-                                 );
-                               },
-                             ),
-                           )
-                         ],
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 1),
+                                    child: Text(
+                                        widget.snapshots.data[widget.index]['brand']
+                                            .toString()
+                                            .toTitleCase(),
+                                        style: GoogleFonts.roboto(
+                                            color: Colors.black54,
+                                            fontSize: widget.smallLayouts ? 14 : 12,
+                                            fontWeight: FontWeight.w500)),
+                                  ),
+                                  Text(
+                                    widget.smallLayouts ? name : shorten(name),
+                                    style: GoogleFonts.roboto(
+                                        letterSpacing: -0.25,
+                                        height: isWebMobile ? null : 0.0,
+                                        fontSize: widget.smallLayouts ? 22 : 16,
+                                        color: Colors.black87),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                AnimatedSize(
+                                  curve: Curves.ease,
+                                  duration: const Duration(milliseconds: 300),
+                                  child: SizedBox(
+                                    width: startScroll ? null : 0,
+                                    child: Visibility(
+                                      visible: startScroll, 
+                                      child: IconButton(
+                                        padding: EdgeInsets.zero,
+                                        onPressed: (){
+                                          _scrollChipViewController.animateTo(
+                                              _scrollChipViewController.offset - 65, 
+                                              duration: const Duration(milliseconds: 300), 
+                                              curve: Curves.fastOutSlowIn);
+                                        }, 
+                                        visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
+                                        color: Colors.black45,
+                                        style: ButtonStyle(
+                                          shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
+                                          backgroundColor: MaterialStatePropertyAll(isHovered
+                                            ? Colors.white30
+                                            : Colors.grey.shade100)
+                                        ),
+                                        icon: const Icon(Icons.arrow_back_ios_new, size: 14)
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                AnimatedSize(
+                                  curve: Curves.ease,
+                                  duration: const Duration(milliseconds: 300),
+                                  child: SizedBox(
+                                    width: widget.smallLayouts 
+                                      ? startScroll && endScroll ? constraints.maxWidth / 2.75 : constraints.maxWidth / 2.5 
+                                      : startScroll && endScroll ? constraints.maxWidth / 3.25 : constraints.maxWidth / 3,
+                                    child: ScrollConfiguration(
+                                      behavior: DragOnScroll(),
+                                      child: SingleChildScrollView(
+                                        controller: _scrollChipViewController,
+                                        scrollDirection: Axis.horizontal,
+                                        child: Wrap(
+                                          spacing: 8,
+                                          children: List.generate(widget.snapshots.data[widget.index]['tags'].length, (i) {
+                                              return FilterChip(
+                                                visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
+                                                padding: widget.smallLayouts ? null : EdgeInsets.zero,
+                                                side: BorderSide.none,
+                                                backgroundColor: isHovered
+                                                    ? Colors.white30
+                                                    : Colors.grey.shade100,
+                                                onSelected: (value) {},
+                                                label: Text(
+                                                    widget.snapshots.data[widget.index]['tags'][i],
+                                                    style: TextStyle(
+                                                        color: Colors.black54,
+                                                        fontSize: widget.smallLayouts ? 12 : 10)),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                AnimatedSize(
+                                  curve: Curves.ease,
+                                  duration: const Duration(milliseconds: 300),
+                                  child: SizedBox(
+                                    width: endScroll ? null : 0,
+                                    child: Visibility(
+                                      visible: endScroll, 
+                                      child: IconButton(
+                                        padding: EdgeInsets.zero,
+                                        onPressed: (){
+                                          _scrollChipViewController.animateTo(
+                                              _scrollChipViewController.offset + 65, 
+                                              duration: const Duration(milliseconds: 300), 
+                                              curve: Curves.fastOutSlowIn);
+                                        }, 
+                                        visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
+                                        color: Colors.black45,
+                                        style: ButtonStyle(
+                                          shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
+                                          backgroundColor: MaterialStatePropertyAll(isHovered
+                                            ? Colors.white30
+                                            : Colors.grey.shade100)
+                                        ),
+                                        icon: const Icon(Icons.arrow_forward_ios, size: 14)
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -1452,38 +1584,39 @@ Widget cardResourceList(index, widget, AsyncSnapshot snapshots, smalllayouts) {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Chip(
-                        padding: isWebMobile ? EdgeInsets.zero : null,
-                        visualDensity: isWebMobile
-                            ? const VisualDensity(horizontal: -4, vertical: -4)
-                            : VisualDensity.compact,
-                        backgroundColor: Colors.white38,
-                        side: BorderSide.none,
-                        avatar: widget.smalllayouts
-                            ? Icon(
-                                snapshots.data[index]['icon'].first.toString().iconParse,
-                                size: 16,
-                                color: isListHovered
-                                    ? Colors.black54
-                                    : Colors.black38)
-                            : null,
-                        label: Text(
-                            widget.smalllayouts
-                                ? '${snapshots.data[index]['category']} · ${snapshots.data[index]['time']}'
-                                : snapshots.data[index]['time'],
-                            style: GoogleFonts.roboto(
-                                color: isListHovered
-                                    ? Colors.black54
-                                    : Colors.black38,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12))
-                      ),
+                          padding: isWebMobile ? EdgeInsets.zero : null,
+                          visualDensity: isWebMobile
+                              ? const VisualDensity(horizontal: -4, vertical: -4)
+                              : VisualDensity.compact,
+                          backgroundColor: Colors.white38,
+                          side: BorderSide.none,
+                          avatar: widget.smallLayouts
+                              ? Icon(
+                                  widget.snapshots.data[widget.index]['icon'].first
+                                      .toString()
+                                      .iconParse,
+                                  size: 16,
+                                  color: isListHovered
+                                      ? Colors.black54
+                                      : Colors.black38)
+                              : null,
+                          label: Text(
+                              widget.smallLayouts
+                                  ? '${widget.snapshots.data[widget.index]['category']} · ${widget.snapshots.data[widget.index]['time']}'
+                                  : widget.snapshots.data[widget.index]['time'],
+                              style: GoogleFonts.roboto(
+                                  color: isListHovered
+                                      ? Colors.black54
+                                      : Colors.black38,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12))),
                       AnimatedSwitcher(
                         duration: const Duration(milliseconds: 200),
                         child: isWebMobile || isListHovered
-                          ? widget.smalllayouts
-                              ? buttonResourceItem()
-                              : buttonResourceItemSmall()
-                          : null,
+                            ? widget.smallLayouts
+                                ? buttonResourceItem()
+                                : buttonResourceItemSmall()
+                            : null,
                       )
                     ],
                   ),
@@ -1493,15 +1626,14 @@ Widget cardResourceList(index, widget, AsyncSnapshot snapshots, smalllayouts) {
           ),
         ),
       );
-    },
-  );
-}
+      },
+    );
+  }
+}  
 
 class CardResource extends StatefulWidget {
   const CardResource(
-      {super.key,
-      required this.layouts,
-      required this.smalllayouts});
+      {super.key, required this.layouts, required this.smalllayouts});
   final bool layouts;
   final bool smalllayouts;
 
@@ -1521,100 +1653,6 @@ class _CardResourceState extends State<CardResource> {
   void initState() {
     super.initState();
     _loadItems = loadItems();
-  }
-
-  Future loadItems() async {
-    // Create a storage reference from our app
-    final FirebaseStorage storageRef = FirebaseStorage.instance;
-    final FirebaseFirestore db = FirebaseFirestore.instance;
-
-    List<Map<String, dynamic>> items = [];
-
-    await db.collection('resource').doc('item').get().then((DocumentSnapshot doc) async {
-      var data = doc.data() as Map<String, dynamic>;
-      for (List element in data.values) {
-        for (String brand in element) {
-        // print(brand.toString());
-        //...
-
-        await db
-            .collection("resource")
-            .doc('item')
-            .collection(brand)
-            .get()
-            .then(
-          (value) async {
-            var result = value.docs.map((e) => e.data()).toList();
-            for (var item in result) {
-              String name = item['name'];
-
-              DateTime timestamp = DateTime.fromMillisecondsSinceEpoch(item['timestamp'] * 1000);
-              String time = timeAgo(timestamp);
-              // print(' name: $name \n brand: ${brand.toTitleCase()} \n time: $time');
-              //...
-
-              String categoryId = item['category'];
-              String imagePath = item['type'];
-              imagePath = imagePath.substring(imagePath.indexOf('/'));
-              // print(imagePath);
-
-              final Reference pathRef = storageRef.ref().child("images$imagePath");
-              final listImage = await pathRef.listAll();
-
-              /* for (var item in listImage.items) {
-                print(item.name.toString());
-              } */
-
-              // Create a reference with an initial file path and name
-              final Reference imageRef = storageRef.ref().child("images$imagePath/${listImage.items.first.name}");
-              // print(imageRef.toString());
-              
-              Uint8List? image;
-              try {
-                const oneMegabyte = 1024 * 1024;
-                final Uint8List? imageData = await imageRef.getData(oneMegabyte);
-                image = imageData;
-              } on FirebaseException catch (e) {
-                debugPrint("$e");
-              }
-
-              await db.doc("resource/category/$categoryId").get().then((doc) {
-                var data = doc.data() as Map<String, dynamic>;
-                //...
-
-                String category = categoryId.substring(0, categoryId.indexOf('/'));
-                category = category.toTitleCase();
-                // print(' category: $category');
-                // print(' icon: ${data['icons'].first}');
-                // print(' tags: ${data['tags']}');
-
-                final List<Map<String, dynamic>> snapshots = [
-                  {
-                    "timestamp": timestamp,
-                    "name": name,
-                    "image": image,
-                    "brand": brand,
-                    "time": time,
-                    "category": category,
-                    "icon": data['icons'],
-                    "tags": data['tags'], 
-                  }
-                ];
-                items.addAll(snapshots);
-              });
-            }
-          },
-          onError: (e) => debugPrint("Error completing: $e"),
-        );
-      }
-      }
-    }, onError: (e) => debugPrint("Error getting document: $e"));
-    items.sort((a, b) {
-      var atime = a['timestamp'];
-      var btime = b['timestamp'];
-      return btime.compareTo(atime);
-    });
-    return items;
   }
 
   @override
@@ -1728,55 +1766,74 @@ class _CardResourceState extends State<CardResource> {
                               );
                             }
                             return Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                              ListView.builder(
-                                  physics: const ClampingScrollPhysics(),
-                                  shrinkWrap: true,
-                                  itemCount: snapshot.data.length,
-                                  itemBuilder: (context, index) {
-                                    return Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        const SizedBox(height: 8),
-                                        cardResourceList(index, widget, snapshot, widget.smalllayouts),
-                                        const SizedBox(height: 8)
-                                      ],
-                                    );
-                                  }),
-                              AnimatedSize(
-                                curve: Curves.easeOut,
-                                duration: const Duration(milliseconds: 200),
-                                child: SizedBox(
-                                  height: isHovered || isWebMobile ? null : 0,
-                                  child: Column(
-                                    children: [
-                                      const SizedBox(height: 8),
-                                      ElevatedButton.icon(
-                                          style: ButtonStyle( visualDensity: VisualDensity.compact,
-                                              foregroundColor:MaterialStateProperty.resolveWith((states) {
-                                                if (states.contains(MaterialState.hovered) || states.contains(MaterialState.pressed)) {
-                                                  return Colors.black54;
-                                                }
-                                                return Colors.black38;
-                                              }),
-                                              backgroundColor: MaterialStatePropertyAll(Colors.grey.shade50),
-                                              elevation: const MaterialStatePropertyAll(0)),
-                                          onPressed: () => context.push('/resource'),
-                                          icon: const Icon(Icons.refresh, size: 14),
-                                          label: Text(
-                                            'Load More', style: GoogleFonts.roboto(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 12),
-                                        )
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ListView.builder(
+                                      physics: const ClampingScrollPhysics(),
+                                      shrinkWrap: true,
+                                      itemCount: snapshot.data.length,
+                                      itemBuilder: (context, index) {
+                                        return Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const SizedBox(height: 8),
+                                            CardResourceList(index: index, smallLayouts: widget.smalllayouts, snapshots: snapshot),
+                                            const SizedBox(height: 8)
+                                          ],
+                                        );
+                                      }),
+                                  AnimatedSize(
+                                    curve: Curves.easeOut,
+                                    duration: const Duration(milliseconds: 200),
+                                    child: SizedBox(
+                                      height:
+                                          isHovered || isWebMobile ? null : 0,
+                                      child: Column(
+                                        children: [
+                                          const SizedBox(height: 8),
+                                          ElevatedButton.icon(
+                                              style: ButtonStyle(
+                                                  visualDensity:
+                                                      VisualDensity.compact,
+                                                  foregroundColor:
+                                                      MaterialStateProperty
+                                                          .resolveWith(
+                                                              (states) {
+                                                    if (states.contains(
+                                                            MaterialState
+                                                                .hovered) ||
+                                                        states.contains(
+                                                            MaterialState
+                                                                .pressed)) {
+                                                      return Colors.black54;
+                                                    }
+                                                    return Colors.black38;
+                                                  }),
+                                                  backgroundColor:
+                                                      MaterialStatePropertyAll(
+                                                          Colors.grey.shade50),
+                                                  elevation:
+                                                      const MaterialStatePropertyAll(
+                                                          0)),
+                                              onPressed: () =>
+                                                  context.push('/resource'),
+                                              icon: const Icon(Icons.refresh,
+                                                  size: 14),
+                                              label: Text(
+                                                'Load More',
+                                                style: GoogleFonts.roboto(
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 12),
+                                              )),
+                                        ],
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ]);
+                                ]);
                           },
                         ),
                       ]),

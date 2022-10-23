@@ -8,7 +8,7 @@ class FadePage extends CustomTransitionPage {
     required Widget child
   }) : super(
          key: key,
-         transitionDuration: const Duration(milliseconds: 600),
+         transitionDuration: const Duration(milliseconds: 800),
          transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeThroughTransition(
             animation: animation, 

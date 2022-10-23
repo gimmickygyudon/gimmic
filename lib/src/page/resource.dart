@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:gimmic/src/view/grid.dart';
@@ -252,11 +251,12 @@ class _ResourceState extends State<Resource> {
       // if the search field is empty or only contains white-space, we'll display all users
       results = _allResource;
 
-      if (kIsWeb) {
+      /* if (kIsWeb) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (initated) GoRouter.of(context).replace('/resource');
         });
-      }
+      } */
+
     } else {
       final name = _allResource
           .where((name) => name["name"]
@@ -274,14 +274,13 @@ class _ResourceState extends State<Resource> {
       results = results.toSet().toList();
       // we use the toLowerCase() method to make it case-insensitive
 
-      if (kIsWeb) {
+      /* if (kIsWeb) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (initated && enteredKeyword.trim().isNotEmpty) {
-            GoRouter.of(context)
-                .replace('/resource?search=${enteredKeyword.trim()}');
+            GoRouter.of(context).replace('/resource?search=${enteredKeyword.trim()}');
           }
         });
-      }
+      } */
 
       Future.delayed(const Duration(milliseconds: 600), () async {
         if (results.isEmpty) {
@@ -494,29 +493,50 @@ class _ResourceState extends State<Resource> {
                                                 ),
                                               )
                                             : Row(
+                                              mainAxisAlignment: MainAxisAlignment.end,
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 Visibility(
                                                   visible: useVerticalLayout2x ? false : true,
-                                                  child: Text(resultCount(_foundResource.length), 
-                                                      style: GoogleFonts.roboto(
-                                                          color: Colors.black54, 
-                                                          fontSize: 12, 
-                                                          fontWeight: FontWeight.w500)),
-                                                ),
-                                                IconButton(
-                                                    icon: const Icon(
-                                                      Icons.clear,
-                                                      color: Colors.black54,
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.only(right: 8),
+                                                    child: Chip(
+                                                      visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
+                                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.7)),
+                                                      side: BorderSide.none,
+                                                      backgroundColor: Colors.blue.shade50,
+                                                      deleteIcon: _foundResource.isEmpty 
+                                                      ? _loading
+                                                        ? const SizedBox(
+                                                            height: 12,
+                                                            width: 12,
+                                                            child: CircularProgressIndicator(strokeWidth: 2),
+                                                          )
+                                                        : Icon(Icons.close, color: Colors.blue.shade700, size: 16)
+                                                      : Icon(Icons.close, color: Colors.blue.shade700, size: 16),
+                                                      onDeleted: () {
+                                                         _searchController.clear();
+                                                        _runFilter(_searchController.text);                                                     
+                                                      },
+                                                      label: Text(resultCount(_foundResource.length), 
+                                                          style: GoogleFonts.roboto(
+                                                              color: Colors.blue.shade700, 
+                                                              fontSize: 12, 
+                                                              fontWeight: FontWeight.w500)),
                                                     ),
-                                                    onPressed: () {
-                                                      GoRouter.of(context)
-                                                          .replace('/resource');
-                                                      _searchController.clear();
-                                                      _runFilter(
-                                                          _searchController.text);
-                                                    },
                                                   ),
+                                                ),
+                                                Visibility(
+                                                  visible: useVerticalLayout2x ? true : false,
+                                                  child: IconButton(
+                                                      icon: const Icon(Icons.clear, color: Colors.black54),
+                                                      onPressed: () {
+                                                        GoRouter.of(context).replace('/resource');
+                                                        _searchController.clear();
+                                                        _runFilter(_searchController.text);
+                                                      },
+                                                    ),
+                                                ),
                                               ],
                                             ),
                                         suffixIconConstraints:
@@ -904,24 +924,26 @@ class _ResourceState extends State<Resource> {
                     ),
                   ),
                   Flexible(
-                    child: AnimatedSwitcher(
-                      switchInCurve: Curves.fastOutSlowIn,
-                      duration: const Duration(seconds: 1),
-                      transitionBuilder: (child, animation) {
-                        const begin = Offset(0,
-                            2); // maybe point 2 offset is out from given frame that probably cause the issue
-                        const end = Offset.zero;
-                        final tween =
-                            Tween(begin: begin, end: end).animate(animation);
-                        return SlideTransition(
-                          position: tween,
-                          child: child,
-                        );
-                      },
-                      child: StatefulBuilder(
-                        key: _bodyStateKey,
-                        builder: (context, setState) => 
-                        _foundResource.isNotEmpty
+                    child: StatefulBuilder(
+                      key: _bodyStateKey,
+                      builder: (context, setState) => 
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 700),
+                        transitionBuilder: (child, animation) {
+                          const begin = Offset(0, 1.5);
+                          const end = Offset.zero;
+                          final tween = Tween(begin: begin, end: end).animate(
+                            CurvedAnimation(
+                              parent: animation,
+                              curve: const Interval(0, 1, curve: Curves.fastOutSlowIn)
+                            )
+                          );
+                          return SlideTransition(
+                            position: tween,
+                            child: child,
+                          );
+                        },
+                       child: _foundResource.isNotEmpty
                             ? _layouts[0] || _layouts[1]
                                 ? GridResource(
                                     layouts: _layouts,
@@ -982,7 +1004,7 @@ class _ResourceState extends State<Resource> {
                                             strokeWidth: 2)),
                                   ),
                                   secondChild: Column(children: [
-                                    const SizedBox(height: 12),
+                                    const SizedBox(height: 20),
                                     Text(
                                       "No result found for '${_searchController.text.trim()}'",
                                       style: GoogleFonts.roboto(
@@ -994,7 +1016,7 @@ class _ResourceState extends State<Resource> {
                                     ),
                                     SelectableText(randomEmoji,
                                         style: GoogleFonts.robotoMono(
-                                            fontSize: 124,
+                                            fontSize: useVerticalLayout2x ? 124 : 100,
                                             color: Colors.black54,
                                             letterSpacing: -10)),
                                     const SizedBox(height: 36),

@@ -265,6 +265,7 @@ class _SearchBarMainState extends State<SearchBarMain> {
                               ? const EdgeInsets.only(right: 6)
                               : const EdgeInsets.only(right: 8),
                           child: ButtonLinks(
+                            fgcolor: Colors.blue.shade700,
                             bgcolor: Colors.blue.shade50,
                           )),
             ),
@@ -666,7 +667,7 @@ class LayoutDesktop extends StatelessWidget {
                                         ]),
                                         Row(
                                           children: [
-                                            ButtonLinks(bgcolor: Colors.white),
+                                            ButtonLinks(bgcolor: Colors.white, fgcolor: Colors.black87),
                                           ],
                                         )
                                       ],

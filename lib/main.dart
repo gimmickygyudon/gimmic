@@ -54,16 +54,6 @@ Future<void> main() async {
   runApp(Gimmic());
 }
 
-class MyCustomScrollBehavior extends MaterialScrollBehavior {
-  // Override behavior methods and getters like dragDevices
-  @override
-  Set<PointerDeviceKind> get dragDevices => {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
-        // etc.
-      };
-}
-
 class Gimmic extends StatelessWidget {
   Gimmic({super.key});
 
@@ -105,7 +95,7 @@ class Gimmic extends StatelessWidget {
 
                         return SharedAxisPage(
                             key: state.pageKey,
-                            duration: const Duration(milliseconds: 500),
+                            duration: const Duration(milliseconds: 600),
                             transitionType: SharedAxisTransitionType.vertical,
                             child: Details(arguments: valueMap));
                       },

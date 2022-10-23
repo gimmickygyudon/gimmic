@@ -155,9 +155,10 @@ Widget buttonMoreMenu(String url, String image, String hero, command) {
 }
 
 class ButtonLinks extends StatelessWidget {
-  ButtonLinks({super.key, required this.bgcolor});
+  ButtonLinks({super.key, required this.bgcolor, required this.fgcolor});
 
   final Color bgcolor;
+  final Color fgcolor;
   final List<String> links = [
     "https://www.instagram.com/gimmickygyudon/",
     "https://twitter.com/GimmickyGyudon",
@@ -187,10 +188,10 @@ class ButtonLinks extends StatelessWidget {
             padding: const MaterialStatePropertyAll(EdgeInsets.all(6)),
             shape: const MaterialStatePropertyAll(CircleBorder()),
             backgroundColor: MaterialStatePropertyAll(bgcolor)),
+            color: fgcolor,
         tooltip: 'Open Links',
-        icon: Icon(
+        icon: const Icon(
           Icons.link,
-          color: Colors.grey.shade800,
         ),
         padding: EdgeInsets.zero,
         onPressed: () {
