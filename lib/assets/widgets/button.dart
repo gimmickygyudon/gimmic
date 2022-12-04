@@ -387,23 +387,15 @@ Widget buttonResourceItem() {
               ? const VisualDensity(horizontal: -4, vertical: -4)
               : VisualDensity.compact,
           onPressed: () {},
-          icon: const Icon(Icons.more_horiz, size: 18, color: Colors.black54)),
+          icon: const Icon(Icons.more_horiz, size: 18, color: Colors.white)),
       IconButton(
           padding: isWebMobile ? EdgeInsets.zero : null,
           visualDensity: isWebMobile
               ? const VisualDensity(horizontal: -4, vertical: -4)
               : VisualDensity.compact,
           onPressed: () {},
-          icon: const Icon(Icons.photo_library_outlined,
-              size: 18, color: Colors.black54)),
-      IconButton(
-          padding: isWebMobile ? EdgeInsets.zero : null,
-          visualDensity: isWebMobile
-              ? const VisualDensity(horizontal: -4, vertical: -4)
-              : VisualDensity.compact,
-          onPressed: () {},
-          icon: const Icon(Icons.bookmark_add_outlined,
-              size: 18, color: Colors.black54)),
+          icon: const Icon(Icons.favorite_outline,
+              size: 18, color: Colors.white)),
     ],
   );
 }
@@ -417,7 +409,7 @@ Widget buttonResourceItemSmall() {
               ? const VisualDensity(horizontal: -4, vertical: -4)
               : VisualDensity.compact,
           onPressed: () {},
-          icon: const Icon(Icons.more_horiz, size: 18, color: Colors.black54)),
+          icon: const Icon(Icons.more_horiz, size: 18, color: Colors.white)),
     ],
   );
 }

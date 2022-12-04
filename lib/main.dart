@@ -2,11 +2,9 @@ import 'dart:convert';
 
 import 'package:animations/animations.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
 import 'assets/functions/route.dart';
 import 'firebase_options.dart';
 
@@ -45,12 +43,6 @@ Future<void> main() async {
   window.document.onContextMenu.listen((evt) => evt.preventDefault());
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.web);
-  await FirebaseAppCheck.instance.activate(
-    androidDebugProvider: false,
-    webRecaptchaSiteKey:
-        kReleaseMode ? webRecaptchaSiteKey : webDebugRecaptchaSiteKey,
-  );
-
   runApp(Gimmic());
 }
 
@@ -74,6 +66,7 @@ class Gimmic extends StatelessWidget {
           routes: <GoRoute>[
             GoRoute(
                 path: 'resource',
+                name: 'resource',
                 pageBuilder: (context, state) {
                   final search = state.queryParams['search'];
                   return FadePage(key: state.pageKey, child: Resource(arguments: search));

@@ -7,22 +7,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:palette_generator/palette_generator.dart';
 
-Completer updatePaletteGenCompleter = Completer();
 List paletteMutedColors = [],
     paletteVibrantColors = [],
     paletteDominantColors = [];
 
+// hook vars.
+List paletteMuted = [],
+    paletteVibrant = [],
+    paletteDominant = [];
+
 List list = [];
+
+bool snackbarbinding = false;
 bool palettecache = false;
 bool loadingpalette = false;
+
 CancelableOperation cancelableFuture = CancelableOperation.fromFuture(
-  updatePaletteGen(list),
+  updatePaletteGen(list, '', null, Completer.sync()),
   onCancel: () {
     debugPrint('Palette generation canceled... cancelableFuture called()');
   },
 );
 
-Future updatePaletteGen(List images) async {
+void resetPalette() {
+  paletteMutedColors.clear();
+  paletteVibrantColors.clear();
+  paletteDominantColors.clear();
+  paletteMuted.clear();
+  paletteVibrant.clear();
+  paletteDominant.clear();
+}
+
+Future updatePaletteGen(List images, String blob, snackbar, Completer updatePaletteGenCompleter) async {
   /// Where I listen to the message from isolate's port
   ReceivePort paletteGenReceivePort = ReceivePort();
 

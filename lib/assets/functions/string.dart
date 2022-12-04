@@ -5,4 +5,8 @@ extension StringCasingExtension on String {
       .split(' ')
       .map((str) => str.toCapitalized())
       .join(' ');
+  String toColorHex() {
+    String string = substring(indexOf('(') + 1, length);
+    return string.substring(0, string.length - 1);
+  }
 }

@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ui' as ui;
 import 'package:async/async.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:gimmic/assets/functions/string.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:squadron/squadron.dart';
 import 'worker/colors_web_service.dart';
 
@@ -12,91 +15,153 @@ class PaletteColorWeb {
   PaletteColorWeb(this.color, this.text);
 }
 
-Completer updatePaletteGenCompleter = Completer();
 List<PaletteColorWeb> paletteMutedColors = [],
     paletteVibrantColors = [],
     paletteDominantColors = [];
 
-bool palettecache = false;
+List<PaletteColorWeb> paletteMuted = [],
+    paletteVibrant = [],
+    paletteDominant = [];
+
+List list = [];
+
+bool snackbarbinding = false;
 bool loadingpalette = false;
+bool palettecache = false; 
+
 final token = CancellationToken();
 final CancelableOperation cancelableFuture = CancelableOperation.fromFuture(
-  updatePaletteGen(list),
+  updatePaletteGen(list, '', null, Completer.sync()),
   onCancel: () {
     token.cancel();
     Squadron.info('Palette generation canceled... cancelableFuture called()');
   },
 );
 
-List list = [];
-List<PaletteColorWeb> paletteMuted = [],
-    paletteVibrant = [],
-    paletteDominant = [];
+void resetPalette() {
+  paletteMutedColors.clear();
+  paletteVibrantColors.clear();
+  paletteDominantColors.clear();
+  paletteMuted.clear();
+  paletteVibrant.clear();
+  paletteDominant.clear();
+}
 
-Future updatePaletteGen(List images, [int noOfPixelsPerAxis = 12]) async {
-  late ThumbnailWorkerPool? thumbnailWorkerPool;
-  debugPrint('Future #updatePaletteGen passed');
-  try {
-    thumbnailWorkerPool = ThumbnailWorkerPool(const ConcurrencySettings(
-        minWorkers: 1, maxWorkers: 4, maxParallel: 2));
-    thumbnailWorkerPool.start();
-    loadingpalette = true;
-    Squadron.info('thumbnailWorkerPool.start()');
-    for (String picture in images) {
-      Squadron.info('Loading image #$picture...');
-      final sw = Stopwatch()..start();
-      Uint8List imageData =
-          (await rootBundle.load(picture)).buffer.asUint8List();
+Future updatePaletteGen(List images, String blob, snackbar, Completer updatePaletteGenCompleter, [int noOfPixelsPerAxis = 12]) async {
+  final prefs = await SharedPreferences.getInstance();
+  if (prefs.getString(blob) != null) {
+    try {
+      palettecache = true;
+      final data = prefs.getString(blob) ?? '';
 
-      Image image = Image.asset(picture);
-      Completer<ui.Image> completer = Completer<ui.Image>();
-      image.image.resolve(const ImageConfiguration()).addListener(
-          ImageStreamListener(
-              (ImageInfo info, bool _) => completer.complete(info.image)));
-      ui.Image info = await completer.future;
-      int width = info.width;
-      int height = info.height;
+      final jsonData = jsonDecode(data);
+      print("$blob: $jsonData");
+    
+      // TODO:Need to add other text colors
 
-      final List generator = await thumbnailWorkerPool
-          .getThumbnail(
-              imagedata: imageData, width: width, height: height, token: token)
-          .whenComplete(() => Squadron.info('Worker pool #generator complete'));
-      sw.stop();
+      for (var element in jsonData) {
+        paletteDominantColors.add(PaletteColorWeb(
+          Color(int.parse(element['paletteDominant']!)), Color(int.parse(element['paletteDominant']!))));
+        paletteVibrantColors.add(PaletteColorWeb(
+          Color(int.parse(element['paletteVibrant']!)), Color(int.parse(element['paletteVibrant']!))));
+        paletteMutedColors.add(PaletteColorWeb(
+          Color(int.parse(element['paletteMuted']!)), Color(int.parse(element['paletteMuted']!))));
+      }
 
-      final PaletteColorWeb colorDominant =
-          PaletteColorWeb(Color(generator.last), Color(generator.first));
-      // Squadron.info('#generator items converted to #colorDominant ${colorDominant.color.toString()} and ${colorDominant.text.toString()}');
+    } catch (e) {
+      debugPrint("catch: ${e.toString()}");
+    } finally {
 
-      final PaletteColorWeb colorMuted =
-          PaletteColorWeb(Color(generator.first), Color(generator.last));
-      // Squadron.info('#generator items converted to #colorMuted ${colorMuted.color.toString()} and ${colorMuted.text.toString()}');
+      loadingpalette = false;
+      updatePaletteGenCompleter.complete();         
 
-      final PaletteColorWeb colorVibrant = PaletteColorWeb(
-          Color(generator.elementAt((generator.length / 3.5).round())),
-          Color(generator.last));
-      // Squadron.info('#generator items converted to #colorVibrant ${colorVibrant.color.toString()} and ${colorVibrant.text.toString()}');
-
-      paletteDominant.add(colorDominant);
-      paletteMuted.add(colorMuted);
-      paletteVibrant.add(colorVibrant);
     }
-  } catch (exception) {
-    debugPrint(exception.toString());
-  } finally {
-    if (paletteVibrant[0].color.computeLuminance() <
-        paletteDominant[0].color.computeLuminance()) {
-      paletteVibrantColors.addAll(paletteVibrant);
-      paletteDominantColors.addAll(paletteDominant);
-    } else {
-      paletteVibrantColors.addAll(paletteDominant);
-      paletteDominantColors.addAll(paletteVibrant);
-    }
-    paletteMutedColors.addAll(paletteMuted);
-    thumbnailWorkerPool?.stop();
-    Squadron.info('WorkerPool finished...');
+  } else {
+    late ThumbnailWorkerPool? thumbnailWorkerPool;
+    debugPrint('Future #updatePaletteGen passed');
+    snackbar();
+    try {
+      thumbnailWorkerPool = ThumbnailWorkerPool(const ConcurrencySettings(
+          minWorkers: 1, maxWorkers: 4, maxParallel: 2));
+      thumbnailWorkerPool.start();
+      loadingpalette = true;
+      Squadron.info('thumbnailWorkerPool.start()');
+      for (Uint8List picture in images) {
+        Squadron.info('Loading image #$picture...');
+        final sw = Stopwatch()..start();
+        Uint8List imageData = picture;
 
-    loadingpalette = false;
-    updatePaletteGenCompleter.complete();
+        Image image = Image.memory(picture);
+        Completer<ui.Image> completer = Completer<ui.Image>();
+        image.image.resolve(const ImageConfiguration()).addListener(
+            ImageStreamListener(
+                (ImageInfo info, bool _) => completer.complete(info.image)));
+        ui.Image info = await completer.future;
+        int width = info.width;
+        int height = info.height;
+
+        final List generator = await thumbnailWorkerPool
+            .getThumbnail(
+                imagedata: imageData, width: width, height: height, token: token)
+            .whenComplete(() => Squadron.info('Worker pool #generator complete'));
+        sw.stop();
+
+        final PaletteColorWeb colorDominant =
+            PaletteColorWeb(Color(generator.last), Color(generator.first));
+        // Squadron.info('#generator items converted to #colorDominant ${colorDominant.color.toString()} and ${colorDominant.text.toString()}');
+
+        final PaletteColorWeb colorMuted =
+            PaletteColorWeb(Color(generator.first), Color(generator.last));
+        // Squadron.info('#generator items converted to #colorMuted ${colorMuted.color.toString()} and ${colorMuted.text.toString()}');
+
+        final PaletteColorWeb colorVibrant = PaletteColorWeb(
+            Color(generator.elementAt((generator.length / 3.5).round())),
+            Color(generator.last));
+        // Squadron.info('#generator items converted to #colorVibrant ${colorVibrant.color.toString()} and ${colorVibrant.text.toString()}');
+
+        paletteDominant.add(colorDominant);
+        paletteMuted.add(colorMuted);
+        paletteVibrant.add(colorVibrant);
+      }
+    } catch (exception) {
+      debugPrint(exception.toString());
+    } finally {
+      List<Map<String, dynamic>> data = [];
+
+      if (paletteVibrant[0].color.computeLuminance() <
+          paletteDominant[0].color.computeLuminance()) {
+        paletteVibrantColors.addAll(paletteVibrant);
+        paletteDominantColors.addAll(paletteDominant);
+      } else {
+        paletteVibrantColors.addAll(paletteDominant);
+        paletteDominantColors.addAll(paletteVibrant);
+      }
+      paletteMutedColors.addAll(paletteMuted);
+      thumbnailWorkerPool?.stop();
+      Squadron.info('WorkerPool finished...');
+
+      // TODO:Need Improvements and to add text colors
+      int i = 0;
+      for (var element in paletteVibrantColors) {
+        data.add({ 
+          "paletteVibrant": element.color.toString().toColorHex(),
+          "paletteDominant": paletteDominantColors[i].color.toString().toColorHex(),
+          "paletteMuted": paletteMutedColors[i].color.toString().toColorHex()
+        });
+
+        i += 1;
+        // print(element.color.toString().toColorHex());
+      }
+      // print("data: $data");
+      final jsonData = jsonEncode(data);
+      // print("jsonData: $jsonData");
+
+      loadingpalette = false;
+      updatePaletteGenCompleter.complete();
+
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString(blob, jsonData);
+    }
   }
 }
 

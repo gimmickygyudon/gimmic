@@ -38,10 +38,10 @@ class _HomeBaseState extends State<HomeBase> {
               },
               child: GestureDetector(
                 onLongPressDown: (details) => onTapPosition(details),
-                onLongPress: () =>
-                    onRightClickPageMenu(context, _refreshIndicatorKey),
+                onLongPress: () => onRightClickPageMenu(
+                  context, _refreshIndicatorKey),
                 onSecondaryTapDown: (details) => onRightClickPageMenu(
-                    context, _refreshIndicatorKey, details),
+                  context, _refreshIndicatorKey, details),
                 child: Row(
                   children: [
                     useVerticalLayout
@@ -62,67 +62,59 @@ class _HomeBaseState extends State<HomeBase> {
                               indicatorColor: Colors.black54,
                               labelType: labelType,
                               leading: showLeading
-                                  ? Padding(
-                                      padding: const EdgeInsets.only(top: 22),
-                                      child: showExtended
-                                          ? TextButton.icon(
-                                              style: const ButtonStyle(
-                                                  foregroundColor:
-                                                      MaterialStatePropertyAll(
-                                                          Colors.black87)),
-                                              onPressed: () {
-                                                setState(() {
-                                                  if (showExtended == true) {
-                                                    labelType =
-                                                        NavigationRailLabelType
-                                                            .all;
-                                                    showExtended = false;
-                                                  } else {
-                                                    labelType =
-                                                        NavigationRailLabelType
-                                                            .none;
-                                                    showExtended = true;
-                                                  }
-                                                });
-                                              },
-                                              icon: const Icon(Icons.menu),
-                                              label: const Text('Menu'))
-                                          : IconButton(
-                                              tooltip: 'Show Menu',
-                                              onPressed: () {
-                                                setState(() {
-                                                  if (showExtended == true) {
-                                                    labelType =
-                                                        NavigationRailLabelType
-                                                            .selected;
-                                                    showExtended = false;
-                                                  } else {
-                                                    labelType =
-                                                        NavigationRailLabelType
-                                                            .none;
-                                                    showExtended = true;
-                                                  }
-                                                });
-                                              },
-                                              icon: const Icon(Icons.menu)),
-                                    )
-                                  : const SizedBox(),
+                                ? Padding(
+                                  padding: const EdgeInsets.only(top: 22),
+                                  child: showExtended
+                                      ? TextButton.icon(
+                                          style: const ButtonStyle(
+                                              foregroundColor: MaterialStatePropertyAll(Colors.black87)
+                                          ),
+                                          onPressed: () {
+                                            setState(() {
+                                              if (showExtended == true) {
+                                                labelType = NavigationRailLabelType.all;
+                                                showExtended = false;
+                                              } else {
+                                                labelType = NavigationRailLabelType.none;
+                                                showExtended = true;
+                                              }
+                                            });
+                                          },
+                                          icon: const Icon(Icons.menu),
+                                          label: const Text('Menu'))
+                                      : IconButton(
+                                          tooltip: 'Show Menu',
+                                          onPressed: () {
+                                            setState(() {
+                                              if (showExtended == true) {
+                                                labelType = NavigationRailLabelType.selected;
+                                                showExtended = false;
+                                              } else {
+                                                labelType = NavigationRailLabelType.none;
+                                                showExtended = true;
+                                              }
+                                            });
+                                          },
+                                          icon: const Icon(Icons.menu)
+                                        ),
+                                  )
+                                : const SizedBox(),
                               trailing: showTrailing
                                   ? IconButton(
-                                      onPressed: () {
-                                        // Add your onPressed code here!
-                                      },
-                                      icon:
-                                          const Icon(Icons.more_horiz_rounded),
+                                      onPressed: () {},
+                                      icon: const Icon(Icons.more_horiz_rounded),
                                     )
                                   : const SizedBox(),
                               destinations: <NavigationRailDestination>[
                                 NavigationRailDestination(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                                  icon: const Icon(Icons.house_outlined,
-                                      color: Colors.black54),
-                                  selectedIcon: const Icon(Icons.house),
+                                  padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                                  icon: const Icon(
+                                    Icons.house_outlined,
+                                    color: Colors.black87
+                                  ),
+                                  selectedIcon: const Icon(
+                                    Icons.house, 
+                                    color: Colors.white),
                                   label: Text(
                                     'Home',
                                     style: GoogleFonts.roboto(
@@ -132,29 +124,40 @@ class _HomeBaseState extends State<HomeBase> {
                                   ),
                                 ),
                                 NavigationRailDestination(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                                  icon: const Icon(Icons.view_in_ar,
-                                      color: Colors.black54),
-                                  selectedIcon:
-                                      const Icon(Icons.view_in_ar_outlined),
-                                  label: Text('Resource',
-                                      style: GoogleFonts.roboto(
-                                        color: Colors.black87,
-                                        fontWeight: FontWeight.w500,
-                                      )),
+                                  padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                                  icon: const Icon(
+                                    Icons.view_in_ar,
+                                    color: Colors.black54
+                                  ),
+                                  selectedIcon: const Icon(
+                                    Icons.view_in_ar_outlined,
+                                    color: Colors.white
+                                  ),
+                                  label: Text(
+                                    'Resource',
+                                    style: GoogleFonts.roboto(
+                                      color: Colors.black87,
+                                      fontWeight: FontWeight.w500,
+                                    )
+                                  ),
                                 ),
                                 NavigationRailDestination(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                                  icon: const Icon(Icons.logo_dev_outlined,
-                                      color: Colors.black54),
-                                  selectedIcon: const Icon(Icons.logo_dev),
-                                  label: Text('Update',
-                                      style: GoogleFonts.roboto(
-                                        color: Colors.black87,
-                                        fontWeight: FontWeight.w500,
-                                      )),
+                                  padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                                  icon: const Icon(
+                                    Icons.logo_dev_outlined,
+                                    color: Colors.black54
+                                  ),
+                                  selectedIcon: const Icon(
+                                    Icons.logo_dev,
+                                    color: Colors.white,
+                                  ),
+                                  label: Text(
+                                    'Update',
+                                    style: GoogleFonts.roboto(
+                                      color: Colors.black87,
+                                      fontWeight: FontWeight.w500,
+                                    )
+                                  ),
                                 ),
                               ],
                             ),

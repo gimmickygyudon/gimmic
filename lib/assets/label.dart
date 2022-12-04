@@ -10,4 +10,28 @@ class StringResource {
   static const String about = "About";
   static const String getstarted = "Get Started";
   static const String greetings = "How are you today?";
+
+  static const List<String> emoji = [
+    "(^_^)b",
+    "(>_<)",
+    "(ง'̀-'́)ง",
+    "(•◡•)",
+    "(¬‿¬)",
+    "(•_•)",
+    "~(˘▾˘~)",
+    "(~˘▾˘)~",
+    "(._.)",
+    "(⇀‸↼‶)",
+    "(Ò_Óˇ)",
+    "⚆ _ ⚆",
+    "(˚▽˚)",
+    "(ಠ_ಠ)",
+    "(˘⌣˘)",
+    "(¬_¬)",
+    "(~_^)",
+    "(°,,°)",
+    "(^-^*)",
+    "(;-;)",
+    "(۶•̀ᴗ•́)۶"
+  ];
 }

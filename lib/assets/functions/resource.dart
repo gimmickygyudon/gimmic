@@ -1,19 +1,20 @@
-import 'dart:typed_data';
-
+import 'package:async/async.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:gimmic/assets/functions/string.dart';
 import 'package:gimmic/assets/functions/time.dart';
 
+final AsyncMemoizer _memoizer = AsyncMemoizer();
+
 Future loadItems() async {
-  // Create a storage reference from our app
+  return _memoizer.runOnce(() async {
   final FirebaseStorage storageRef = FirebaseStorage.instance;
   final FirebaseFirestore db = FirebaseFirestore.instance;
 
   List<Map<String, dynamic>> items = [];
 
-  await db.enablePersistence(const PersistenceSettings(synchronizeTabs: true));
   await db.collection('resource').doc('item').get().then(
       (DocumentSnapshot doc) async {
     var data = doc.data() as Map<String, dynamic>;
@@ -49,22 +50,31 @@ Future loadItems() async {
               final listImage = await pathRef.listAll();
 
               /* for (var item in listImage.items) {
-              print(item.name.toString());
-            } */
+                print(item.name.toString());
+              } */
 
-              // Create a reference with an initial file path and name
+              // List of image
+              List<Uint8List?> images = [];
+              for (var item in listImage.items) {
+                // The items under storageRef.
+
               final Reference imageRef = storageRef
                   .ref()
-                  .child("images$imagePath/${listImage.items.first.name}");
-              // print(imageRef.toString());
+                  .child("images$imagePath/${item.name}");
 
-              Uint8List? image;
-              try {
-                const oneMegabyte = 1024 * 1024;
-                final Uint8List? imageData =
-                    await imageRef.getData(oneMegabyte);
-                image = imageData;
-              } on FirebaseException catch (e) {}
+                Uint8List? image;
+                // print("image names: ${item.name}");
+                try {
+                  const oneMegabyte = 1024 * 1024;
+                  final Uint8List? imageData = await imageRef.getData(oneMegabyte);
+                  image = imageData;
+                  
+                  images.add(image);
+                } on FirebaseException catch (e) {
+                  // ignore: avoid_print
+                  kReleaseMode ? null : print(e);
+                }
+              }
 
               await db.doc("resource/category/$categoryId").get().then((doc) {
                 var data = doc.data() as Map<String, dynamic>;
@@ -81,7 +91,7 @@ Future loadItems() async {
                   {
                     "timestamp": timestamp,
                     "name": name,
-                    "image": image,
+                    "images" : images,
                     "brand": brand,
                     "time": time,
                     "category": category,
@@ -93,15 +103,16 @@ Future loadItems() async {
               });
             }
           },
-          onError: (e) {},
+          onError: (e) { debugPrint(e.toString()); },
         );
       }
     }
-  }, onError: (e) {});
+  }, onError: (e) { debugPrint(e.toString()); });
   items.sort((a, b) {
     var atime = a['timestamp'];
     var btime = b['timestamp'];
     return btime.compareTo(atime);
   });
   return items;
+  });
 }

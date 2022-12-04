@@ -1,7 +1,5 @@
-import 'dart:typed_data';
+import 'dart:ui';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -90,8 +88,7 @@ class _CardBigState extends State<CardBig> {
                 aspectRatio: 1 / 1,
                 child: Stack(fit: StackFit.expand, children: [
                   AnimatedCrossFade(
-                    layoutBuilder:
-                        ((topChild, topChildKey, bottomChild, bottomChildKey) {
+                    layoutBuilder: ((topChild, topChildKey, bottomChild, bottomChildKey) {
                       return Stack(
                         fit: StackFit.expand,
                         clipBehavior: Clip.none,
@@ -119,13 +116,6 @@ class _CardBigState extends State<CardBig> {
                             if (wasSynchronouslyLoaded == true) return child;
                             return imageFrameBulilder(
                                 child, frame, wasSynchronouslyLoaded);
-                          },
-                          loadingBuilder: (BuildContext context, Widget child,
-                              ImageChunkEvent? loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Column(children: [
-                              imageLoadingBuilder(child, loadingProgress)
-                            ]);
                           },
                         ),
                       ),
@@ -1080,16 +1070,16 @@ Widget cardYoutube(thumbnails, palettecolor, colorindex) {
     return Card(
       color: palettecolor.isEmpty
           ? Colors.grey.shade100
-          : colorLight(palettecolor[colorindex].color, .1),
+          : colorLightButton(palettecolor[colorindex].color),
       elevation: 0,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         hoverColor: palettecolor.isEmpty
             ? Colors.grey.shade200
-            : colorLight(palettecolor[colorindex].color, .0),
+            : colorLight(palettecolor[colorindex].color, .7),
         splashColor: palettecolor.isEmpty
             ? Colors.grey.shade50
-            : colorLightText(palettecolor[colorindex].color, .2),
+            : colorLight(palettecolor[colorindex].color, .8),
         onTap: () {},
         child: Padding(
           padding: constraints.maxWidth > 320
@@ -1108,7 +1098,7 @@ Widget cardYoutube(thumbnails, palettecolor, colorindex) {
                       borderRadius: BorderRadius.circular(12),
                       child: Image(
                           height: 70,
-                          image: AssetImage(thumbnails),
+                          image: ResizeImage(AssetImage(thumbnails), height: 300, width: 300),
                           fit: BoxFit.cover),
                     ),
                     Align(
@@ -1402,225 +1392,342 @@ class _CardResourceListState extends State<CardResourceList> {
       builder: (BuildContext context, BoxConstraints constraints) {
         return Theme(
         data: ThemeData(useMaterial3: true),
-        child: InkWell(
-          onHover: (value) => setState(() => isListHovered = value),
-          onTap: () => context.push('/resource'),
-          splashColor: Colors.blueGrey.shade50,
-          borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SizedBox(
-              height: widget.smallLayouts ? 120 : 90,
-              child: Flex(
-                direction: Axis.horizontal,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: AnimatedScale(
-                          curve: Curves.easeOutQuart,
-                          duration: const Duration(milliseconds: 800),
-                          scale: isListHovered ? 1.05 : 1,
-                          child: AspectRatio(
-                            aspectRatio: widget.smallLayouts ? 1 / 0.7 : 1 / 0.85,
-                            child: Image(
-                                image:
-                                    MemoryImage(widget.snapshots.data[widget.index]['image']),
-                                frameBuilder: (BuildContext context,
-                                    Widget child,
-                                    int? frame,
-                                    bool wasSynchronouslyLoaded) {
-                                  return imageFrameBulilder(
-                                      child, frame, wasSynchronouslyLoaded);
-                                },
-                                loadingBuilder: (BuildContext context,
-                                    Widget child,
-                                    ImageChunkEvent? loadingProgress) {
-                                  return imageLoadingBuilder(
-                                      child, loadingProgress);
-                                },
-                                fit: BoxFit.cover),
-                          ),
+        child: AnimatedSlide(
+          curve: Curves.easeOutExpo,
+          duration: const Duration(milliseconds: 600),
+          offset: isListHovered
+            ? const Offset(0.0, -0.025)
+            : const Offset(0.0, 0.0),
+          child: InkWell(
+            onHover: (value) => setState(() => isListHovered = value),
+            onTap: () => context.push('/resource'),
+            splashColor: Colors.transparent,
+            hoverColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            overlayColor: const MaterialStatePropertyAll(Colors.transparent),
+            child: Card(
+              color: Colors.transparent,
+              surfaceTintColor: Colors.transparent,
+              elevation: isListHovered ? 4 : 0,
+              shadowColor: Colors.black,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 600),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  image: DecorationImage(
+                    scale: 0.2,
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(isListHovered ? 0.0 : 0.5), 
+                      BlendMode.saturation),
+                    image: MemoryImage(widget.snapshots.data[widget.index]['images'].last))
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          stops: const [0, 0.5, 1.0],
+                          colors: <Color>[
+                            isListHovered ? Colors.black26 : Colors.black12,
+                            isListHovered ? Colors.black38 : Colors.black26,
+                            isListHovered ? Colors.black87 : Colors.black54
+                          ],
                         ),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 2, left: 8),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 2),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: SizedBox(
+                          height: widget.smallLayouts ? 120 : 90,
+                          child: Flex(
+                            direction: Axis.horizontal,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
                                 children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 1),
-                                    child: Text(
-                                        widget.snapshots.data[widget.index]['brand']
-                                            .toString()
-                                            .toTitleCase(),
-                                        style: GoogleFonts.roboto(
-                                            color: Colors.black54,
-                                            fontSize: widget.smallLayouts ? 14 : 12,
-                                            fontWeight: FontWeight.w500)),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: AnimatedScale(
+                                      curve: Curves.easeOut,
+                                      duration: const Duration(milliseconds: 800),
+                                      scale: isListHovered ? 1.05 : 1,
+                                      child: AspectRatio(
+                                        aspectRatio: widget.smallLayouts ? 1 / 0.8 : 1 / 0.85,
+                                        child: Image(
+                                          image: MemoryImage(widget.snapshots.data[widget.index]['images'].first),
+                                          frameBuilder: (BuildContext context,
+                                              Widget child,
+                                              int? frame,
+                                              bool wasSynchronouslyLoaded) {
+                                            return imageFrameBulilder(child, frame, wasSynchronouslyLoaded);
+                                          },
+                                          loadingBuilder: (BuildContext context,
+                                              Widget child,
+                                              ImageChunkEvent? loadingProgress) {
+                                            return imageLoadingBuilder(child, loadingProgress);
+                                          },
+                                          fit: BoxFit.cover
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                  Text(
-                                    widget.smallLayouts ? name : shorten(name),
-                                    style: GoogleFonts.roboto(
-                                        letterSpacing: -0.25,
-                                        height: isWebMobile ? null : 0.0,
-                                        fontSize: widget.smallLayouts ? 22 : 16,
-                                        color: Colors.black87),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 2, left: 12),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 1),
+                                              child: Text(
+                                                widget.snapshots.data[widget.index]['brand']
+                                                  .toString()
+                                                  .toTitleCase(),
+                                                style: TextStyle(
+                                                  color: Colors.grey.shade300,
+                                                  fontSize: widget.smallLayouts ? 14 : 12,
+                                                  fontWeight: FontWeight.w500,
+                                                  shadows: const [
+                                                    Shadow(
+                                                      color: Colors.black45,
+                                                      offset: Offset(1, 1),
+                                                      blurRadius: 2
+                                                    ),
+                                                  ],
+                                                )
+                                              ),
+                                            ),
+                                            Text(
+                                              widget.smallLayouts ? name : shorten(name),
+                                              style: TextStyle(
+                                                letterSpacing: -0.25,
+                                                height: isWebMobile ? null : 0.0,
+                                                fontSize: widget.smallLayouts ? 20 : 16,
+                                                color: Colors.white,
+                                                shadows: const [
+                                                  Shadow(
+                                                    color: Colors.black45,
+                                                    offset: Offset(1, 1),
+                                                    blurRadius: 2
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Visibility(
+                                              visible: widget.smallLayouts ? true : false,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(top: 6),
+                                                child: Chip(
+                                                  padding: const EdgeInsets.only(left:8, right: 8),
+                                                  labelPadding: EdgeInsets.zero,
+                                                  visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+                                                  backgroundColor: Colors.blue.shade600,
+                                                  side: BorderSide(color: Colors.blue.shade600),
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                                  label: Text(
+                                                    '${widget.snapshots.data[widget.index]['category']}',
+                                                    style: TextStyle(
+                                                        color: Colors.grey.shade200,
+                                                        fontWeight: FontWeight.w500,
+                                                        fontSize: 12)
+                                                    )
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        AnimatedSwitcher(
+                                          duration: Duration.zero,
+                                          child: widget.smallLayouts 
+                                          ? Row(
+                                            children: [
+                                              AnimatedSize(
+                                                curve: Curves.ease,
+                                                duration: const Duration(milliseconds: 300),
+                                                child: SizedBox(
+                                                  width: startScroll && isListHovered ? null : 0,
+                                                  child: Visibility(
+                                                    visible: startScroll && isListHovered, 
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.only(right: 8),
+                                                      child: IconButton(
+                                                        padding: EdgeInsets.zero,
+                                                        onPressed: () {
+                                                          _scrollChipViewController.animateTo(
+                                                            _scrollChipViewController.offset - 65, 
+                                                            duration: const Duration(milliseconds: 300), 
+                                                            curve: Curves.fastOutSlowIn
+                                                          );
+                                                        }, 
+                                                        visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
+                                                        color: Colors.black45,
+                                                        style: ButtonStyle(
+                                                          shape: MaterialStatePropertyAll(
+                                                            RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.circular(25.7))),
+                                                          backgroundColor: MaterialStatePropertyAll(isHovered
+                                                            ? Colors.grey.shade200
+                                                            : Colors.grey.shade100)
+                                                        ),
+                                                        icon: const Icon(Icons.chevron_left, size: 14)
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              AnimatedSize(
+                                                curve: Curves.ease,
+                                                duration: const Duration(milliseconds: 300),
+                                                child: ClipRRect(
+                                                  borderRadius: BorderRadius.circular(25.7),
+                                                  child: SizedBox(
+                                                    width: widget.smallLayouts 
+                                                      ? startScroll && endScroll ? constraints.maxWidth / 2.25 : constraints.maxWidth / 2
+                                                      : constraints.maxWidth / 1.5,
+                                                    child: ScrollConfiguration(
+                                                      behavior: DragOnScroll(),
+                                                      child: SingleChildScrollView(
+                                                        controller: _scrollChipViewController,
+                                                        scrollDirection: Axis.horizontal,
+                                                        child: Wrap(
+                                                          spacing: 8,
+                                                          children: List.generate(widget.snapshots.data[widget.index]['tags'].length, (i) {
+                                                            return FilterChip(
+                                                              visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
+                                                              padding: const EdgeInsets.symmetric(horizontal: 1),
+                                                              side: BorderSide(color: Colors.grey.shade800),
+                                                              shape: RoundedRectangleBorder(
+                                                                borderRadius: BorderRadius.circular(25.7)),
+                                                              backgroundColor: Colors.grey.shade800,
+                                                              onSelected: (value) {},
+                                                              label: Text(
+                                                                widget.snapshots.data[widget.index]['tags'][i],
+                                                                style: TextStyle(
+                                                                  letterSpacing: 0.6,
+                                                                  fontWeight: FontWeight.w700,
+                                                                  color: Colors.grey.shade200,
+                                                                  fontSize: 10)),
+                                                            );
+                                                          }),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              AnimatedSize(
+                                                curve: Curves.ease,
+                                                duration: const Duration(milliseconds: 300),
+                                                child: SizedBox(
+                                                  width: endScroll && isListHovered ? null : 0,
+                                                  child: Visibility(
+                                                    visible: endScroll && isListHovered, 
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.only(left: 8),
+                                                      child: IconButton(
+                                                        padding: EdgeInsets.zero,
+                                                        onPressed: (){
+                                                          _scrollChipViewController.animateTo(
+                                                              _scrollChipViewController.offset + 65, 
+                                                              duration: const Duration(milliseconds: 300), 
+                                                              curve: Curves.fastOutSlowIn);
+                                                        }, 
+                                                        visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
+                                                        color: Colors.grey.shade700,
+                                                        style: ButtonStyle(
+                                                          shape: MaterialStatePropertyAll(
+                                                            RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.circular(25.7))),
+                                                          backgroundColor: MaterialStatePropertyAll(isHovered
+                                                            ? Colors.grey.shade200
+                                                            : Colors.grey.shade100)
+                                                        ),
+                                                        icon: const Icon(Icons.chevron_right, size: 14)
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          )
+                                          : Chip(
+                                              padding: const EdgeInsets.only(right: 8),
+                                              labelPadding: EdgeInsets.zero,
+                                              visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+                                              backgroundColor: Colors.grey.shade600,
+                                              side: BorderSide.none,
+                                              avatar: Icon(widget.snapshots.data[widget.index]['icon'].first
+                                                      .toString()
+                                                      .iconParse,
+                                                    size: 16,
+                                                    color: isListHovered
+                                                      ? Colors.grey.shade300
+                                                      : Colors.grey.shade200),
+                                              label: Text(
+                                                '${widget.snapshots.data[widget.index]['category']}',
+                                                style: TextStyle(
+                                                    color: isListHovered
+                                                        ? Colors.grey.shade300
+                                                        : Colors.grey.shade200,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 12)
+                                                )
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
-                            Row(
-                              children: [
-                                AnimatedSize(
-                                  curve: Curves.ease,
-                                  duration: const Duration(milliseconds: 300),
-                                  child: SizedBox(
-                                    width: startScroll ? null : 0,
-                                    child: Visibility(
-                                      visible: startScroll, 
-                                      child: IconButton(
-                                        padding: EdgeInsets.zero,
-                                        onPressed: (){
-                                          _scrollChipViewController.animateTo(
-                                              _scrollChipViewController.offset - 65, 
-                                              duration: const Duration(milliseconds: 300), 
-                                              curve: Curves.fastOutSlowIn);
-                                        }, 
-                                        visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
-                                        color: Colors.black45,
-                                        style: ButtonStyle(
-                                          shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
-                                          backgroundColor: MaterialStatePropertyAll(isHovered
-                                            ? Colors.white30
-                                            : Colors.grey.shade100)
-                                        ),
-                                        icon: const Icon(Icons.arrow_back_ios_new, size: 14)
-                                      ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 8),
+                                    child: Text(
+                                      widget.snapshots.data[widget.index]['time'],
+                                      style: TextStyle(
+                                          color: isListHovered
+                                              ? Colors.grey.shade100
+                                              : Colors.grey.shade200,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 12,
+                                          shadows: const [
+                                            Shadow(
+                                              color: Colors.black45,
+                                              offset: Offset(1, 1),
+                                              blurRadius: 2
+                                            ),
+                                          ],
+                                      )
                                     ),
                                   ),
-                                ),
-                                AnimatedSize(
-                                  curve: Curves.ease,
-                                  duration: const Duration(milliseconds: 300),
-                                  child: SizedBox(
-                                    width: widget.smallLayouts 
-                                      ? startScroll && endScroll ? constraints.maxWidth / 2.75 : constraints.maxWidth / 2.5 
-                                      : startScroll && endScroll ? constraints.maxWidth / 3.25 : constraints.maxWidth / 3,
-                                    child: ScrollConfiguration(
-                                      behavior: DragOnScroll(),
-                                      child: SingleChildScrollView(
-                                        controller: _scrollChipViewController,
-                                        scrollDirection: Axis.horizontal,
-                                        child: Wrap(
-                                          spacing: 8,
-                                          children: List.generate(widget.snapshots.data[widget.index]['tags'].length, (i) {
-                                              return FilterChip(
-                                                visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
-                                                padding: widget.smallLayouts ? null : EdgeInsets.zero,
-                                                side: BorderSide.none,
-                                                backgroundColor: isHovered
-                                                    ? Colors.white30
-                                                    : Colors.grey.shade100,
-                                                onSelected: (value) {},
-                                                label: Text(
-                                                    widget.snapshots.data[widget.index]['tags'][i],
-                                                    style: TextStyle(
-                                                        color: Colors.black54,
-                                                        fontSize: widget.smallLayouts ? 12 : 10)),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                AnimatedSize(
-                                  curve: Curves.ease,
-                                  duration: const Duration(milliseconds: 300),
-                                  child: SizedBox(
-                                    width: endScroll ? null : 0,
-                                    child: Visibility(
-                                      visible: endScroll, 
-                                      child: IconButton(
-                                        padding: EdgeInsets.zero,
-                                        onPressed: (){
-                                          _scrollChipViewController.animateTo(
-                                              _scrollChipViewController.offset + 65, 
-                                              duration: const Duration(milliseconds: 300), 
-                                              curve: Curves.fastOutSlowIn);
-                                        }, 
-                                        visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
-                                        color: Colors.black45,
-                                        style: ButtonStyle(
-                                          shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
-                                          backgroundColor: MaterialStatePropertyAll(isHovered
-                                            ? Colors.white30
-                                            : Colors.grey.shade100)
-                                        ),
-                                        icon: const Icon(Icons.arrow_forward_ios, size: 14)
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ],
+                                  AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 200),
+                                    child: widget.smallLayouts
+                                      ? buttonResourceItem()
+                                      : buttonResourceItemSmall(),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Chip(
-                          padding: isWebMobile ? EdgeInsets.zero : null,
-                          visualDensity: isWebMobile
-                              ? const VisualDensity(horizontal: -4, vertical: -4)
-                              : VisualDensity.compact,
-                          backgroundColor: Colors.white38,
-                          side: BorderSide.none,
-                          avatar: widget.smallLayouts
-                              ? Icon(
-                                  widget.snapshots.data[widget.index]['icon'].first
-                                      .toString()
-                                      .iconParse,
-                                  size: 16,
-                                  color: isListHovered
-                                      ? Colors.black54
-                                      : Colors.black38)
-                              : null,
-                          label: Text(
-                              widget.smallLayouts
-                                  ? '${widget.snapshots.data[widget.index]['category']} · ${widget.snapshots.data[widget.index]['time']}'
-                                  : widget.snapshots.data[widget.index]['time'],
-                              style: GoogleFonts.roboto(
-                                  color: isListHovered
-                                      ? Colors.black54
-                                      : Colors.black38,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12))),
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 200),
-                        child: isWebMobile || isListHovered
-                            ? widget.smallLayouts
-                                ? buttonResourceItem()
-                                : buttonResourceItemSmall()
-                            : null,
-                      )
-                    ],
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -1645,6 +1752,21 @@ final String date = DateFormat("MMMM dd").format(DateTime.now());
 bool isHovered = false;
 bool isHeaderHovered = false;
 bool isTileExpanded = false;
+bool _loading = true;
+AsyncSnapshot _data = const AsyncSnapshot.nothing();
+
+String resultCount(int data) {    
+  String count = 'No Result';
+  if (data == 1) {
+    count = 'About $data Results';
+    return count;
+  } else if (data > 1) {
+    count = 'About $data Results';
+    return count;
+  }
+  return count;
+}
+    
 
 class _CardResourceState extends State<CardResource> {
   late Future _loadItems;
@@ -1652,7 +1774,13 @@ class _CardResourceState extends State<CardResource> {
   @override
   void initState() {
     super.initState();
-    _loadItems = loadItems();
+    _loadItems = loadItems().whenComplete(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          _loading = true;
+        });
+      });
+    });
   }
 
   @override
@@ -1686,38 +1814,52 @@ class _CardResourceState extends State<CardResource> {
                   child: ExpansionTile(
                       expandedAlignment: Alignment.topLeft,
                       expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                      onExpansionChanged: (value) =>
-                          setState(() => isTileExpanded = value),
+                      onExpansionChanged: (value) => setState(() => isTileExpanded = value),
                       initiallyExpanded: true,
                       leading: MouseRegion(
-                        onEnter: (event) =>
-                            setParentState(() => isHeaderHovered = true),
-                        onExit: (event) =>
-                            setParentState(() => isHeaderHovered = false),
+                        onEnter: (event) => setParentState(() => isHeaderHovered = true),
+                        onExit: (event) => setParentState(() => isHeaderHovered = false),
                         child: Icon(
                             isHovered
-                                ? Icons.view_in_ar_outlined
-                                : Icons.view_in_ar,
-                            color: isHovered ? Colors.black87 : Colors.black54,
+                              ? Icons.view_in_ar_outlined
+                              : Icons.view_in_ar,
+                            color: isHovered 
+                              ? Colors.black87 
+                              : Colors.black54,
                             size: 22),
                       ),
                       title: MouseRegion(
-                        onEnter: (event) =>
-                            setParentState(() => isHeaderHovered = true),
-                        onExit: (event) =>
-                            setParentState(() => isHeaderHovered = false),
-                        child: Text('Resource'.toUpperCase(),
-                            style: GoogleFonts.roboto(
-                                color:
-                                    isHovered ? Colors.black87 : Colors.black54,
+                        onEnter: (event) => setParentState(() => isHeaderHovered = true),
+                        onExit: (event) => setParentState(() => isHeaderHovered = false),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(_loading
+                              ? 'Resource   · '.toUpperCase()
+                              : 'Resource'.toUpperCase(),
+                              style: GoogleFonts.roboto(
+                                color: isHovered 
+                                  ? Colors.black87 
+                                  : Colors.black54,
                                 fontSize: 14,
-                                fontWeight: FontWeight.w500)),
+                                fontWeight: FontWeight.w500)
+                              ),
+                              const SizedBox(width: 8),
+                              Text(!_data.hasData 
+                              ? _loading 
+                                ? 'Please Wait' 
+                                : resultCount(_data.data.length)
+                              : resultCount(_data.data.length), 
+                                    style: GoogleFonts.roboto(
+                                        color: Colors.blue.shade700, 
+                                        fontSize: 12, 
+                                        fontWeight: FontWeight.w500)),
+                          ],
+                        ),
                       ),
                       trailing: MouseRegion(
-                        onEnter: (event) =>
-                            setParentState(() => isHeaderHovered = true),
-                        onExit: (event) =>
-                            setParentState(() => isHeaderHovered = false),
+                        onEnter: (event) => setParentState(() => isHeaderHovered = true),
+                        onExit: (event) => setParentState(() => isHeaderHovered = false),
                         child: Theme(
                           data: ThemeData(useMaterial3: true),
                           child: Row(
@@ -1739,14 +1881,14 @@ class _CardResourceState extends State<CardResource> {
                                     child: SizedBox(
                                       width: isHeaderHovered ? null : 0,
                                       child: IconButton(
-                                          mouseCursor: SystemMouseCursors.click,
-                                          onPressed: null,
-                                          icon: Icon(
-                                              isTileExpanded
-                                                  ? Icons.remove_circle
-                                                  : Icons.expand_circle_down,
-                                              size: 18,
-                                              color: Colors.black54)),
+                                        mouseCursor: SystemMouseCursors.click,
+                                        onPressed: null,
+                                        icon: Icon(
+                                          isTileExpanded
+                                              ? Icons.remove_circle
+                                              : Icons.expand_circle_down,
+                                          size: 18,
+                                          color: Colors.black54)),
                                     ),
                                   ))
                             ],
@@ -1757,78 +1899,66 @@ class _CardResourceState extends State<CardResource> {
                         FutureBuilder(
                           future: _loadItems,
                           builder: (context, AsyncSnapshot snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
                               return const Center(
                                 heightFactor: 2,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 3),
+                                child: CircularProgressIndicator(strokeWidth: 3),
                               );
                             }
+                            if (snapshot.connectionState == ConnectionState.done) _data = snapshot;
+                            
                             return Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   ListView.builder(
-                                      physics: const ClampingScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemCount: snapshot.data.length,
-                                      itemBuilder: (context, index) {
-                                        return Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const SizedBox(height: 8),
-                                            CardResourceList(index: index, smallLayouts: widget.smalllayouts, snapshots: snapshot),
-                                            const SizedBox(height: 8)
-                                          ],
-                                        );
-                                      }),
+                                    physics: const ClampingScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: snapshot.data.length,
+                                    itemBuilder: (context, index) {
+                                      return Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(height: 6),
+                                          CardResourceList(
+                                            index: index, 
+                                            smallLayouts: widget.smalllayouts, 
+                                            snapshots: snapshot),
+                                          const SizedBox(height: 6)
+                                        ],
+                                      );
+                                    }),
                                   AnimatedSize(
                                     curve: Curves.easeOut,
                                     duration: const Duration(milliseconds: 200),
                                     child: SizedBox(
-                                      height:
-                                          isHovered || isWebMobile ? null : 0,
+                                      height: isHovered || isWebMobile ? null : 0,
                                       child: Column(
                                         children: [
                                           const SizedBox(height: 8),
                                           ElevatedButton.icon(
-                                              style: ButtonStyle(
-                                                  visualDensity:
-                                                      VisualDensity.compact,
-                                                  foregroundColor:
-                                                      MaterialStateProperty
-                                                          .resolveWith(
-                                                              (states) {
-                                                    if (states.contains(
-                                                            MaterialState
-                                                                .hovered) ||
-                                                        states.contains(
-                                                            MaterialState
-                                                                .pressed)) {
-                                                      return Colors.black54;
-                                                    }
-                                                    return Colors.black38;
-                                                  }),
-                                                  backgroundColor:
-                                                      MaterialStatePropertyAll(
-                                                          Colors.grey.shade50),
-                                                  elevation:
-                                                      const MaterialStatePropertyAll(
-                                                          0)),
-                                              onPressed: () =>
-                                                  context.push('/resource'),
-                                              icon: const Icon(Icons.refresh,
-                                                  size: 14),
-                                              label: Text(
-                                                'Load More',
-                                                style: GoogleFonts.roboto(
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 12),
-                                              )),
+                                            style: ButtonStyle(
+                                                visualDensity: VisualDensity.compact,
+                                                foregroundColor: MaterialStateProperty
+                                                  .resolveWith((states) {
+                                                    if (states.contains(MaterialState.hovered) 
+                                                      || states.contains(MaterialState.pressed)) {
+                                                    return Colors.black54;
+                                                  }
+                                                  return Colors.black38;
+                                                }),
+                                                backgroundColor: MaterialStatePropertyAll(Colors.grey.shade50),
+                                                elevation: const MaterialStatePropertyAll(0)),
+                                            onPressed: () => context.push('/resource'),
+                                            icon: const Icon(Icons.refresh, size: 14),
+                                            label: Text(
+                                              'Load More',
+                                              style: GoogleFonts.roboto(
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 12),
+                                            )
+                                          ),
                                         ],
                                       ),
                                     ),

@@ -22,6 +22,7 @@ Color colorLuminance(Color color, [double amount = .1, double percent = .5]) {
   return palette;
 }
 
+// [DEPRECATED]
 Color colorLightText(Color color, [double amount = .1, double percent = .5]) {
   final luminance = lighten(color, amount).computeLuminance();
 
@@ -35,17 +36,47 @@ Color colorLightText(Color color, [double amount = .1, double percent = .5]) {
   return palette;
 }
 
-Color colorLight(Color color, [double amount = .1, double percent = .5]) {
-  final luminance = lighten(color, amount).computeLuminance();
+Color colorLight(Color color, [double percent = .8, double amount = .45]) {
+  double power = amount;
+  double lum = lighten(color, power).computeLuminance();
+  Color palette = color;
 
-  final palette = luminance > percent
-      ? lighten(color, amount).computeLuminance() < .95
-          ? lighten(color, amount)
-          : lighten(color, kIsWeb ? .05 : .075)
-      : lighten(color, amount).computeLuminance() > .95
-          ? lighten(color, amount / (amount * 1.25))
-          : darken(color, amount);
+  if (lum < percent)
+  {
+    for (var i = lum; i < percent; power += .01) {
+      if (power > 1) break;
+
+      palette = lighten(color, power);
+      i = palette.computeLuminance();
+    } 
+  } else if (lum > percent) {
+    for (var i = lum; i > percent; power -= .01) {
+      if (power < 0) break;
+
+      palette = lighten(color, power);
+      i = palette.computeLuminance();
+    }
+
+    // Input color might be too bright -> try darken the color.
+    if (power < 0) {
+      power = 0;
+      debugPrint('darkening the color');
+      for (var i = lum; i > percent; power += .01) {
+        if (power > 1) break;
+
+        palette = darken(color, power);
+        i = palette.computeLuminance();
+      }
+    }
+  } else {
+    palette = lighten(color, power);
+  }
+
   return palette;
+}
+
+Color colorLightButton(Color color, [double percent = .75, double amount = .45]) {
+  return colorLight(color, percent, amount);
 }
 
 Color colorDark(Color color, [double amount = .1, double percent = .5]) {

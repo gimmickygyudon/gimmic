@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gimmic/assets/functions/string.dart';
 import 'package:gimmic/assets/label.dart';
 import 'package:gimmic/assets/widgets/button.dart';
 import 'package:gimmic/assets/widgets/card.dart';
@@ -8,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../assets/functions/platform.dart';
+import '../../assets/functions/resource.dart';
 import '../../assets/widgets/appbar.dart';
 
 class Resource {
@@ -21,7 +23,7 @@ class Resource {
 
   final String name;
   final String subname;
-  final String image;
+  final Uint8List image;
   final int index;
   final String hero;
 
@@ -49,7 +51,10 @@ class _SearchBarMainState extends State<SearchBarMain> {
   late TextEditingController _textEditingController;
   late FocusNode _focusNode;
   late FocusAttachment _nodeAttachment;
-  bool searching = false;
+  late Future _loadItems;
+  
+  bool _isLoading = true;
+  bool isSearching = false;
 
   @override
   void initState() {
@@ -58,16 +63,24 @@ class _SearchBarMainState extends State<SearchBarMain> {
     _textEditingController.addListener(() {
       if (_textEditingController.text.trim().isNotEmpty) {
         setState(() {
-          searching = true;
+          isSearching = true;
         });
       } else {
         setState(() {
-          searching = false;
+          isSearching = false;
         });
       }
     });
     _nodeAttachment = _focusNode.attach(context, onKey: _handleKeyPress);
     super.initState();
+    _loadItems = loadItems().then((value) {
+      setState(() {
+        _allResource = value;
+        _isLoading = false;  
+      });
+    });
+
+    _loadItems;
   }
 
   @override
@@ -106,44 +119,7 @@ class _SearchBarMainState extends State<SearchBarMain> {
     return KeyEventResult.ignored;
   }
 
-  final List<Map<String, dynamic>> _allResource = [
-    {
-      "id": 1,
-      "index": 0,
-      "hero": "catHero",
-      "name": "Andy",
-      "subname": "Legends of Zelda",
-      "image": "images/hellocat.jpg",
-      "size": "29.0 MB"
-    },
-    {
-      "id": 2,
-      "index": 1,
-      "hero": "dogHero",
-      "name": "Aragon Malay",
-      "subname": "Cross Code",
-      "image": "images/hellocat1.jpg",
-      "size": "40.2 MB"
-    },
-    {
-      "id": 3,
-      "index": 0,
-      "hero": "lizardHero",
-      "name": "Cross",
-      "subname": "Cross Code",
-      "image": "images/hellocat.jpg",
-      "size": "5.5 MB"
-    },
-    {
-      "id": 4,
-      "index": 1,
-      "hero": "monkeyHero",
-      "name": "Barbara",
-      "subname": "Zenity",
-      "image": "images/hellocat1.jpg",
-      "size": "35.2 MB"
-    },
-  ];
+  List<Map<String, dynamic>> _allResource = [];
 
   int selectedIndex = 0, searchIndex = 0;
   String searchHero = '', searchKeyword = '';
@@ -156,143 +132,156 @@ class _SearchBarMainState extends State<SearchBarMain> {
       focusNode: _focusNode,
       fieldViewBuilder:
           (context, textEditingController, focusNode, onFieldSubmitted) {
-        return TextField(
-          controller: textEditingController,
-          focusNode: focusNode,
-          onSubmitted: (value) async {
-            if (selectedIndex == -1 || notFound && searching) {
-              context.push('/resource?search=${searchKeyword.trim()}');
-            } else if (notFound == false && searching) {
-              context.pushNamed('details', params: {
-                'name': searchKeyword.toLowerCase(),
-              }, extra: {
-                "name": searchKeyword,
-                "hero": searchHero,
-                "index": '$searchIndex'
-              });
-            }
-          },
-          style: GoogleFonts.roboto(fontWeight: FontWeight.w500),
-          decoration: InputDecoration(
-            isDense: false,
-            filled: true,
-            fillColor: Colors.white70,
-            hoverColor: Colors.white,
-            prefixIcon: searching
-                ? null
-                : const Icon(Icons.search, color: Colors.black54),
-            prefixIconConstraints: const BoxConstraints(minWidth: 55),
-            suffixIcon: Padding(
-              padding: EdgeInsets.only(
-                  right: searching
-                      ? 5
-                      : widget.useVHideDetails
-                          ? 10
-                          : 0),
-              child: searching
-                  ? IntrinsicHeight(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                              onPressed: () {
-                                _textEditingController.clear();
-                              },
-                              icon: const Icon(
-                                Icons.close,
-                                color: Colors.black54,
-                              )),
-                          isWebMobile
-                              ? const VerticalDivider(
-                                  width: 8,
-                                  thickness: 1,
-                                  indent: 12,
-                                  endIndent: 12,
-                                  color: Colors.black26,
-                                )
-                              : const VerticalDivider(
-                                  width: 8,
-                                  thickness: 1,
-                                  indent: 4,
-                                  endIndent: 4,
-                                  color: Colors.black26),
-                          IconButton(
-                              onPressed: () async {
-                                if (searching) {
-                                  context.push(
-                                      '/resource?search=${textEditingController.text}');
-                                }
-                              },
-                              icon: const Icon(
-                                Icons.search,
-                                color: Colors.blue,
-                              )),
-                        ],
-                      ),
-                    )
-                  : widget.useVHideDetails
-                      ? Row(
+        return Material(
+          elevation: 2,
+          shadowColor: Colors.black38,
+          borderRadius: isSearching
+              ? focusNode.hasFocus
+                  ? const BorderRadius.only(
+                      topRight: Radius.circular(12),
+                      topLeft: Radius.circular(12))
+                  : BorderRadius.circular(25.7)
+              : BorderRadius.circular(focusNode.hasFocus ? 12 : 25.7),
+          child: TextField(
+            controller: textEditingController,
+            focusNode: focusNode,
+            onSubmitted: (value) async {
+              if (selectedIndex == -1 || notFound && isSearching) {
+                context.push('/resource?search=${searchKeyword.trim()}');
+              } else if (notFound == false && isSearching) {
+                context.pushNamed('details', params: {
+                  'name': searchKeyword.toLowerCase(),
+                }, extra: {
+                  "name": searchKeyword,
+                  "hero": searchHero,
+                  "index": '$searchIndex'
+                });
+              }
+            },
+            style: GoogleFonts.roboto(fontWeight: FontWeight.w500),
+            decoration: InputDecoration(
+              isDense: false,
+              filled: true,
+              fillColor: Colors.white70,
+              hoverColor: Colors.white,
+              prefixIcon: isSearching
+                  ? null
+                  : const Icon(Icons.search, color: Colors.black54),
+              prefixIconConstraints: const BoxConstraints(minWidth: 55),
+              suffixIcon: Padding(
+                padding: EdgeInsets.only(
+                    right: isSearching
+                        ? 5
+                        : widget.useVHideDetails
+                            ? 10
+                            : 0),
+                child: isSearching
+                    ? IntrinsicHeight(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            AnimatedSwitcher(
-                              switchInCurve: Curves.ease,
-                              switchOutCurve: Curves.ease,
-                              duration: const Duration(milliseconds: 100),
-                              child: _focusNode.hasFocus
-                                  ? null
-                                  : Chip(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(25.7)),
-                                      side: BorderSide.none,
-                                      backgroundColor:
-                                          Colors.black.withOpacity(0.025),
-                                      labelStyle: GoogleFonts.roboto(
-                                        fontSize: 14,
-                                        color: Colors.black54,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                      label:
-                                          const Text(StringResource.greetings),
-                                    ),
-                            ),
-                            const SizedBox(width: 6),
-                            buttonNotification(context),
+                            IconButton(
+                                onPressed: () => _textEditingController.clear(),
+                                icon: const Icon(
+                                  Icons.close,
+                                  color: Colors.black54,
+                                )),
+                            isWebMobile
+                                ? const VerticalDivider(
+                                    width: 8,
+                                    thickness: 1,
+                                    indent: 12,
+                                    endIndent: 12,
+                                    color: Colors.black26,
+                                  )
+                                : const VerticalDivider(
+                                    width: 8,
+                                    thickness: 1,
+                                    indent: 4,
+                                    endIndent: 4,
+                                    color: Colors.black26),
+                            IconButton(
+                                onPressed: () async {
+                                  if (isSearching) {
+                                    context.push('/resource?search=${textEditingController.text}');
+                                  }
+                                },
+                                icon: const Icon(
+                                  Icons.search,
+                                  color: Colors.blue,
+                                )),
                           ],
-                        )
-                      : Padding(
-                          padding: isWebMobile
-                              ? const EdgeInsets.only(right: 6)
-                              : const EdgeInsets.only(right: 8),
-                          child: ButtonLinks(
-                            fgcolor: Colors.blue.shade700,
-                            bgcolor: Colors.blue.shade50,
-                          )),
-            ),
-            suffixStyle: GoogleFonts.roboto(
-              fontWeight: FontWeight.w500,
-            ),
-            hintText: 'Search...',
-            hintStyle: GoogleFonts.roboto(
-              fontWeight: FontWeight.w500,
-            ),
-            labelText: widget.useVHideDetails ? null : StringResource.greetings,
-            contentPadding: searching
-                ? const EdgeInsets.symmetric(horizontal: 16)
-                : EdgeInsets.zero,
-            suffixIconConstraints: const BoxConstraints(minWidth: 40),
-            focusedBorder: OutlineInputBorder(
-                borderSide: searching
-                    ? BorderSide.none
-                    : const BorderSide(width: 2, color: Colors.blue),
-                borderRadius: searching
-                    ? const BorderRadius.only(
-                        topRight: Radius.circular(12),
-                        topLeft: Radius.circular(12))
-                    : BorderRadius.circular(25.7)),
-            enabledBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Colors.transparent),
-              borderRadius: BorderRadius.circular(25.7),
+                        ),
+                      )
+                    : widget.useVHideDetails
+                        ? Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              AnimatedSwitcher(
+                                switchInCurve: Curves.ease,
+                                switchOutCurve: Curves.ease,
+                                duration: const Duration(milliseconds: 100),
+                                child: _focusNode.hasFocus
+                                    ? null
+                                    : Chip(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(25.7)),
+                                        side: BorderSide.none,
+                                        backgroundColor: Colors.deepPurple.withOpacity(0.025),
+                                        avatar: Icon(
+                                            Icons.sentiment_very_satisfied_outlined,
+                                            color: Colors.deepPurple.shade300),
+                                        labelStyle: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black54,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                        label: Text(
+                                          StringResource.greetings,
+                                          style: TextStyle(
+                                              color: Colors.deepPurple.shade300,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ),
+                              ),
+                              const SizedBox(width: 6),
+                              buttonNotification(context),
+                            ],
+                          )
+                        : Padding(
+                            padding: isWebMobile
+                                ? const EdgeInsets.only(right: 6)
+                                : const EdgeInsets.only(right: 8),
+                            child: ButtonLinks(
+                              fgcolor: Colors.blue.shade700,
+                              bgcolor: Colors.blue.shade50,
+                            )),
+              ),
+              suffixStyle: GoogleFonts.roboto(
+                fontWeight: FontWeight.w500,
+              ),
+              hintText: 'Search...',
+              hintStyle: GoogleFonts.roboto(
+                fontWeight: FontWeight.w500,
+              ),
+              labelText:  widget.useVHideDetails ? null : StringResource.greetings,
+              contentPadding: isSearching
+                  ? const EdgeInsets.symmetric(horizontal: 16)
+                  : EdgeInsets.zero,
+              suffixIconConstraints: const BoxConstraints(minWidth: 40),
+              focusedBorder: OutlineInputBorder(
+                  borderSide: isSearching
+                      ? BorderSide.none
+                      : const BorderSide(width: 2, color: Colors.deepPurple),
+                  borderRadius: isSearching
+                      ? const BorderRadius.only(
+                          topRight: Radius.circular(12),
+                          topLeft: Radius.circular(12))
+                      : BorderRadius.circular(12)),
+              enabledBorder: OutlineInputBorder(
+                borderSide: const BorderSide(color: Colors.transparent),
+                borderRadius: BorderRadius.circular(25.7),
+              ),
             ),
           ),
         );
@@ -339,8 +328,7 @@ class _SearchBarMainState extends State<SearchBarMain> {
                     if (index == -1) {
                       return InkWell(
                         onTap: () async {
-                          context.push(
-                              '/resource?search=${_textEditingController.text}');
+                          context.push('/resource?search=${_textEditingController.text}');
                         },
                         onHover: (value) {},
                         child: ListTile(
@@ -363,31 +351,33 @@ class _SearchBarMainState extends State<SearchBarMain> {
                             title: RichText(
                                 text: TextSpan(
                                     text: _textEditingController.text.trim(),
-                                    style: GoogleFonts.roboto(
+                                    style: const TextStyle(
                                         color: Colors.black87,
                                         fontWeight: FontWeight.w500),
-                                    children: [
+                                    children: const [
                                   TextSpan(
                                       text: ' - Search',
-                                      style: GoogleFonts.roboto(
+                                      style: TextStyle(
                                           color: Colors.black54,
                                           wordSpacing: 2,
                                           fontWeight: FontWeight.w500))
                                 ]))),
                       );
                     }
-                    if (index == -1) {
-                      index = 0;
-                    }
 
+                    if (index == -1) index = 0;
                     final Resource option = options.elementAt(index);
 
-                    if (option.name == option.subname &&
-                        option.name == option.image) {
+                    if (option.name == option.subname && option.name == option.hero) {
                       notFound = true;
                     } else {
                       notFound = false;
                     }
+
+                    if(_isLoading) {
+                      return const LinearProgressIndicator();
+                    }
+                        
                     return Visibility(
                       visible: notFound ? false : true,
                       child: InkWell(
@@ -418,7 +408,7 @@ class _SearchBarMainState extends State<SearchBarMain> {
                                       borderRadius: BorderRadius.circular(8),
                                       image: DecorationImage(
                                           fit: BoxFit.cover,
-                                          image: AssetImage(option.image)))),
+                                          image: MemoryImage(option.image)))),
                             ),
                           ),
                           trailing: selectedIndex == index
@@ -429,7 +419,7 @@ class _SearchBarMainState extends State<SearchBarMain> {
                             style: GoogleFonts.roboto(fontSize: 16),
                           ),
                           subtitle: Text(
-                            option.subname,
+                            option.subname.toTitleCase(),
                             style: GoogleFonts.roboto(fontSize: 12, height: 1),
                           ),
                         ),
@@ -449,18 +439,15 @@ class _SearchBarMainState extends State<SearchBarMain> {
         }
 
         List<Resource> resource = <Resource>[];
-
-        /* for (var element in _allResource) {
-          suggestionsName.add(element["name"]);
-        } */
-
+        int i = 0;
         for (final item in _allResource) {
           resource.add(Resource(
               name: item["name"],
-              subname: item["subname"],
-              image: item['image'],
-              index: item['index'],
-              hero: item['hero']));
+              subname: item["brand"],
+              image: item['images'].first,
+              index: i,
+              hero: "hero$i"));
+          i++;
         }
 
         final suggestionsName = resource
@@ -481,7 +468,7 @@ class _SearchBarMainState extends State<SearchBarMain> {
           finalSuggestionsName.add(Resource(
             name: textEditingValue.text.trim(),
             subname: textEditingValue.text.trim(),
-            image: textEditingValue.text.trim(),
+            image: Uint8List.fromList(List.empty()),
             index: 0,
             hero: textEditingValue.text.trim(),
           ));
@@ -626,7 +613,7 @@ class LayoutDesktop extends StatelessWidget {
                               )),
                               Flexible(
                                 child: Padding(
-                                    padding: const EdgeInsets.only(top: 8),
+                                    padding: const EdgeInsets.only(top: 40),
                                     child: cardUpdateLog()),
                               ),
                             ],
@@ -667,7 +654,9 @@ class LayoutDesktop extends StatelessWidget {
                                         ]),
                                         Row(
                                           children: [
-                                            ButtonLinks(bgcolor: Colors.white, fgcolor: Colors.black87),
+                                            ButtonLinks(
+                                                bgcolor: Colors.white,
+                                                fgcolor: Colors.black87),
                                           ],
                                         )
                                       ],

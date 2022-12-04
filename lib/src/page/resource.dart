@@ -3,12 +3,15 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:gimmic/assets/label.dart';
 import 'package:gimmic/src/view/grid.dart';
 import 'package:gimmic/src/view/list.dart';
 import 'package:gimmic/src/view/list_big.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../assets/functions/platform.dart';
+import '../../assets/functions/resource.dart';
 import '../../assets/widgets/appbar.dart';
 import '../../assets/widgets/menu.dart';
 
@@ -37,16 +40,12 @@ class _ResourceState extends State<Resource> {
   bool isScrollingDown = false;
   bool initated = false;
   bool _showBackToTopButton = false;
+  late bool parallax;
 
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      GlobalKey<RefreshIndicatorState>();
-  final GlobalKey<State<StatefulWidget>> _appBarKey =
-      GlobalKey<State<StatefulWidget>>();
-  final GlobalKey<State<StatefulWidget>> _bodyStateKey =
-      GlobalKey<State<StatefulWidget>>();
-  final GlobalKey<State<StatefulWidget>> _floatingButtonKey = 
-      GlobalKey<State<StatefulWidget>>();
-
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+  final GlobalKey<State<StatefulWidget>> _appBarKey = GlobalKey<State<StatefulWidget>>();
+  final GlobalKey<State<StatefulWidget>> _bodyStateKey = GlobalKey<State<StatefulWidget>>();
+  final GlobalKey<State<StatefulWidget>> _floatingButtonKey = GlobalKey<State<StatefulWidget>>();
 
   final GlobalKey<PopupMenuButtonState> _openTagsMenuKey = GlobalKey();
   final GlobalKey<PopupMenuButtonState> _openSortMenuKey = GlobalKey();
@@ -55,43 +54,12 @@ class _ResourceState extends State<Resource> {
   final FocusNode _buttonSortFocusNode = FocusNode();
   final FocusNode _searchBarFocusNode = FocusNode();
 
+  late Future _loadItems;
+  late AsyncSnapshot snapshots;
   /// This holds a list of fiction users
   /// You can use data fetched from a database or a server as well
-  final List<Map<String, dynamic>> _allResource = [
-    {
-      "id": 1,
-      "hero": "catHero",
-      "index": 0,
-      "name": "Andy",
-      "subname": "Legends of Zelda",
-      "size": "29.0 MB"
-    },
-    {
-      "id": 2,
-      "index": 1,
-      "hero": "dogHero",
-      "name": "Aragon Malay",
-      "subname": "Cross Code",
-      "size": "40.2 MB"
-    },
-    {
-      "id": 3,
-      "index": 0,
-      "hero": "lizardHero",
-      "name": "Cross",
-      "subname": "Cross Code",
-      "size": "5.5 MB"
-    },
-    {
-      "id": 4,
-      "index": 1,
-      "hero": "monkeyHero",
-      "name": "Barbara",
-      "subname": "Zenity",
-      "size": "35.2 MB"
-    },
-  ];
 
+  List<Map<String, dynamic>> json = [];
   List<Map<String, dynamic>> _foundResource = []; // This list holds the data for the list view
   String resultCount(int data) {    
       String count = 'No Result';
@@ -107,21 +75,29 @@ class _ResourceState extends State<Resource> {
 
   @override
   void initState() {
+    isWebMobile ? parallax = false : parallax = true;
     super.initState();
-    if (widget.arguments == null) {
-      _foundResource = _allResource; // at the beginning, all users are shown
-    } else {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _searchController.text = widget.arguments!;
-        _runFilter(widget.arguments!);
-      });
-    }
+    _loadItems = loadItems().then((value) async {
+      json = value;
+      // print('load items runs: $json');
+      if (widget.arguments == null && _searchController.text.trim().isEmpty) {
+        _runFilter(""); // at the beginning, all users are shown
+      } else {
+          if (widget.arguments != null) {
+            _searchController.text = widget.arguments!;
+            _runFilter(widget.arguments!);
+          } else {
+            _runFilter(_searchController.text);
+          }
+      }
+    });
+
 
     final random = Random();
-    randomEmoji = emoji[random.nextInt(emoji.length)];
+    randomEmoji = StringResource.emoji[random.nextInt(StringResource.emoji.length)];
     Timer.periodic(const Duration(seconds: 45), (Timer timer) {
       final random = Random();
-      randomEmoji = emoji[random.nextInt(emoji.length)];
+      randomEmoji = StringResource.emoji[random.nextInt(StringResource.emoji.length)];
     });
 
     initated = true;
@@ -244,28 +220,21 @@ class _ResourceState extends State<Resource> {
 
   void _runFilter(String enteredKeyword) {
     List<Map<String, dynamic>> results = [];
+    // List<Map<String, dynamic>> json = snapshots.data as List<Map<String, dynamic>>;
     setState(() {
       _loading = true;
     });
     if (enteredKeyword.trim().isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
-      results = _allResource;
-
-      /* if (kIsWeb) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (initated) GoRouter.of(context).replace('/resource');
-        });
-      } */
-
+      // results = _allResource;
+      results = json;
     } else {
-      final name = _allResource
-          .where((name) => name["name"]
+     final name = json.where((element) => element["name"]
               .toLowerCase()
               .contains(enteredKeyword.trim().toLowerCase()))
           .toList();
 
-      final subname = _allResource
-          .where((subname) => subname["subname"]
+      final subname = json.where((element) => element["brand"]
               .toLowerCase()
               .contains(enteredKeyword.trim().toLowerCase()))
           .toList();
@@ -273,14 +242,6 @@ class _ResourceState extends State<Resource> {
       results = name..addAll(subname);
       results = results.toSet().toList();
       // we use the toLowerCase() method to make it case-insensitive
-
-      /* if (kIsWeb) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (initated && enteredKeyword.trim().isNotEmpty) {
-            GoRouter.of(context).replace('/resource?search=${enteredKeyword.trim()}');
-          }
-        });
-      } */
 
       Future.delayed(const Duration(milliseconds: 600), () async {
         if (results.isEmpty) {
@@ -299,29 +260,7 @@ class _ResourceState extends State<Resource> {
 
   List<bool> checkedTags = [true, false, false];
   final List<bool> _layouts = [false, true, false];
-  final List<String> emoji = [
-    "(^_^)b",
-    "(>_<)",
-    "(ง'̀-'́)ง",
-    "(•◡•)",
-    "(¬‿¬)",
-    "(•_•)",
-    "~(˘▾˘~)",
-    "(~˘▾˘)~",
-    "(._.)",
-    "(⇀‸↼‶)",
-    "(Ò_Óˇ)",
-    "⚆ _ ⚆",
-    "(˚▽˚)",
-    ":')",
-    "(ಠ_ಠ)",
-    "(˘⌣˘)",
-    "(¬_¬)",
-    "(~_^)",
-    "(°,,°)",
-    "(^-^*)",
-    "(;-;)"
-  ];
+
   String randomEmoji = '';
   String sortbyValue = 'Most Updated';
 
@@ -427,138 +366,123 @@ class _ResourceState extends State<Resource> {
                                 children: [
                                   IconButton(
                                       style: const ButtonStyle(
-                                          foregroundColor:
-                                              MaterialStatePropertyAll(
-                                                  Colors.black54),
-                                          backgroundColor:
-                                              MaterialStatePropertyAll(
-                                                  Colors.white70)),
+                                          foregroundColor: MaterialStatePropertyAll(Colors.black54),
+                                          backgroundColor: MaterialStatePropertyAll(Colors.white70)),
                                       onPressed: () => context.pop(),
                                       icon: const Icon(Icons.arrow_back)),
                                   const SizedBox(width: 12),
                                   Flexible(
-                                    child: TextField(
-                                      onChanged: (value) => _runFilter(value),
-                                      focusNode: _searchBarFocusNode,
-                                      controller: _searchController,
-                                      autofocus: false,
-                                      style: GoogleFonts.roboto(
-                                          fontWeight: FontWeight.w500),
-                                      decoration: InputDecoration(
-                                        isDense: false,
-                                        filled: true,
-                                        fillColor: Colors.white70,
-                                        hoverColor: Colors.white,
-                                        prefixIcon: const Icon(Icons.search,
-                                            color: Colors.black54),
-                                        prefixIconConstraints:
-                                            const BoxConstraints(minWidth: 55),
-                                        suffixIcon: _searchController.text.isEmpty
-                                            ? Visibility(
-                                                visible: useVerticalLayout2x
-                                                    ? false
-                                                    : true,
-                                                child: PopupMenuButton(
-                                                  tooltip: '',
-                                                  key: _openSortMenuKey,
-                                                  enabled: true,
-                                                  elevation: 4,
-                                                  offset: const Offset(0, 45),
-                                                  color: Colors.grey.shade50,
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12)),
-                                                  onSelected: (value) =>
-                                                      _buttonSortFocusNode
-                                                          .requestFocus(),
-                                                  onCanceled: () =>
-                                                      _buttonSortFocusNode
-                                                          .requestFocus(),
-                                                  itemBuilder: (context) {
-                                                    return _listSort
-                                                        .map((PopupItem value) {
-                                                      return menuSort(value);
-                                                    }).toList();
-                                                  },
-                                                  child: IconButton(
-                                                      onPressed: () {
-                                                        dynamic state =
-                                                            _openSortMenuKey
-                                                                .currentState;
-                                                        state.showButtonMenu();
-                                                      },
-                                                      icon: const Icon(Icons.sort,
-                                                          color: Colors.black54)),
-                                                ),
-                                              )
-                                            : Row(
-                                              mainAxisAlignment: MainAxisAlignment.end,
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Visibility(
+                                    child: Material(
+                                      elevation: 2,
+                                      shadowColor: Colors.black38,
+                                      borderRadius: _searchBarFocusNode.hasFocus 
+                                        ? BorderRadius.circular(12) 
+                                        : BorderRadius.circular(25.7),
+                                      child: TextField(
+                                        onChanged: (value) => _runFilter(value),
+                                        focusNode: _searchBarFocusNode,
+                                        controller: _searchController,
+                                        autofocus: false,
+                                        style: GoogleFonts.roboto(fontWeight: FontWeight.w500),
+                                        decoration: InputDecoration(
+                                          isDense: false,
+                                          filled: true,
+                                          fillColor: Colors.white70,
+                                          hoverColor: Colors.white,
+                                          prefixIcon: const Icon(Icons.search, color: Colors.black54),
+                                          prefixIconConstraints: const BoxConstraints(minWidth: 55),
+                                          suffixIcon: _searchController.text.isEmpty
+                                              ? Visibility(
                                                   visible: useVerticalLayout2x ? false : true,
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.only(right: 8),
-                                                    child: Chip(
-                                                      visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
-                                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.7)),
-                                                      side: BorderSide.none,
-                                                      backgroundColor: Colors.blue.shade50,
-                                                      deleteIcon: _foundResource.isEmpty 
-                                                      ? _loading
-                                                        ? const SizedBox(
-                                                            height: 12,
-                                                            width: 12,
-                                                            child: CircularProgressIndicator(strokeWidth: 2),
-                                                          )
-                                                        : Icon(Icons.close, color: Colors.blue.shade700, size: 16)
-                                                      : Icon(Icons.close, color: Colors.blue.shade700, size: 16),
-                                                      onDeleted: () {
-                                                         _searchController.clear();
-                                                        _runFilter(_searchController.text);                                                     
-                                                      },
-                                                      label: Text(resultCount(_foundResource.length), 
-                                                          style: GoogleFonts.roboto(
-                                                              color: Colors.blue.shade700, 
-                                                              fontSize: 12, 
-                                                              fontWeight: FontWeight.w500)),
+                                                  child: PopupMenuButton(
+                                                    tooltip: '',
+                                                    key: _openSortMenuKey,
+                                                    enabled: true,
+                                                    elevation: 4,
+                                                    offset: const Offset(0, 45),
+                                                    color: Colors.grey.shade50,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(12)
+                                                    ),
+                                                    onSelected: (value) => _buttonSortFocusNode.requestFocus(),
+                                                    onCanceled: () => _buttonSortFocusNode.requestFocus(),
+                                                    itemBuilder: (context) {
+                                                      return _listSort.map((PopupItem value) {
+                                                        return menuSort(value);
+                                                      }).toList();
+                                                    },
+                                                    child: IconButton(
+                                                        onPressed: () {
+                                                          dynamic state = _openSortMenuKey.currentState;
+                                                          state.showButtonMenu();
+                                                        },
+                                                        icon: const Icon(Icons.sort, color: Colors.black54)),
+                                                  ),
+                                                )
+                                              : Row(
+                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Visibility(
+                                                    visible: useVerticalLayout2x ? false : true,
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.only(right: 8),
+                                                      child: Chip(
+                                                        visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
+                                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.7)),
+                                                        side: BorderSide.none,
+                                                        backgroundColor: Colors.blue.shade50,
+                                                        deleteIcon: _foundResource.isEmpty 
+                                                        ? _loading
+                                                          ? const SizedBox(
+                                                              height: 12,
+                                                              width: 12,
+                                                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.blue),
+                                                            )
+                                                          : Icon(Icons.close, color: Colors.blue.shade700, size: 16)
+                                                        : Icon(Icons.close, color: Colors.blue.shade700, size: 16),
+                                                        onDeleted: () {
+                                                           _searchController.clear();
+                                                          _runFilter(_searchController.text);                                                     
+                                                        },
+                                                    label: Text(_foundResource.isEmpty 
+                                                      ? _loading 
+                                                        ? 'Please Wait' 
+                                                        : resultCount(_foundResource.length)
+                                                      : resultCount(_foundResource.length), 
+                                                            style: GoogleFonts.roboto(
+                                                                color: Colors.blue.shade700, 
+                                                                fontSize: 12, 
+                                                                fontWeight: FontWeight.w500)),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                                Visibility(
-                                                  visible: useVerticalLayout2x ? true : false,
-                                                  child: IconButton(
-                                                      icon: const Icon(Icons.clear, color: Colors.black54),
-                                                      onPressed: () {
-                                                        GoRouter.of(context).replace('/resource');
-                                                        _searchController.clear();
-                                                        _runFilter(_searchController.text);
-                                                      },
-                                                    ),
-                                                ),
-                                              ],
-                                            ),
-                                        suffixIconConstraints:
-                                            const BoxConstraints(
-                                                minWidth: 50, minHeight: 50),
-                                        hintText: 'Search...',
-                                        hintStyle: GoogleFonts.roboto(
-                                            fontWeight: FontWeight.w500),
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 0, horizontal: 0),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderSide: const BorderSide(
-                                              color: Colors.blue, width: 2),
-                                          borderRadius:
-                                              BorderRadius.circular(25.7),
-                                        ),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderSide: const BorderSide(
-                                              color: Colors.transparent),
-                                          borderRadius:
-                                              BorderRadius.circular(25.7),
+                                                  Visibility(
+                                                    visible: useVerticalLayout2x ? true : false,
+                                                    child: IconButton(
+                                                        icon: const Icon(Icons.clear, color: Colors.black54),
+                                                        onPressed: () {
+                                                          GoRouter.of(context).replace('/resource');
+                                                          _searchController.clear();
+                                                          _runFilter(_searchController.text);
+                                                        },
+                                                      ),
+                                                  ),
+                                                ]
+                                              ),
+                                          suffixIconConstraints: const BoxConstraints(minWidth: 50, minHeight: 50),
+                                          hintText: 'Search...',
+                                          hintStyle: GoogleFonts.roboto(fontWeight: FontWeight.w500, height: isWebMobile ? 2.55 : null),
+                                          contentPadding: isWebMobile 
+                                            ? const EdgeInsets.fromLTRB(0, 0, 0, 0)
+                                            : const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderSide: const BorderSide(color: Colors.transparent),
+                                            borderRadius: BorderRadius.circular(25.7),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderSide: const BorderSide(width: 2, color: Colors.deepPurple),
+                                            borderRadius: BorderRadius.circular(12))  
                                         ),
                                       ),
                                     ),
@@ -624,12 +548,8 @@ class _ResourceState extends State<Resource> {
                                           scale: 0.85,
                                           child: IconButton(
                                               style: const ButtonStyle(
-                                                  foregroundColor:
-                                                      MaterialStatePropertyAll(
-                                                          Colors.black54),
-                                                  backgroundColor:
-                                                      MaterialStatePropertyAll(
-                                                          Colors.white70)),
+                                                  foregroundColor: MaterialStatePropertyAll(Colors.black54),
+                                                  backgroundColor: MaterialStatePropertyAll(Colors.white70)),
                                               onPressed: () => context.pop(),
                                               icon: const Icon(Icons.arrow_back)),
                                         ),
@@ -649,10 +569,8 @@ class _ResourceState extends State<Resource> {
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(12)),
-                                      onSelected: (value) =>
-                                          _buttonTagsFocusNode.requestFocus(),
-                                      onCanceled: () =>
-                                          _buttonTagsFocusNode.requestFocus(),
+                                      onSelected: (value) => _buttonTagsFocusNode.requestFocus(),
+                                      onCanceled: () => _buttonTagsFocusNode.requestFocus(),
                                       itemBuilder: (context) {
                                         return _listTags.map((PopupItem value) {
                                               return menuTags(value, checkedTags);
@@ -660,54 +578,36 @@ class _ResourceState extends State<Resource> {
                                             [
                                               // Reset button
                                               PopupMenuItem(
-                                                  height: 0,
+                                                height: 0,
                                                   enabled: false,
                                                   child: Align(
-                                                    alignment:
-                                                        Alignment.centerRight,
+                                                    alignment: Alignment.centerRight,
                                                     child: TextButton(
-                                                        onPressed: () {
-                                                          setState(() {
-                                                            List.filled(
-                                                                checkedTags
-                                                                    .length,
-                                                                false,
-                                                                growable: true);
-                                                          });
-                                                        },
-                                                        child:
-                                                            const Text('Reset')),
-                                                  ))
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          List.filled(checkedTags.length, false, growable: true);
+                                                        });
+                                                      },
+                                                      child: const Text('Reset')),
+                                                ))
                                             ];
                                       },
                                       child: ElevatedButton.icon(
                                           style: ButtonStyle(
                                               padding: const MaterialStatePropertyAll(
-                                                  EdgeInsets.fromLTRB(
-                                                      12, 16, 8, 16)),
-                                              elevation:
-                                                  const MaterialStatePropertyAll(
-                                                      0),
-                                              side: MaterialStateProperty.resolveWith(
-                                                  (states) {
-                                                if (states.contains(
-                                                    MaterialState.focused)) {
-                                                  return const BorderSide(
-                                                      color: Colors.blue,
-                                                      width: 2);
-                                                }
-                                                return const BorderSide(
-                                                    color: Colors.transparent,
-                                                    width: 2);
-                                              }),
+                                                EdgeInsets.fromLTRB(12, 0, 4, 0)),
+                                              elevation: const MaterialStatePropertyAll(0),
+                                              side: const MaterialStatePropertyAll(BorderSide.none), 
                                               shape: MaterialStatePropertyAll(
-                                                  RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              25.7))),
-                                              backgroundColor:
-                                                  const MaterialStatePropertyAll(
-                                                      Colors.transparent)),
+                                                RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(25.7))),
+                                              backgroundColor: MaterialStateProperty.resolveWith((states) {
+                                                if (states.contains(MaterialState.focused)) {
+                                                  return Colors.deepPurple.withOpacity(0.005);
+                                                }
+                                                return Colors.transparent;
+                                              }),
+                                          ),
                                           onPressed: () {
                                             dynamic state =
                                                 _openTagsMenuKey.currentState;
@@ -721,23 +621,19 @@ class _ResourceState extends State<Resource> {
                                                   style: GoogleFonts.roboto(
                                                       fontWeight: FontWeight.w500,
                                                       color: Colors.black87)),
-                                              const SizedBox(width: 10),
+                                              const SizedBox(width: 8),
                                               const Icon(Icons.arrow_drop_down,
                                                   color: Colors.black87),
                                             ],
                                           ))),
-                                  const SizedBox(width: 10),
+                                  const SizedBox(width: 8),
                                   AnimatedSwitcher(
                                       duration: const Duration(milliseconds: 200),
                                       child: useVerticalLayout2x
                                           ? ElevatedButton.icon(
                                               style: const ButtonStyle(
-                                                  backgroundColor:
-                                                      MaterialStatePropertyAll(
-                                                          Colors.white70),
-                                                  elevation:
-                                                      MaterialStatePropertyAll(
-                                                          0)),
+                                                  backgroundColor: MaterialStatePropertyAll(Colors.transparent),
+                                                  elevation: MaterialStatePropertyAll(0)),
                                               onPressed: () {
                                                 _appBarKey.currentState?.setState(() {
                                                     isScrollingDown = false;
@@ -752,19 +648,25 @@ class _ResourceState extends State<Resource> {
                                                     child: SizedBox(
                                                       height: 12,
                                                       width: 12,
-                                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                                      child: CircularProgressIndicator(
+                                                        strokeWidth: 2, color: Colors.deepPurple),
                                                     ),
                                                   )
-                                                  : Icon(_showAppbar ? Icons.bar_chart : Icons.search)
-                                                : Icon(_showAppbar ? Icons.bar_chart : Icons.search),
+                                                  : Icon(_showAppbar ? Icons.bar_chart : Icons.search,
+                                                    color: Colors.deepPurple)
+                                                : Icon(_showAppbar 
+                                                  ? Icons.bar_chart : Icons.search, 
+                                                    color: Colors.deepPurple),
                                               label: Text(
                                                 _foundResource.isEmpty
                                                 ? _loading
-                                                  ? 'Loading'
+                                                  ? 'Please Wait'
                                                   : resultCount(_foundResource.length)
                                                 : resultCount(_foundResource.length),
-                                                style: GoogleFonts.roboto(
-                                                    fontWeight: FontWeight.w500),
+                                                style: const TextStyle(
+                                                  color: Colors.deepPurple,
+                                                  fontWeight: FontWeight.w600
+                                                ),
                                               ),
                                             )
                                           : null)
@@ -783,54 +685,32 @@ class _ResourceState extends State<Resource> {
                                               offset: const Offset(0, 45),
                                               color: Colors.grey.shade50,
                                               shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(12)),
-                                              onSelected: (value) =>
-                                                  _buttonSortFocusNode
-                                                      .requestFocus(),
-                                              onCanceled: () =>
-                                                  _buttonSortFocusNode
-                                                      .requestFocus(),
+                                                  borderRadius: BorderRadius.circular(12)),
+                                              onSelected: (value) => _buttonSortFocusNode.requestFocus(),
+                                              onCanceled: () => _buttonSortFocusNode.requestFocus(),
                                               itemBuilder: (context) {
-                                                return _listSort
-                                                    .map((PopupItem value) {
+                                                return _listSort.map((PopupItem value) {
                                                   return menuSort(value);
                                                 }).toList();
                                               },
                                               child: ElevatedButton.icon(
                                                   style: ButtonStyle(
-                                                      padding:
-                                                          const MaterialStatePropertyAll(
-                                                              EdgeInsets.fromLTRB(
-                                                                  16, 16, 8, 16)),
-                                                      elevation:
-                                                          const MaterialStatePropertyAll(
-                                                              0),
-                                                      side: MaterialStateProperty.resolveWith(
-                                                          (states) {
-                                                        if (states.contains(
-                                                            MaterialState
-                                                                .focused)) {
-                                                          return const BorderSide(
-                                                              color: Colors.blue,
-                                                              width: 2);
-                                                        }
-                                                        return const BorderSide(
-                                                            color: Colors
-                                                                .transparent,
-                                                            width: 2);
-                                                      }),
+                                                      padding: const MaterialStatePropertyAll(
+                                                        EdgeInsets.fromLTRB(12, 0, 4, 0)),
+                                                      elevation: const MaterialStatePropertyAll(0),
+                                                      side: const MaterialStatePropertyAll(BorderSide.none), 
                                                       shape: MaterialStatePropertyAll(
-                                                          RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius.circular(
-                                                                      25.7))),
-                                                      backgroundColor: const MaterialStatePropertyAll(
-                                                          Colors.transparent)),
+                                                        RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.circular(25.7))),
+                                                      backgroundColor: MaterialStateProperty.resolveWith((states) {
+                                                        if (states.contains(MaterialState.focused)) {
+                                                          return Colors.deepPurple.withOpacity(0.005);
+                                                        }
+                                                        return Colors.transparent;
+                                                      }),
+                                                  ),
                                                   onPressed: () {
-                                                    dynamic state =
-                                                        _openSortMenuKey
-                                                            .currentState;
+                                                    dynamic state = _openSortMenuKey.currentState;
                                                     state.showButtonMenu();
                                                   },
                                                   focusNode: _buttonSortFocusNode,
@@ -840,18 +720,16 @@ class _ResourceState extends State<Resource> {
                                                   label: Row(
                                                     children: [
                                                       Text(
-                                                          'Sort by: Most Popular',
-                                                          style:
-                                                              GoogleFonts.roboto(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  color: Colors
-                                                                      .black87)),
-                                                      const SizedBox(width: 10),
+                                                        'Sort by: Most Popular',
+                                                        style: GoogleFonts.roboto(
+                                                          fontWeight: FontWeight.w500,
+                                                          color: Colors.black87)
+                                                      ),
+                                                      const SizedBox(width: 6),
                                                       const Icon(
                                                           Icons.arrow_drop_down,
-                                                          color: Colors.black87),
+                                                          color: Colors.black87
+                                                      ),
                                                     ],
                                                   )),
                                             )
@@ -866,7 +744,7 @@ class _ResourceState extends State<Resource> {
                                     borderRadius: BorderRadius.circular(4),
                                     onPressed: (int index) {
                                       _bodyStateKey.currentState?.setState(() {
-                                       for (int buttonIndex = 0;
+                                        for (int buttonIndex = 0;
                                             buttonIndex < _layouts.length;
                                             buttonIndex++) {
                                           if (buttonIndex == index) {
@@ -877,7 +755,7 @@ class _ResourceState extends State<Resource> {
                                         }                                     
                                       });
                                       _appBarKey.currentState?.setState(() {});
-                                   },
+                                    },
                                     isSelected: _layouts,
                                     children: const <Widget>[
                                       Tooltip(
@@ -885,13 +763,32 @@ class _ResourceState extends State<Resource> {
                                           child: Icon(Icons.web_asset)),
                                       Tooltip(
                                           message: 'Grid Mode',
-                                          child:
-                                              Icon(Icons.view_module_outlined)),
+                                          child: Icon(Icons.view_module_outlined)),
                                       Tooltip(
                                           message: 'List Mode',
                                           child: Icon(Icons.view_list_outlined)),
                                     ],
                                   ),
+                                  SizedBox(width: !isWebMobile ? 4 : null),
+                                  !isWebMobile 
+                                  ? IconButton(
+                                      tooltip: parallax 
+                                        ? "Disable Parallax Mode" 
+                                        : "Enable Parallax Mode",
+                                      onPressed: () {
+                                        setState(() {
+                                          parallax ? parallax = false : parallax = true;
+                                        });
+                                        _bodyStateKey.currentState?.setState(() {});
+                                      },
+                                      icon: Icon(
+                                        parallax 
+                                          ? Icons.style_outlined
+                                          : Icons.burst_mode_outlined,
+                                        color: parallax 
+                                          ? Colors.deepPurple
+                                          : Colors.black54))
+                                  : const SizedBox(),
                                   const SizedBox(width: 10),
                                   Visibility(
                                     visible: useVerticalLayout2x ? false : true,
@@ -943,101 +840,108 @@ class _ResourceState extends State<Resource> {
                             child: child,
                           );
                         },
-                       child: _foundResource.isNotEmpty
-                            ? _layouts[0] || _layouts[1]
-                                ? GridResource(
-                                    layouts: _layouts,
-                                    useVerticalLayout: useVerticalLayout,
-                                    useVerticalLayout2x: useVerticalLayout2x,
-                                    useVerticalLayout3x: useVerticalLayout3x,
-                                    gridRowCount: gridRowCount,
-                                    foundResource: _foundResource,
-                                    scrollViewController: _scrollGridViewController,
-                                  )
-                                : useVerticalLayout3x
-                                    ? useVerticalLayout2x
-                                        ? ListBigResource(
-                                            foundResource: _foundResource,
-                                            layouts: _layouts[0],
-                                            useVerticalLayout: useVerticalLayout,
-                                            hideDetailHorizontal:
-                                                hideDetailHorizontal,
-                                            scrollViewController:
-                                                _scrollListViewController,
-                                          )
-                                        : ListBigResource(
-                                            foundResource: _foundResource,
-                                            layouts: _layouts[0],
-                                            useVerticalLayout: useVerticalLayout,
-                                            hideDetailHorizontal:
-                                                hideDetailHorizontal,
-                                            scrollViewController:
-                                                _scrollListViewController,
-                                          )
-                                    : ListResource(foundResource: _foundResource)
-                            : Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: AnimatedCrossFade(
-                                  layoutBuilder: ((topChild, topChildKey,
-                                      bottomChild, bottomChildKey) {
-                                    return Stack(
-                                      clipBehavior: Clip.none,
-                                      alignment: Alignment.topCenter,
-                                      children: [
-                                        Positioned(
-                                            key: bottomChildKey,
-                                            child: bottomChild),
-                                        Positioned(
-                                            key: topChildKey, child: topChild)
-                                      ],
-                                    );
-                                  }),
-                                  crossFadeState: _loading
-                                      ? CrossFadeState.showFirst
-                                      : CrossFadeState.showSecond,
-                                  duration: const Duration(milliseconds: 200),
-                                  firstChild: Padding(
-                                    padding: const EdgeInsets.only(top: 46),
-                                    child: Transform.scale(
-                                        scale: 2,
-                                        child: const CircularProgressIndicator(
-                                            strokeWidth: 2)),
-                                  ),
-                                  secondChild: Column(children: [
-                                    const SizedBox(height: 20),
-                                    Text(
-                                      "No result found for '${_searchController.text.trim()}'",
-                                      style: GoogleFonts.roboto(
-                                        color: Colors.black54,
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                      textAlign: TextAlign.center,
+                       child: FutureBuilder(
+                          future: _loadItems,
+                          builder: (context, AsyncSnapshot snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(
+                                heightFactor: 2,
+                                child: CircularProgressIndicator(strokeWidth: 3),
+                              );
+                            }
+                            return _foundResource.isNotEmpty
+                              ? _layouts[0] || _layouts[1]
+                                  ? GridResource(
+                                      layouts: _layouts,
+                                      useVerticalLayout: useVerticalLayout,
+                                      useVerticalLayout2x: useVerticalLayout2x,
+                                      useVerticalLayout3x: useVerticalLayout3x,
+                                      parallax: parallax,
+                                      gridRowCount: gridRowCount,
+                                      foundResource: _foundResource,
+                                      scrollViewController: _scrollGridViewController,
+                                    )
+                                  : useVerticalLayout3x
+                                      ? useVerticalLayout2x
+                                          ? ListBigResource(
+                                              foundResource: _foundResource,
+                                              layouts: _layouts[0],
+                                              useVerticalLayout: useVerticalLayout,
+                                              hideDetailHorizontal: hideDetailHorizontal,
+                                              scrollViewController:_scrollListViewController,
+                                            )
+                                          : ListBigResource(
+                                              foundResource: _foundResource,
+                                              layouts: _layouts[0],
+                                              useVerticalLayout: useVerticalLayout,
+                                              hideDetailHorizontal: hideDetailHorizontal,
+                                              scrollViewController: _scrollListViewController,
+                                            )
+                                      : ListResource(foundResource: _foundResource)
+                              : Padding(
+                                  padding: const EdgeInsets.all(20),
+                                  child: AnimatedCrossFade(
+                                    layoutBuilder: ((topChild, topChildKey, bottomChild, bottomChildKey) {
+                                      return Stack(
+                                        clipBehavior: Clip.none,
+                                        alignment: Alignment.topCenter,
+                                        children: [
+                                          Positioned(
+                                              key: bottomChildKey,
+                                              child: bottomChild),
+                                          Positioned(
+                                              key: topChildKey, child: topChild)
+                                        ],
+                                      );
+                                    }),
+                                    crossFadeState: _loading
+                                        ? CrossFadeState.showFirst
+                                        : CrossFadeState.showSecond,
+                                    duration: const Duration(milliseconds: 200),
+                                    firstChild: Padding(
+                                      padding: const EdgeInsets.only(top: 46),
+                                      child: Transform.scale(
+                                          scale: 2,
+                                          child: const CircularProgressIndicator(
+                                              strokeWidth: 2)),
                                     ),
-                                    SelectableText(randomEmoji,
-                                        style: GoogleFonts.robotoMono(
-                                            fontSize: useVerticalLayout2x ? 124 : 100,
-                                            color: Colors.black54,
-                                            letterSpacing: -10)),
-                                    const SizedBox(height: 36),
-                                    OutlinedButton(
-                                        style: OutlinedButton.styleFrom(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 24, vertical: 15),
-                                            side: const BorderSide(
-                                                color: Colors.blue),
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(4))),
-                                        onPressed: () {
-                                          _searchController.clear();
-                                          _runFilter(_searchController.text);
-                                        },
-                                        child: const Text(
-                                            'Clear your search and try again'))
-                                  ]),
-                                ),
-                              ),
+                                    secondChild: Column(children: [
+                                      const SizedBox(height: 20),
+                                      Text(
+                                        "No result found for '${_searchController.text.trim()}'",
+                                        style: GoogleFonts.roboto(
+                                          color: Colors.black54,
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      SelectableText(randomEmoji,
+                                          style: GoogleFonts.robotoMono(
+                                              fontSize: useVerticalLayout2x ? 124 : 100,
+                                              color: Colors.black54,
+                                              letterSpacing: -10)),
+                                      const SizedBox(height: 36),
+                                      OutlinedButton(
+                                          style: OutlinedButton.styleFrom(
+                                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
+                                              side: const BorderSide(color: Colors.deepPurple),
+                                              shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(4))),
+                                          onPressed: () {
+                                            _searchController.clear();
+                                            _runFilter(_searchController.text);
+                                            _searchBarFocusNode.requestFocus();
+                                          },
+                                          child: const Text(
+                                            'Clear your search and try again',
+                                            style: TextStyle(fontWeight: FontWeight.w600)
+                                          )
+                                      )
+                                    ]),
+                                  ),
+                                );
+                          },
+                       ),
                       ),
                     ),
                   ),
