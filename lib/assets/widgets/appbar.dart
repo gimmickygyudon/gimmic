@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 Widget appbarSetting(layout) {
   return Row(
@@ -12,10 +11,10 @@ Widget appbarSetting(layout) {
                     TextButton.icon(
                       icon: const Icon(Icons.light_mode_rounded, size: 20),
                       onPressed: null,
-                      label: Text(
+                      label: const Text(
                         'Light Mode',
-                        style: GoogleFonts.roboto(
-                          fontWeight: FontWeight.w500,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),

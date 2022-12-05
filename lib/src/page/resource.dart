@@ -370,7 +370,7 @@ class _ResourceState extends State<Resource> {
                                           backgroundColor: MaterialStatePropertyAll(Colors.white70)),
                                       onPressed: () => context.pop(),
                                       icon: const Icon(Icons.arrow_back)),
-                                  const SizedBox(width: 12),
+                                  SizedBox(width: useVerticalLayout ? 120 : 12),
                                   Flexible(
                                     child: Material(
                                       elevation: 2,
@@ -383,7 +383,7 @@ class _ResourceState extends State<Resource> {
                                         focusNode: _searchBarFocusNode,
                                         controller: _searchController,
                                         autofocus: false,
-                                        style: GoogleFonts.roboto(fontWeight: FontWeight.w500),
+                                        style: const TextStyle(fontWeight: FontWeight.w600),
                                         decoration: InputDecoration(
                                           isDense: false,
                                           filled: true,
@@ -450,16 +450,19 @@ class _ResourceState extends State<Resource> {
                                                         ? 'Please Wait' 
                                                         : resultCount(_foundResource.length)
                                                       : resultCount(_foundResource.length), 
-                                                            style: GoogleFonts.roboto(
+                                                            style: TextStyle(
                                                                 color: Colors.blue.shade700, 
                                                                 fontSize: 12, 
-                                                                fontWeight: FontWeight.w500)),
+                                                                fontWeight: FontWeight.w600)),
                                                       ),
                                                     ),
                                                   ),
                                                   Visibility(
                                                     visible: useVerticalLayout2x ? true : false,
-                                                    child: IconButton(
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.only(right: 4),
+                                                      child: IconButton(
+                                                        visualDensity: VisualDensity.compact,
                                                         icon: const Icon(Icons.clear, color: Colors.black54),
                                                         onPressed: () {
                                                           GoRouter.of(context).replace('/resource');
@@ -467,12 +470,13 @@ class _ResourceState extends State<Resource> {
                                                           _runFilter(_searchController.text);
                                                         },
                                                       ),
+                                                    ),
                                                   ),
                                                 ]
                                               ),
                                           suffixIconConstraints: const BoxConstraints(minWidth: 50, minHeight: 50),
                                           hintText: 'Search...',
-                                          hintStyle: GoogleFonts.roboto(fontWeight: FontWeight.w500, height: isWebMobile ? 2.55 : null),
+                                          hintStyle: TextStyle(fontWeight: FontWeight.w600, height: isWebMobile ? 2.55 : null),
                                           contentPadding: isWebMobile 
                                             ? const EdgeInsets.fromLTRB(0, 0, 0, 0)
                                             : const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
@@ -487,11 +491,14 @@ class _ResourceState extends State<Resource> {
                                       ),
                                     ),
                                   ),
+                                  SizedBox(width: useVerticalLayout ? 80 : 0),
                                   AnimatedSize(
                                     curve: Curves.ease,
                                     duration: const Duration(milliseconds: 300),
                                     child: SizedBox(
-                                      width: _searchBarFocusNode.hasFocus ? 0 : null,
+                                      width: useVerticalLayout 
+                                        ? null 
+                                        : _searchBarFocusNode.hasFocus ? 0 : null,
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
@@ -513,24 +520,24 @@ class _ResourceState extends State<Resource> {
                           curve: Curves.fastOutSlowIn,
                           duration: const Duration(milliseconds: 600),
                           padding: useVerticalLayout
-                              ? _showAppbar
-                                  ? EdgeInsets.symmetric(
-                                      vertical: useVerticalLayout ? 0 : 8, horizontal: 48)
-                                  : const EdgeInsets.symmetric(
-                                      vertical: 0, horizontal: 12)
-                              : useVerticalLayout2x
-                                  ? _showAppbar
-                                      ? const EdgeInsets.symmetric(
-                                          vertical: 0,
-                                          horizontal: 24)
-                                      : const EdgeInsets.symmetric(
-                                          vertical: 0,
-                                          horizontal: 6)
-                                  : _showAppbar
-                                      ? const EdgeInsets.only(
-                                          top: 0, right: 24, left: 24)
-                                      : const EdgeInsets.only(
-                                          top: 0, right: 6, left: 6),
+                            ? _showAppbar
+                                ? EdgeInsets.symmetric(
+                                    vertical: useVerticalLayout ? 0 : 8, horizontal: 48)
+                                : const EdgeInsets.symmetric(
+                                    vertical: 0, horizontal: 12)
+                            : useVerticalLayout2x
+                                ? _showAppbar
+                                    ? const EdgeInsets.symmetric(
+                                        vertical: 0,
+                                        horizontal: 24)
+                                    : const EdgeInsets.symmetric(
+                                        vertical: 0,
+                                        horizontal: 6)
+                                : _showAppbar
+                                    ? const EdgeInsets.only(
+                                        top: 0, right: 24, left: 24)
+                                    : const EdgeInsets.only(
+                                        top: 0, right: 6, left: 6),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -909,7 +916,7 @@ class _ResourceState extends State<Resource> {
                                       const SizedBox(height: 20),
                                       Text(
                                         "No result found for '${_searchController.text.trim()}'",
-                                        style: GoogleFonts.roboto(
+                                        style: const TextStyle(
                                           color: Colors.black54,
                                           fontSize: 24,
                                           fontWeight: FontWeight.w400,
@@ -917,10 +924,10 @@ class _ResourceState extends State<Resource> {
                                         textAlign: TextAlign.center,
                                       ),
                                       SelectableText(randomEmoji,
-                                          style: GoogleFonts.robotoMono(
-                                              fontSize: useVerticalLayout2x ? 124 : 100,
-                                              color: Colors.black54,
-                                              letterSpacing: -10)),
+                                        style: TextStyle(
+                                            fontSize: useVerticalLayout2x ? 124 : 100,
+                                            color: Colors.black54,
+                                            letterSpacing: 10)),
                                       const SizedBox(height: 36),
                                       OutlinedButton(
                                           style: OutlinedButton.styleFrom(

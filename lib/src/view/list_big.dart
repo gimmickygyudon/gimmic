@@ -269,6 +269,9 @@ class _ListBigResourceState extends State<ListBigResource> {
                                                       labelPadding: EdgeInsets.zero,
                                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                                                       side: BorderSide.none,
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(25.7)
+                                                      ),
                                                       backgroundColor: selectedIndex == index
                                                         ? Colors.green.shade50
                                                         : Colors.deepPurple.withOpacity(0.025),
@@ -295,6 +298,9 @@ class _ListBigResourceState extends State<ListBigResource> {
                                                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                                                 labelPadding: EdgeInsets.zero,
                                                                 side: BorderSide.none,
+                                                                shape: RoundedRectangleBorder(
+                                                                  borderRadius: BorderRadius.circular(25.7)
+                                                                ),
                                                                 backgroundColor: selectedIndex == index
                                                                   ? Colors.green.shade50
                                                                   : Colors.deepPurple.withOpacity(0.025),

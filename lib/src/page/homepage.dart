@@ -158,7 +158,7 @@ class _SearchBarMainState extends State<SearchBarMain> {
                 });
               }
             },
-            style: GoogleFonts.roboto(fontWeight: FontWeight.w500),
+            style: const TextStyle(fontWeight: FontWeight.w600),
             decoration: InputDecoration(
               isDense: false,
               filled: true,
@@ -257,12 +257,12 @@ class _SearchBarMainState extends State<SearchBarMain> {
                               bgcolor: Colors.blue.shade50,
                             )),
               ),
-              suffixStyle: GoogleFonts.roboto(
-                fontWeight: FontWeight.w500,
+              suffixStyle: const TextStyle(
+                fontWeight: FontWeight.w600,
               ),
               hintText: 'Search...',
-              hintStyle: GoogleFonts.roboto(
-                fontWeight: FontWeight.w500,
+              hintStyle: const TextStyle(
+                fontWeight: FontWeight.w600,
               ),
               labelText:  widget.useVHideDetails ? null : StringResource.greetings,
               contentPadding: isSearching
@@ -331,7 +331,16 @@ class _SearchBarMainState extends State<SearchBarMain> {
                           context.push('/resource?search=${_textEditingController.text}');
                         },
                         onHover: (value) {},
-                        child: ListTile(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: selectedIndex == index 
+                              ? Border(left: BorderSide(color: Colors.blue.shade200, width: 3))
+                              : null
+                          ),
+                          child: ListTile(
+                            contentPadding: selectedIndex == index 
+                              ? const EdgeInsets.symmetric(horizontal: 13.0)
+                              : null,
                             selected: selectedIndex == index ? true : false,
                             selectedTileColor: selectedIndex == index
                                 ? Colors.lightBlue.shade50
@@ -349,19 +358,24 @@ class _SearchBarMainState extends State<SearchBarMain> {
                                   )
                                 : null,
                             title: RichText(
-                                text: TextSpan(
-                                    text: _textEditingController.text.trim(),
-                                    style: const TextStyle(
-                                        color: Colors.black87,
-                                        fontWeight: FontWeight.w500),
-                                    children: const [
+                              text: TextSpan(
+                                text: _textEditingController.text.trim(),
+                                style: const TextStyle(
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w600),
+                                children: const [
                                   TextSpan(
-                                      text: ' - Search',
-                                      style: TextStyle(
-                                          color: Colors.black54,
-                                          wordSpacing: 2,
-                                          fontWeight: FontWeight.w500))
-                                ]))),
+                                    text: ' - Search',
+                                    style: TextStyle(
+                                      color: Colors.black54,
+                                      wordSpacing: 2,
+                                      fontWeight: FontWeight.w600)
+                                  )
+                                ]
+                              )
+                            )
+                          ),
+                        ),
                       );
                     }
 
@@ -391,36 +405,53 @@ class _SearchBarMainState extends State<SearchBarMain> {
                           });
                         },
                         onHover: (value) {},
-                        child: ListTile(
-                          selected: selectedIndex == index ? true : false,
-                          selectedTileColor: selectedIndex == index
-                              ? Colors.lightBlue.shade100
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: selectedIndex == index 
+                              ? const Border(left: BorderSide(color: Colors.blue, width: 3))
+                              : null
+                          ),
+                          child: ListTile(
+                            contentPadding: selectedIndex == index 
+                              ? const EdgeInsets.symmetric(horizontal: 13.0)
                               : null,
-                          selectedColor: Colors.lightBlue.shade900,
-                          dense: true,
-                          leading: Hero(
-                            tag: option.hero + option.index.toString(),
-                            child: AspectRatio(
-                              aspectRatio: 1 / 1,
-                              child: Container(
-                                  height: 36,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                      image: DecorationImage(
-                                          fit: BoxFit.cover,
-                                          image: MemoryImage(option.image)))),
+                            selected: selectedIndex == index ? true : false,
+                            selectedTileColor: selectedIndex == index
+                                ? Colors.lightBlue.shade50
+                                : null,
+                            selectedColor: Colors.lightBlue.shade900,
+                            dense: true,
+                            leading: Hero(
+                              tag: option.hero + option.index.toString(),
+                              child: AspectRatio(
+                                aspectRatio: 1 / 1,
+                                child: Container(
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        image: DecorationImage(
+                                            fit: BoxFit.cover,
+                                            image: MemoryImage(option.image)))),
+                              ),
                             ),
-                          ),
-                          trailing: selectedIndex == index
-                              ? const Icon(Icons.chevron_right)
-                              : null,
-                          title: Text(
-                            option.name,
-                            style: GoogleFonts.roboto(fontSize: 16),
-                          ),
-                          subtitle: Text(
-                            option.subname.toTitleCase(),
-                            style: GoogleFonts.roboto(fontSize: 12, height: 1),
+                            trailing: selectedIndex == index
+                                ? const Icon(Icons.chevron_right)
+                                : null,
+                            title: Text(
+                              option.name,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            subtitle: Text(
+                              option.subname.toTitleCase(),
+                              style: const TextStyle(
+                                fontSize: 12, 
+                                fontWeight: FontWeight.w600,
+                                height: 1
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -508,16 +539,17 @@ class LayoutDesktop extends StatelessWidget {
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: const [
                     Tooltip(
                       message: StringResource.version,
                       child: Text(StringResource.title,
-                          style: GoogleFonts.raleway(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black87)),
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500
+                          )
+                      ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                   ]),
             ),
             actions: [
