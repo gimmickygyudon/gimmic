@@ -129,7 +129,9 @@ class _ListBigResourceState extends State<ListBigResource> {
                                 : const EdgeInsets.only(bottom: 16, left: 25, right: 25),
                             // key: ValueKey(widget.foundResource[index]["id"]),
                             elevation: selectedIndex == index ? 6 : 2,
-                            shadowColor: Colors.black38,
+                            shadowColor: selectedIndex == index 
+                              ? Colors.green.withOpacity(0.5)
+                              : Colors.black38,
                             surfaceTintColor: Colors.green.shade100,
                             color: Colors.white,
                             shape: selectedIndex == index
@@ -225,18 +227,18 @@ class _ListBigResourceState extends State<ListBigResource> {
                                                   children: [
                                                     Text(
                                                       name,
-                                                      style: TextStyle(
-                                                          color: Colors.black87,
+                                                      style: GoogleFonts.roboto(
+                                                          color: Colors.grey.shade800,
                                                           fontSize: widget.hideDetailHorizontal ? 20 : 16,
-                                                          fontWeight: FontWeight.w500,
+                                                          fontWeight: FontWeight.w600,
                                                           letterSpacing: -0.5),
                                                     ),
                                                     Text(
                                                       widget.foundResource[index]["brand"].toString().toTitleCase(),
                                                       style: GoogleFonts.roboto(
-                                                          color: Colors.black54,
+                                                          color: Colors.grey.shade600,
                                                           fontSize: widget.hideDetailHorizontal ? 14 : 12,
-                                                          fontWeight: FontWeight.w500,
+                                                          fontWeight: FontWeight.w600,
                                                           letterSpacing: 0),
                                                     ),
                                                     const SizedBox(height: 16),
@@ -264,23 +266,29 @@ class _ListBigResourceState extends State<ListBigResource> {
                                                 child: Wrap(
                                                   spacing: 8,
                                                   children: [
-                                                    Chip(
-                                                      visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
-                                                      labelPadding: EdgeInsets.zero,
-                                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                                                      side: BorderSide.none,
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(25.7)
+                                                    Theme(
+                                                      data: Theme.of(context).copyWith(
+                                                        splashColor: Colors.white60,
+                                                        canvasColor: selectedIndex == index
+                                                          ? Colors.green.shade50
+                                                          : Colors.deepPurple.withOpacity(0.05)
                                                       ),
-                                                      backgroundColor: selectedIndex == index
-                                                        ? Colors.green.shade50
-                                                        : Colors.deepPurple.withOpacity(0.025),
-                                                      label: Icon(
-                                                        selectedIndex == index 
-                                                          ? Icons.directions_car
-                                                          : Icons.directions_car_outlined, 
-                                                        color: Colors.grey.shade700, 
-                                                        size: 18),
+                                                      child: FilterChip(
+                                                        onSelected: (value) {},
+                                                        visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
+                                                        labelPadding: EdgeInsets.zero,
+                                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                                        side: BorderSide.none,
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.circular(25.7)
+                                                        ),
+                                                        label: Icon(
+                                                          selectedIndex == index 
+                                                            ? Icons.directions_car
+                                                            : Icons.directions_car_outlined, 
+                                                          color: Colors.grey.shade700, 
+                                                          size: 18),
+                                                      ),
                                                     ),
                                                     SizedBox(
                                                       width: widget.hideDetailHorizontal
@@ -293,23 +301,28 @@ class _ListBigResourceState extends State<ListBigResource> {
                                                           child: Wrap(
                                                             spacing: 8,
                                                             children: List.generate(widget.foundResource[index]['tags'].length, (i) {
-                                                              return FilterChip(
-                                                                visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
-                                                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                                                labelPadding: EdgeInsets.zero,
-                                                                side: BorderSide.none,
-                                                                shape: RoundedRectangleBorder(
-                                                                  borderRadius: BorderRadius.circular(25.7)
+                                                              return Theme(
+                                                                data: Theme.of(context).copyWith(
+                                                                  splashColor: Colors.white60,
+                                                                  canvasColor: selectedIndex == index
+                                                                    ? Colors.green.shade50
+                                                                    : Colors.deepPurple.withOpacity(0.05)
                                                                 ),
-                                                                backgroundColor: selectedIndex == index
-                                                                  ? Colors.green.shade50
-                                                                  : Colors.deepPurple.withOpacity(0.025),
-                                                                onSelected: (value) {},
-                                                                label: Text(
-                                                                  widget.foundResource[index]['tags'][i],
-                                                                  style: TextStyle(
-                                                                    color: Colors.black54,
-                                                                    fontSize: widget.hideDetailHorizontal ? 12 : 10, fontWeight: FontWeight.w600)
+                                                                child: FilterChip(
+                                                                  visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
+                                                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                                                  labelPadding: EdgeInsets.zero,
+                                                                  side: BorderSide.none,
+                                                                  shape: RoundedRectangleBorder(
+                                                                    borderRadius: BorderRadius.circular(25.7)
+                                                                  ),
+                                                                  onSelected: (value) {},
+                                                                  label: Text(
+                                                                    widget.foundResource[index]['tags'][i],
+                                                                    style: TextStyle(
+                                                                      color: Colors.black54,
+                                                                      fontSize: widget.hideDetailHorizontal ? 12 : 10, fontWeight: FontWeight.w600)
+                                                                  ),
                                                                 ),
                                                               );
                                                             })
@@ -335,25 +348,28 @@ class _ListBigResourceState extends State<ListBigResource> {
                                         Row(
                                           children: [
                                             Visibility(
-                                              visible: widget.hideDetailHorizontal
-                                                  ? true
-                                                  : false,
-                                              child: FilterChip(
-                                                onSelected: (value) {},
-                                                visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
-                                                backgroundColor: selectedIndex == index
-                                                  ? Colors.green.shade50
-                                                  : Colors.deepPurple.withOpacity(0.025),
-                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.7)),
-                                                side: BorderSide.none,
-                                                label: Text(
-                                                  widget.foundResource[index]["time"],
-                                                  style: GoogleFonts.roboto(
-                                                    color: selectedIndex == index
-                                                        ? Colors.black87
-                                                        : Colors.black54,
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w500,
+                                              visible: widget.hideDetailHorizontal ? true : false,
+                                              child: Theme(
+                                                data: Theme.of(context).copyWith(
+                                                  splashColor: Colors.white60,
+                                                  canvasColor: selectedIndex == index
+                                                    ? Colors.green.shade50
+                                                    : Colors.deepPurple.withOpacity(0.05)
+                                                ),
+                                                child: FilterChip(
+                                                  onSelected: (value) {},
+                                                  visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.7)),
+                                                  side: BorderSide.none,
+                                                  label: Text(
+                                                    widget.foundResource[index]["time"],
+                                                    style: GoogleFonts.roboto(
+                                                      color: selectedIndex == index
+                                                          ? Colors.black87
+                                                          : Colors.black54,
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w500,
+                                                    ),
                                                   ),
                                                 ),
                                               ),

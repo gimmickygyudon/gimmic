@@ -48,7 +48,7 @@ class _DetailsState extends State<Details> {
   late Future _loadItems;
   late String resource;
   late String randomEmoji;
-  List<Map<String, dynamic>> data = [];
+  List<Map<String, dynamic>> data = List.empty();
 
   final GlobalKey<ScaffoldState> detailScaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
@@ -57,6 +57,7 @@ class _DetailsState extends State<Details> {
   final String timenow = DateFormat("EEEEE, MMMM dd").format(DateTime.now());
 
   bool isAnimated = false;
+  bool paletteLoaded = false;
   Map<dynamic, dynamic> arguments = {
     'name': 'default',
     'hero': 'default',
@@ -77,40 +78,45 @@ class _DetailsState extends State<Details> {
       resource = resource.replaceAll(RegExp(r'%20'), ' ');
       
       data = json.where((element) => element["name"].toLowerCase().contains(resource.toLowerCase())).toList();
-      // print("resource: ${data.first['name']}");
-      if (data.first["name"].toLowerCase() != resource.toLowerCase())
-      { 
-        data = [];
-      }
+      
+      if (data.first["name"].toLowerCase() != resource.toLowerCase()) { 
+        data = List.empty();
+      } else {
+        void bindSnackBar() {
+          rootScaffoldMessengerKey.currentState
+            ?.showSnackBar(snackbarPaletteLoading('Creating palette color...'))
+            .closed
+            .then((value) {
+            rootScaffoldMessengerKey.currentState?.showSnackBar(snackbarPaletteComplete('Palette color created'));
+          });
+        }
 
-      void bindSnackBar() {
-        rootScaffoldMessengerKey.currentState
-          ?.showSnackBar(snackbarPaletteLoading('Creating palette color...'))
-          .closed
-          .then((value) {
-          rootScaffoldMessengerKey.currentState?.showSnackBar(snackbarPaletteComplete('Palette color created'));
-        });
-      }
-
-      Timer(const Duration(milliseconds: 200), () {
-        String blob = GoRouter.of(context).location;
-        blob = blob.substring(blob.lastIndexOf('/') + 1, blob.length).replaceAll('%20', ' ');
-        // print("blob: $blob");
-        updatePaletteGen(data.first["images"], blob, bindSnackBar, updatePaletteGenCompleter).whenComplete(() async {
-          await updatePaletteGenCompleter.future.whenComplete(() {
-            if (loadingpalette == false) {
-              rootScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
-            }
-            if (snackbarbinding == false) {
-              detailScaffoldKey.currentState?.setState(() {
-                setState(() {
-                  // debugPrint('updatePaletteGenCompleter Complete');
+        Timer(const Duration(milliseconds: 200), () {
+          String blob = GoRouter.of(context).location;
+          blob = blob.substring(blob.lastIndexOf('/') + 1, blob.length).replaceAll('%20', ' ');
+          
+          updatePaletteGen(data.first["images"], blob, bindSnackBar, updatePaletteGenCompleter).whenComplete(() async {
+            await updatePaletteGenCompleter.future.whenComplete(() {
+              if (loadingpalette == false) {
+                rootScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+              }
+              if (snackbarbinding == false) {
+                detailScaffoldKey.currentState?.setState(() {
+                  setState(() {
+                    if (paletteMutedColors.isNotEmpty 
+                    && paletteVibrantColors.isNotEmpty 
+                    && paletteDominantColors.isNotEmpty) {
+                        paletteLoaded = true;  
+                    }
+                    print(paletteLoaded.toString());
+                    // debugPrint('updatePaletteGenCompleter Complete');
+                  });
                 });
-              });
-            }
+              }
+            });
           });
         });
-      });
+      }
     });
 
     final random = Random();
@@ -162,7 +168,6 @@ class _DetailsState extends State<Details> {
     controller.dispose();
     controllerComment.dispose();
     resetPalette();
-    print("check dispose: $paletteMutedColors + $paletteVibrantColors + $paletteDominantColors");
     super.dispose();
   }
 
@@ -677,9 +682,12 @@ class _DetailsState extends State<Details> {
                                                     notifyParent: updateTheme, 
                                                     key: _detailCardKey,
                                                     data: data,
+                                                    paletteLoaded: paletteLoaded,
                                                     usePhoneLayout: usePhoneLayout,
-                                                    useVerticalLayout: useVerticalLayout),
-                                                )),
+                                                    useVerticalLayout: useVerticalLayout
+                                                  ),
+                                                )
+                                              ),
                                             )
                                           ],
                                         ),
@@ -696,22 +704,34 @@ class _DetailsState extends State<Details> {
                         Visibility(
                           visible: useVerticalLayout ? true : false,
                           child: Expanded(
-                              flex: 3,
-                              child: AnimatedPadding(
-                                curve: Curves.fastOutSlowIn,
-                                duration: const Duration(milliseconds: 600),
-                                padding: useSmallLayout
-                                    ? const EdgeInsets.only(
-                                        top: 14, left: 0, right: 12, bottom: 14)
-                                    : const EdgeInsets.only(
-                                        top: 12, left: 0, right: 24, bottom: 12),
-                                child: DetailCard(
-                                  notifyParent: updateTheme, 
-                                  key: _detailCardKey,
-                                  data: data,
-                                  usePhoneLayout: usePhoneLayout,
-                                  useVerticalLayout: useVerticalLayout),
-                              )),
+                            flex: 3,
+                            child: FutureBuilder(
+                              future: _loadItems,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return const Center(child: CircularProgressIndicator(strokeWidth: 3));
+                                }
+
+                                return AnimatedPadding(
+                                  curve: Curves.fastOutSlowIn,
+                                  duration: const Duration(milliseconds: 600),
+                                  padding: useSmallLayout
+                                      ? const EdgeInsets.only(
+                                          top: 14, left: 0, right: 12, bottom: 14)
+                                      : const EdgeInsets.only(
+                                          top: 12, left: 0, right: 24, bottom: 12),
+                                  child: DetailCard(
+                                    notifyParent: updateTheme, 
+                                    key: _detailCardKey,
+                                    data: data,
+                                    paletteLoaded: paletteLoaded,
+                                    usePhoneLayout: usePhoneLayout,
+                                    useVerticalLayout: useVerticalLayout
+                                  ),
+                                );
+                              },
+                            )
+                          ),
                         )
                       ],
                     ),
@@ -732,10 +752,13 @@ class DetailCard extends StatefulWidget {
     required this.notifyParent, 
     required this.usePhoneLayout, 
     required this.useVerticalLayout,
-    required this.data
+    required this.data, 
+    required this.paletteLoaded
   });
+  
   final Function(int) notifyParent;
   final bool usePhoneLayout, useVerticalLayout;
+  final bool paletteLoaded;
   final List<Map<String, dynamic>> data;
 
   @override
@@ -1076,22 +1099,30 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                                     child: Wrap(
                                       spacing: 8,
                                         children: List.generate(widget.data.first['tags'].length, (i) {
-                                          return InkWell(
-                                            onTap: () {},
-                                            hoverColor: colorLight(paletteMutedColors[activePage].color, .7),
-                                            child: FilterChip(
+                                          // TODO: Theme is only workaround for ripple splash effect on chips
+                                          return Theme(
+                                            data: Theme.of(context).copyWith(
+                                              splashColor: widget.paletteLoaded 
+                                                ? colorLight(paletteMutedColors[activePage].color, .8)
+                                                : Colors.grey.shade200,
+                                              canvasColor: widget.paletteLoaded 
+                                                ? colorLightButton(paletteMutedColors[activePage].color)
+                                                : Colors.grey
+                                            ),
+                                            child: ActionChip(
                                               visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
                                               padding: null,
                                               side: BorderSide.none,
-                                              backgroundColor: colorLightButton(
-                                                paletteMutedColors[activePage].color
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(25.7)
                                               ),
-                                              onSelected: (value) {},
+                                              onPressed: () {},
                                               label: Text(
                                                 widget.data.first['tags'][i],
                                                 style: const TextStyle(
-                                                    color: Colors.black54,
-                                                    fontSize: 12, fontWeight: FontWeight.w600)
+                                                  color: Colors.black54,
+                                                  fontSize: 12, fontWeight: FontWeight.w600
+                                                )
                                               ),
                                             ),
                                           );
@@ -1286,7 +1317,12 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                                     ],
                                   ),
                                   const SizedBox(height: 8),
-                                  cardYoutube(images[0], paletteMutedColors, activePage),
+                                  CardYoutube(
+                                    thumbnails: images[0], 
+                                    paletteColor: paletteMutedColors, 
+                                    paletteLoaded: widget.paletteLoaded,
+                                    colorIndex: activePage
+                                  ),
                                 ]),
                           ),
                         ),

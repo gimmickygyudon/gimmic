@@ -383,19 +383,14 @@ Widget buttonResourceItem() {
     children: [
       IconButton(
           padding: isWebMobile ? EdgeInsets.zero : null,
-          visualDensity: isWebMobile
-              ? const VisualDensity(horizontal: -4, vertical: -4)
-              : VisualDensity.compact,
+          visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
           onPressed: () {},
           icon: const Icon(Icons.more_horiz, size: 18, color: Colors.white)),
       IconButton(
           padding: isWebMobile ? EdgeInsets.zero : null,
-          visualDensity: isWebMobile
-              ? const VisualDensity(horizontal: -4, vertical: -4)
-              : VisualDensity.compact,
+          visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
           onPressed: () {},
-          icon: const Icon(Icons.favorite_outline,
-              size: 18, color: Colors.white)),
+          icon: const Icon(Icons.favorite_outline, size: 18, color: Colors.white)),
     ],
   );
 }

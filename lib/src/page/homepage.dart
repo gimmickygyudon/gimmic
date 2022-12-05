@@ -166,7 +166,9 @@ class _SearchBarMainState extends State<SearchBarMain> {
               hoverColor: Colors.white,
               prefixIcon: isSearching
                   ? null
-                  : const Icon(Icons.search, color: Colors.black54),
+                  : Icon(Icons.search, color: focusNode.hasFocus 
+                    ? Colors.deepPurple 
+                    : Colors.black54),
               prefixIconConstraints: const BoxConstraints(minWidth: 55),
               suffixIcon: Padding(
                 padding: EdgeInsets.only(
@@ -223,11 +225,17 @@ class _SearchBarMainState extends State<SearchBarMain> {
                                 duration: const Duration(milliseconds: 100),
                                 child: _focusNode.hasFocus
                                     ? null
-                                    : Chip(
+                                    : Theme(
+                                      data: Theme.of(context).copyWith(
+                                        splashColor: Colors.deepPurple.withOpacity(0.025),
+                                        canvasColor: Colors.deepPurple.withOpacity(0.05),
+                                        hoverColor: Colors.deepPurple.withOpacity(0.0525)
+                                      ),
+                                      child: ActionChip(
+                                        onPressed: () => focusNode.requestFocus(),
                                         shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(25.7)),
                                         side: BorderSide.none,
-                                        backgroundColor: Colors.deepPurple.withOpacity(0.025),
                                         avatar: Icon(
                                             Icons.sentiment_very_satisfied_outlined,
                                             color: Colors.deepPurple.shade300),
@@ -240,9 +248,11 @@ class _SearchBarMainState extends State<SearchBarMain> {
                                           StringResource.greetings,
                                           style: TextStyle(
                                               color: Colors.deepPurple.shade300,
-                                              fontWeight: FontWeight.w500),
+                                              fontWeight: FontWeight.w500
+                                          ),
                                         ),
                                       ),
+                                    ),
                               ),
                               const SizedBox(width: 6),
                               buttonNotification(context),
@@ -260,7 +270,7 @@ class _SearchBarMainState extends State<SearchBarMain> {
               suffixStyle: const TextStyle(
                 fontWeight: FontWeight.w600,
               ),
-              hintText: 'Search...',
+              hintText: focusNode.hasFocus ? null : 'Search...',
               hintStyle: const TextStyle(
                 fontWeight: FontWeight.w600,
               ),

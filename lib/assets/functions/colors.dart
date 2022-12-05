@@ -36,21 +36,20 @@ Color colorLightText(Color color, [double amount = .1, double percent = .5]) {
   return palette;
 }
 
-Color colorLight(Color color, [double percent = .8, double amount = .45]) {
-  double power = amount;
-  double lum = lighten(color, power).computeLuminance();
+Color colorLight(Color color, [double amount = .8, double power = .45]) {
+  double luminance = lighten(color, power).computeLuminance();
   Color palette = color;
 
-  if (lum < percent)
+  if (luminance < amount)
   {
-    for (var i = lum; i < percent; power += .01) {
+    for (var i = luminance; i < amount; power += .01) {
       if (power > 1) break;
 
       palette = lighten(color, power);
       i = palette.computeLuminance();
     } 
-  } else if (lum > percent) {
-    for (var i = lum; i > percent; power -= .01) {
+  } else if (luminance > amount) {
+    for (var i = luminance; i > amount; power -= .01) {
       if (power < 0) break;
 
       palette = lighten(color, power);
@@ -61,7 +60,7 @@ Color colorLight(Color color, [double percent = .8, double amount = .45]) {
     if (power < 0) {
       power = 0;
       debugPrint('darkening the color');
-      for (var i = lum; i > percent; power += .01) {
+      for (var i = luminance; i > amount; power += .01) {
         if (power > 1) break;
 
         palette = darken(color, power);
@@ -75,8 +74,8 @@ Color colorLight(Color color, [double percent = .8, double amount = .45]) {
   return palette;
 }
 
-Color colorLightButton(Color color, [double percent = .75, double amount = .45]) {
-  return colorLight(color, percent, amount);
+Color colorLightButton(Color color, [double amount = .75, double power = .45]) {
+  return colorLight(color, amount, power);
 }
 
 Color colorDark(Color color, [double amount = .1, double percent = .5]) {

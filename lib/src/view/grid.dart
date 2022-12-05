@@ -109,10 +109,10 @@ Widget gridDescription(context, setState, layouts, name, widget, selectedIndex, 
                           onEnter: (event) => setState(() => isTileSelected = true),
                           onExit: (event) => setState(() => isTileSelected = false),
                           child: Text(name,
-                              style: TextStyle(
-                                  color: Colors.black,
+                              style: GoogleFonts.roboto(
+                                  color: Colors.grey.shade800,
                                   fontSize: isWebMobile ? 22 : 20,
-                                  fontWeight: FontWeight.w400,
+                                  fontWeight: FontWeight.w600,
                                   letterSpacing: -1)),
                         ),
                         subtitle: MouseRegion(
@@ -122,9 +122,9 @@ Widget gridDescription(context, setState, layouts, name, widget, selectedIndex, 
                               widget.foundResource[index]["brand"].toString().toTitleCase(),
                               style: GoogleFonts.roboto(
                                   height: 1,
-                                  color: Colors.grey.shade700,
+                                  color: Colors.grey.shade600,
                                   fontSize: isWebMobile ? 18 : 16,
-                                  fontWeight: FontWeight.w400,
+                                  fontWeight: FontWeight.w600,
                                   letterSpacing: 0)
                               ),
                         ),
@@ -214,8 +214,8 @@ Widget gridDescription(context, setState, layouts, name, widget, selectedIndex, 
                                                     ),
                                                     backgroundColor:
                                                       selectedIndex == index
-                                                          ? Colors.deepPurple.withOpacity(.05)
-                                                          : null,
+                                                          ? Colors.deepPurple.withOpacity(.15)
+                                                          : Colors.deepPurple.withOpacity(.05),
                                                     onSelected: (value) {},
                                                     label: Text(widget.foundResource[index]['tags'][i],
                                                       style: const TextStyle(

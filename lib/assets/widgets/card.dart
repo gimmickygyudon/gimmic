@@ -9,6 +9,7 @@ import 'package:gimmic/assets/widgets/builder.dart';
 import 'package:gimmic/assets/widgets/button.dart';
 import 'package:gimmic/assets/functions/icon.dart';
 import 'package:gimmic/assets/functions/string.dart';
+import '../colors_web.dart';
 import '../functions/colors.dart';
 import '../functions/platform.dart';
 import '../functions/resource.dart';
@@ -1032,142 +1033,157 @@ Widget cardUpdateLog() {
 }
 
 // YouTube Card
-Widget cardYoutube(thumbnails, palettecolor, colorindex) {
-  return LayoutBuilder(
+class CardYoutube extends StatelessWidget {
+  const CardYoutube({
+    super.key, 
+    required this.thumbnails, 
+    required this.paletteColor, 
+    required this.colorIndex, 
+    required this.paletteLoaded
+  });
+
+  final String thumbnails;
+  final List<dynamic> paletteColor;
+  final int colorIndex;
+  final bool paletteLoaded;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-    return Card(
-      color: palettecolor.isEmpty
-          ? Colors.grey.shade100
-          : colorLightButton(palettecolor[colorindex].color),
-      elevation: 0,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        hoverColor: palettecolor.isEmpty
-            ? Colors.grey.shade200
-            : colorLight(palettecolor[colorindex].color, .7),
-        splashColor: palettecolor.isEmpty
-            ? Colors.grey.shade50
-            : colorLight(palettecolor[colorindex].color, .8),
-        onTap: () {},
-        child: Padding(
-          padding: constraints.maxWidth > 320
-              ? const EdgeInsets.symmetric(vertical: 12, horizontal: 12)
-              : EdgeInsets.zero,
-          child: IntrinsicHeight(
-            child: Flex(
-              direction:
-                  constraints.maxWidth > 320 ? Axis.horizontal : Axis.vertical,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                AspectRatio(
-                  aspectRatio: constraints.maxWidth > 320 ? 1.2 : 16 / 9,
-                  child: Stack(fit: StackFit.expand, children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image(
-                          height: 70,
-                          image: ResizeImage(AssetImage(thumbnails), height: 300, width: 300),
-                          fit: BoxFit.cover),
+        return Card(
+          color: paletteLoaded
+              ? colorLightButton(paletteColor[colorIndex].color)
+              : Colors.grey.shade100,
+          elevation: 0,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            hoverColor: paletteLoaded
+                ? colorLight(paletteColor[colorIndex].color, .7)
+                : Colors.grey.shade200,
+            splashColor: paletteLoaded
+                ? colorLight(paletteColor[colorIndex].color, .8)
+                : Colors.grey.shade50,
+            onTap: () {},
+            child: Padding(
+              padding: constraints.maxWidth > 320
+                  ? const EdgeInsets.symmetric(vertical: 12, horizontal: 12)
+                  : EdgeInsets.zero,
+              child: IntrinsicHeight(
+                child: Flex(
+                  direction: constraints.maxWidth > 320 ? Axis.horizontal : Axis.vertical,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    AspectRatio(
+                      aspectRatio: constraints.maxWidth > 320 ? 1.2 : 16 / 9,
+                      child: Stack(fit: StackFit.expand, children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image(
+                              height: 70,
+                              image: ResizeImage(AssetImage(thumbnails), height: 300, width: 300),
+                              fit: BoxFit.cover),
+                        ),
+                        Align(
+                            alignment: Alignment.bottomRight,
+                            child: Container(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4),
+                                    color: Colors.grey.shade800),
+                                margin: const EdgeInsets.all(10),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 5, vertical: 1),
+                                child: Text('12:53',
+                                    style: GoogleFonts.roboto(color: Colors.white))))
+                      ]),
                     ),
-                    Align(
-                        alignment: Alignment.bottomRight,
-                        child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4),
-                                color: Colors.grey.shade800),
-                            margin: const EdgeInsets.all(10),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 5, vertical: 1),
-                            child: Text('12:53',
-                                style:
-                                    GoogleFonts.roboto(color: Colors.white))))
-                  ]),
-                ),
-                Flexible(
-                  child: Padding(
-                      padding: constraints.maxWidth > 320
-                          ? const EdgeInsets.fromLTRB(15, 4, 2, 4)
-                          : const EdgeInsets.fromLTRB(15, 8, 2, 8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Flexible(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const <Widget>[
-                                Text(
-                                  'Sheep Overflow Easy Tutorial',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Padding(padding: EdgeInsets.only(bottom: 2.0)),
-                                Text(
-                                  'An complete tutorial for Beginner to Adapt into',
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 12.0,
-                                    color: Colors.black54,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                              height: constraints.maxWidth > 320 ? null : 8),
-                          Flexible(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: <Widget>[
-                                const Text(
-                                  "Raze Im",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                                RichText(
-                                  text: TextSpan(
-                                    children: [
-                                      TextSpan(
-                                          text: 'Sep 2 • 12 min  ',
-                                          style: GoogleFonts.roboto(
-                                              fontSize: 12,
-                                              color: Colors.black54)),
-                                      const WidgetSpan(
-                                        child: Padding(
-                                          padding: EdgeInsets.only(bottom: 1),
-                                          child: Icon(Icons.star,
-                                              size: 12, color: Colors.black54),
-                                        ),
+                    Flexible(
+                      child: Padding(
+                          padding: constraints.maxWidth > 320
+                              ? const EdgeInsets.fromLTRB(15, 4, 2, 4)
+                              : const EdgeInsets.fromLTRB(15, 8, 2, 8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Flexible(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: const <Widget>[
+                                    Text(
+                                      'Sheep Overflow Easy Tutorial',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                      const WidgetSpan(
-                                        child: Padding(
-                                          padding: EdgeInsets.only(bottom: 1),
-                                          child: Icon(Icons.star,
-                                              size: 12, color: Colors.black54),
-                                        ),
+                                    ),
+                                    Padding(padding: EdgeInsets.only(bottom: 2.0)),
+                                    Text(
+                                      'An complete tutorial for Beginner to Adapt into',
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 12.0,
+                                        color: Colors.black54,
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      )),
+                              ),
+                              SizedBox(
+                                  height: constraints.maxWidth > 320 ? null : 8),
+                              Flexible(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: <Widget>[
+                                    const Text(
+                                      "Raze Im",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                              text: 'Sep 2 • 12 min  ',
+                                              style: GoogleFonts.roboto(
+                                                  fontSize: 12,
+                                                  color: Colors.black54)),
+                                          const WidgetSpan(
+                                            child: Padding(
+                                              padding: EdgeInsets.only(bottom: 1),
+                                              child: Icon(Icons.star,
+                                                  size: 12, color: Colors.black54),
+                                            ),
+                                          ),
+                                          const WidgetSpan(
+                                            child: Padding(
+                                              padding: EdgeInsets.only(bottom: 1),
+                                              child: Icon(Icons.star,
+                                                  size: 12, color: Colors.black54),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      }
     );
-  });
+  }
 }
 
 // Comment Card
@@ -1343,9 +1359,7 @@ class _CardResourceListState extends State<CardResourceList> {
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        return Theme(
-        data: ThemeData(useMaterial3: true),
-        child: AnimatedSlide(
+        return AnimatedSlide(
           curve: Curves.easeOutExpo,
           duration: const Duration(milliseconds: 600),
           offset: isListHovered
@@ -1354,7 +1368,6 @@ class _CardResourceListState extends State<CardResourceList> {
           child: InkWell(
             onHover: (value) => setState(() => isListHovered = value),
             onTap: () => context.push('/resource'),
-            splashColor: Colors.transparent,
             overlayColor: const MaterialStatePropertyAll(Colors.transparent),
             child: Card(
               color: Colors.transparent,
@@ -1484,20 +1497,27 @@ class _CardResourceListState extends State<CardResourceList> {
                                                 visible: widget.smallLayouts ? true : false,
                                                 child: Padding(
                                                   padding: const EdgeInsets.only(top: 6),
-                                                  child: Chip(
-                                                    padding: const EdgeInsets.only(left:8, right: 8),
-                                                    labelPadding: EdgeInsets.zero,
-                                                    visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-                                                    backgroundColor: Colors.blue.shade600,
-                                                    side: BorderSide(color: Colors.blue.shade600),
-                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                                                    label: Text(
-                                                      '${widget.snapshots.data[widget.index]['category']}',
-                                                      style: TextStyle(
-                                                          color: Colors.grey.shade200,
-                                                          fontWeight: FontWeight.w500,
-                                                          fontSize: 12)
-                                                      )
+                                                  child: Theme(
+                                                    data: Theme.of(context).copyWith(
+                                                      splashColor: Colors.blue.shade300,
+                                                      canvasColor: Colors.blue.shade600,
+                                                      hoverColor: Colors.blue.shade700
+                                                    ),
+                                                    child: ActionChip(
+                                                      onPressed: () {},
+                                                      padding: const EdgeInsets.only(left:8, right: 8),
+                                                      labelPadding: EdgeInsets.zero,
+                                                      visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+                                                      side: BorderSide.none,
+                                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                                      label: Text(
+                                                        '${widget.snapshots.data[widget.index]['category']}',
+                                                        style: TextStyle(
+                                                            color: Colors.grey.shade200,
+                                                            fontWeight: FontWeight.w500,
+                                                            fontSize: 12)
+                                                        )
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -1520,21 +1540,28 @@ class _CardResourceListState extends State<CardResourceList> {
                                                     child: Wrap(
                                                       spacing: 8,
                                                       children: List.generate(widget.snapshots.data[widget.index]['tags'].length, (i) {
-                                                        return FilterChip(
-                                                          visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
-                                                          padding: const EdgeInsets.symmetric(horizontal: 1),
-                                                          side: BorderSide(color: Colors.grey.shade800),
-                                                          shape: RoundedRectangleBorder(
-                                                            borderRadius: BorderRadius.circular(25.7)),
-                                                          backgroundColor: Colors.grey.shade800,
-                                                          onSelected: (value) {},
-                                                          label: Text(
-                                                            widget.snapshots.data[widget.index]['tags'][i],
-                                                            style: TextStyle(
-                                                              letterSpacing: 0.6,
-                                                              fontWeight: FontWeight.w500,
-                                                              color: Colors.grey.shade200,
-                                                              fontSize: 10)),
+                                                        return Theme(
+                                                          data: Theme.of(context).copyWith(
+                                                            splashColor: Colors.grey.shade300,
+                                                            canvasColor: Colors.grey.shade800,
+                                                            hoverColor: Colors.grey.shade700,
+                                                          ),
+                                                          child: FilterChip(
+                                                            visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
+                                                            padding: const EdgeInsets.symmetric(horizontal: 1),
+                                                            side: BorderSide.none,
+                                                            shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.circular(25.7)),
+                                                            onSelected: (value) {},
+                                                            label: Text(
+                                                              widget.snapshots.data[widget.index]['tags'][i],
+                                                              style: TextStyle(
+                                                                letterSpacing: 0.6,
+                                                                fontWeight: FontWeight.w500,
+                                                                color: Colors.grey.shade200,
+                                                                fontSize: 10)
+                                                            ),
+                                                          ),
                                                         );
                                                       }),
                                                     ),
@@ -1614,8 +1641,7 @@ class _CardResourceListState extends State<CardResourceList> {
               ),
             ),
           ),
-        ),
-      );
+        );
       },
     );
   }
@@ -1726,23 +1752,32 @@ class _CardResourceState extends State<CardResource> {
                               Text(_loading
                                 ? 'Resource'.toUpperCase()
                                 : 'Resource   · '.toUpperCase(),
-                                style: GoogleFonts.roboto(
+                                style: TextStyle(
                                   color: isHovered 
                                     ? Colors.black87 
                                     : Colors.black54,
                                   fontSize: 14,
-                                  fontWeight: FontWeight.w500)
+                                  fontWeight: FontWeight.w600)
                                 ),
-                                const SizedBox(width: 8),
-                                Text(!_data.hasData 
-                                ? _loading 
-                                  ? 'Please Wait' 
-                                  : resultCount(_data.data.length)
-                                : resultCount(_data.data.length), 
-                                    style: GoogleFonts.roboto(
-                                        color: Colors.blue.shade700, 
-                                        fontSize: 12, 
-                                        fontWeight: FontWeight.w500)
+                                // const SizedBox(width: 8),
+                                TextButton(
+                                  style: ButtonStyle(
+                                    foregroundColor: MaterialStateProperty.resolveWith((states) {
+                                      return states.contains(MaterialState.hovered)
+                                        ? Colors.blue.shade700
+                                        : Colors.blue.shade500;
+                                    }),
+                                    visualDensity: const VisualDensity(horizontal: -4, vertical: -4)),
+                                  onPressed: () {},
+                                  child: Text(!_data.hasData 
+                                  ? _loading 
+                                    ? 'Please Wait' 
+                                    : resultCount(_data.data.length)
+                                  : resultCount(_data.data.length), 
+                                      style: GoogleFonts.roboto(
+                                          fontSize: 12, 
+                                          fontWeight: FontWeight.w500)
+                                  ),
                                 ),
                             ],
                           ),

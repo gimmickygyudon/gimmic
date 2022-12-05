@@ -55,7 +55,6 @@ Future updatePaletteGen(List images, String blob, snackbar, Completer updatePale
       final data = prefs.getString(blob) ?? '';
 
       final jsonData = jsonDecode(data);
-      print("$blob: $jsonData");
     
       // TODO:Need to add other text colors
 

@@ -265,7 +265,7 @@ class _ResourceState extends State<Resource> {
   String sortbyValue = 'Most Updated';
 
   final List<PopupItem> _listTags = [
-    PopupItem(0, "Any Categories", Icons.grid_view),
+    PopupItem(0, "Any Categories", Icons.view_in_ar_outlined),
     PopupItem(1, "Animal", Icons.cruelty_free),
     PopupItem(2, "Sci-fi", Icons.smart_toy_outlined),
   ];
@@ -365,12 +365,35 @@ class _ResourceState extends State<Resource> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
-                                      style: const ButtonStyle(
-                                          foregroundColor: MaterialStatePropertyAll(Colors.black54),
-                                          backgroundColor: MaterialStatePropertyAll(Colors.white70)),
-                                      onPressed: () => context.pop(),
-                                      icon: const Icon(Icons.arrow_back)),
-                                  SizedBox(width: useVerticalLayout ? 120 : 12),
+                                    tooltip: 'Click to Go Back',
+                                    style: ButtonStyle(
+                                      foregroundColor: const MaterialStatePropertyAll(Colors.black54),
+                                      backgroundColor: MaterialStateProperty.resolveWith((states) {
+                                        return states.contains(MaterialState.hovered)
+                                          ? Colors.deepPurple.withOpacity(0.015)
+                                          : Colors.white;
+                                      })
+                                    ),
+                                    onPressed: () => context.pop(),
+                                    icon: const Icon(Icons.arrow_back)
+                                  ),
+                                  const SizedBox(width: 8),
+                                  useVerticalLayout
+                                    ? IconButton(
+                                      tooltip: 'Open the Home Page',
+                                      style: ButtonStyle(
+                                        foregroundColor: const MaterialStatePropertyAll(Colors.black54),
+                                        backgroundColor: MaterialStateProperty.resolveWith((states) {
+                                          return states.contains(MaterialState.hovered)
+                                            ? Colors.deepPurple.withOpacity(0.015)
+                                            : Colors.white;
+                                        })
+                                      ),
+                                      onPressed: () => context.go('/'),
+                                      icon: const Icon(Icons.home)
+                                    ) 
+                                    : const SizedBox(),
+                                  SizedBox(width: useVerticalLayout ? 100 : 12),
                                   Flexible(
                                     child: Material(
                                       elevation: 2,
@@ -389,93 +412,98 @@ class _ResourceState extends State<Resource> {
                                           filled: true,
                                           fillColor: Colors.white70,
                                           hoverColor: Colors.white,
-                                          prefixIcon: const Icon(Icons.search, color: Colors.black54),
+                                          prefixIcon: Icon(
+                                            Icons.search, 
+                                            color: _searchBarFocusNode.hasFocus 
+                                              ? Colors.deepPurple.shade600
+                                              : Colors.black54
+                                          ),
                                           prefixIconConstraints: const BoxConstraints(minWidth: 55),
                                           suffixIcon: _searchController.text.isEmpty
-                                              ? Visibility(
+                                            ? Visibility(
+                                                visible: useVerticalLayout2x ? false : true,
+                                                child: PopupMenuButton(
+                                                  tooltip: '',
+                                                  key: _openSortMenuKey,
+                                                  enabled: true,
+                                                  elevation: 4,
+                                                  offset: const Offset(0, 45),
+                                                  color: Colors.grey.shade50,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(12)
+                                                  ),
+                                                  onSelected: (value) => _buttonSortFocusNode.requestFocus(),
+                                                  onCanceled: () => _buttonSortFocusNode.requestFocus(),
+                                                  itemBuilder: (context) {
+                                                    return _listSort.map((PopupItem value) {
+                                                      return menuSort(value);
+                                                    }).toList();
+                                                  },
+                                                  child: IconButton(
+                                                      onPressed: () {
+                                                        dynamic state = _openSortMenuKey.currentState;
+                                                        state.showButtonMenu();
+                                                      },
+                                                      icon: const Icon(Icons.sort, color: Colors.black54)),
+                                                ),
+                                              )
+                                            : Row(
+                                              mainAxisAlignment: MainAxisAlignment.end,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Visibility(
                                                   visible: useVerticalLayout2x ? false : true,
-                                                  child: PopupMenuButton(
-                                                    tooltip: '',
-                                                    key: _openSortMenuKey,
-                                                    enabled: true,
-                                                    elevation: 4,
-                                                    offset: const Offset(0, 45),
-                                                    color: Colors.grey.shade50,
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(12)
-                                                    ),
-                                                    onSelected: (value) => _buttonSortFocusNode.requestFocus(),
-                                                    onCanceled: () => _buttonSortFocusNode.requestFocus(),
-                                                    itemBuilder: (context) {
-                                                      return _listSort.map((PopupItem value) {
-                                                        return menuSort(value);
-                                                      }).toList();
-                                                    },
-                                                    child: IconButton(
-                                                        onPressed: () {
-                                                          dynamic state = _openSortMenuKey.currentState;
-                                                          state.showButtonMenu();
-                                                        },
-                                                        icon: const Icon(Icons.sort, color: Colors.black54)),
-                                                  ),
-                                                )
-                                              : Row(
-                                                mainAxisAlignment: MainAxisAlignment.end,
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Visibility(
-                                                    visible: useVerticalLayout2x ? false : true,
-                                                    child: Padding(
-                                                      padding: const EdgeInsets.only(right: 8),
-                                                      child: Chip(
-                                                        visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
-                                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.7)),
-                                                        side: BorderSide.none,
-                                                        backgroundColor: Colors.blue.shade50,
-                                                        deleteIcon: _foundResource.isEmpty 
-                                                        ? _loading
-                                                          ? const SizedBox(
-                                                              height: 12,
-                                                              width: 12,
-                                                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.blue),
-                                                            )
-                                                          : Icon(Icons.close, color: Colors.blue.shade700, size: 16)
-                                                        : Icon(Icons.close, color: Colors.blue.shade700, size: 16),
-                                                        onDeleted: () {
-                                                           _searchController.clear();
-                                                          _runFilter(_searchController.text);                                                     
-                                                        },
-                                                    label: Text(_foundResource.isEmpty 
-                                                      ? _loading 
-                                                        ? 'Please Wait' 
-                                                        : resultCount(_foundResource.length)
-                                                      : resultCount(_foundResource.length), 
-                                                            style: TextStyle(
-                                                                color: Colors.blue.shade700, 
-                                                                fontSize: 12, 
-                                                                fontWeight: FontWeight.w600)),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Visibility(
-                                                    visible: useVerticalLayout2x ? true : false,
-                                                    child: Padding(
-                                                      padding: const EdgeInsets.only(right: 4),
-                                                      child: IconButton(
-                                                        visualDensity: VisualDensity.compact,
-                                                        icon: const Icon(Icons.clear, color: Colors.black54),
-                                                        onPressed: () {
-                                                          GoRouter.of(context).replace('/resource');
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.only(right: 8),
+                                                    child: Chip(
+                                                      visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
+                                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.7)),
+                                                      side: BorderSide.none,
+                                                      backgroundColor: Colors.blue.shade50,
+                                                      deleteIcon: _foundResource.isEmpty 
+                                                      ? _loading
+                                                        ? const SizedBox(
+                                                            height: 12,
+                                                            width: 12,
+                                                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.blue),
+                                                          )
+                                                        : Icon(Icons.close, color: Colors.blue.shade700, size: 16)
+                                                      : Icon(Icons.close, color: Colors.blue.shade700, size: 16),
+                                                      onDeleted: () {
                                                           _searchController.clear();
-                                                          _runFilter(_searchController.text);
-                                                        },
-                                                      ),
+                                                        _runFilter(_searchController.text);                                                     
+                                                      },
+                                                  label: Text(_foundResource.isEmpty 
+                                                    ? _loading 
+                                                      ? 'Please Wait' 
+                                                      : resultCount(_foundResource.length)
+                                                    : resultCount(_foundResource.length), 
+                                                          style: TextStyle(
+                                                              color: Colors.blue.shade700, 
+                                                              fontSize: 12, 
+                                                              fontWeight: FontWeight.w600)),
                                                     ),
                                                   ),
-                                                ]
-                                              ),
+                                                ),
+                                                Visibility(
+                                                  visible: useVerticalLayout2x ? true : false,
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.only(right: 4),
+                                                    child: IconButton(
+                                                      visualDensity: VisualDensity.compact,
+                                                      icon: const Icon(Icons.clear, color: Colors.black54),
+                                                      onPressed: () {
+                                                        GoRouter.of(context).replace('/resource');
+                                                        _searchController.clear();
+                                                        _runFilter(_searchController.text);
+                                                      },
+                                                    ),
+                                                  ),
+                                                ),
+                                              ]
+                                            ),
                                           suffixIconConstraints: const BoxConstraints(minWidth: 50, minHeight: 50),
-                                          hintText: 'Search...',
+                                          hintText: _searchBarFocusNode.hasFocus ? null : 'Search...',
                                           hintStyle: TextStyle(fontWeight: FontWeight.w600, height: isWebMobile ? 2.55 : null),
                                           contentPadding: isWebMobile 
                                             ? const EdgeInsets.fromLTRB(0, 0, 0, 0)
@@ -486,7 +514,8 @@ class _ResourceState extends State<Resource> {
                                           ),
                                           focusedBorder: OutlineInputBorder(
                                             borderSide: const BorderSide(width: 2, color: Colors.deepPurple),
-                                            borderRadius: BorderRadius.circular(12))  
+                                            borderRadius: BorderRadius.circular(12)
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -621,7 +650,7 @@ class _ResourceState extends State<Resource> {
                                             state.showButtonMenu();
                                           },
                                           focusNode: _buttonTagsFocusNode,
-                                          icon: const Icon(Icons.grid_view, color: Colors.black87, size: 18),
+                                          icon: const Icon(Icons.view_in_ar_outlined, color: Colors.black87, size: 18),
                                           label: Row(
                                             children: [
                                               Text('Any Categories',
@@ -659,11 +688,12 @@ class _ResourceState extends State<Resource> {
                                                         strokeWidth: 2, color: Colors.deepPurple),
                                                     ),
                                                   )
-                                                  : Icon(_showAppbar ? Icons.bar_chart : Icons.search,
-                                                    color: Colors.deepPurple)
-                                                : Icon(_showAppbar 
-                                                  ? Icons.bar_chart : Icons.search, 
-                                                    color: Colors.deepPurple),
+                                                  : _showAppbar 
+                                                    ? const Icon(Icons.bar_chart, color: Colors.deepPurple)
+                                                    : const Icon(Icons.search, color: Colors.deepPurple, size: 18)
+                                                : _showAppbar 
+                                                    ? const Icon(Icons.bar_chart, color: Colors.deepPurple)
+                                                    : const Icon(Icons.search, color: Colors.deepPurple, size: 18),
                                               label: Text(
                                                 _foundResource.isEmpty
                                                 ? _loading

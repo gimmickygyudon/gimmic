@@ -58,6 +58,7 @@ class _HomeBaseState extends State<HomeBase> {
                               },
                               backgroundColor: Colors.transparent,
                               extended: showExtended,
+                              minWidth: 100,
                               minExtendedWidth: 158,
                               indicatorColor: Colors.black54,
                               labelType: labelType,
@@ -82,9 +83,9 @@ class _HomeBaseState extends State<HomeBase> {
                                           },
                                           icon: const Icon(Icons.menu),
                                           label: const Text('Menu'))
-                                      : IconButton(
-                                          tooltip: 'Show Menu',
-                                          onPressed: () {
+                                      : const IconButton(
+                                          // tooltip: 'Show Menu',
+                                          onPressed: null /* () {
                                             setState(() {
                                               if (showExtended == true) {
                                                 labelType = NavigationRailLabelType.selected;
@@ -94,8 +95,8 @@ class _HomeBaseState extends State<HomeBase> {
                                                 showExtended = true;
                                               }
                                             });
-                                          },
-                                          icon: const Icon(Icons.menu)
+                                          } */,
+                                          icon: Icon(Icons.menu)
                                         ),
                                   )
                                 : const SizedBox(),
@@ -108,9 +109,9 @@ class _HomeBaseState extends State<HomeBase> {
                               destinations: <NavigationRailDestination>[
                                 NavigationRailDestination(
                                   padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.house_outlined,
-                                    color: Colors.black87
+                                    color: Colors.grey.shade700
                                   ),
                                   selectedIcon: const Icon(
                                     Icons.house, 
@@ -118,16 +119,17 @@ class _HomeBaseState extends State<HomeBase> {
                                   label: Text(
                                     'Home',
                                     style: GoogleFonts.roboto(
-                                      color: Colors.black87,
+                                      color: Colors.grey.shade800,
+                                      fontSize: 12,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ),
                                 NavigationRailDestination(
                                   padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.view_in_ar,
-                                    color: Colors.black54
+                                    color: Colors.grey.shade700
                                   ),
                                   selectedIcon: const Icon(
                                     Icons.view_in_ar_outlined,
@@ -136,16 +138,17 @@ class _HomeBaseState extends State<HomeBase> {
                                   label: Text(
                                     'Resource',
                                     style: GoogleFonts.roboto(
-                                      color: Colors.black87,
+                                      color: Colors.grey.shade800,
+                                      fontSize: 12,
                                       fontWeight: FontWeight.w500,
                                     )
                                   ),
                                 ),
                                 NavigationRailDestination(
                                   padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.logo_dev_outlined,
-                                    color: Colors.black54
+                                    color: Colors.grey.shade700
                                   ),
                                   selectedIcon: const Icon(
                                     Icons.logo_dev,
@@ -154,7 +157,8 @@ class _HomeBaseState extends State<HomeBase> {
                                   label: Text(
                                     'Update',
                                     style: GoogleFonts.roboto(
-                                      color: Colors.black87,
+                                      color: Colors.grey.shade800,
+                                      fontSize: 12,
                                       fontWeight: FontWeight.w500,
                                     )
                                   ),
