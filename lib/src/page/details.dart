@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gimmic/assets/functions/string.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -108,7 +109,6 @@ class _DetailsState extends State<Details> {
                     && paletteDominantColors.isNotEmpty) {
                         paletteLoaded = true;  
                     }
-                    print(paletteLoaded.toString());
                     // debugPrint('updatePaletteGenCompleter Complete');
                   });
                 });
@@ -303,9 +303,13 @@ class _DetailsState extends State<Details> {
                             return MaterialRectCenterArcTween(begin: begin, end: end);
                           },
                           tag: arguments['hero'] + pagePosition.toString(),
-                          child: Image(
-                            image: MemoryImage(data.first["images"][pagePosition]),
-                            fit: BoxFit.cover,
+                          child: InteractiveViewer(
+                            maxScale: 4.5,
+                            minScale: 1,
+                            child: Image(
+                              image: MemoryImage(data.first["images"][pagePosition]),
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       );
@@ -382,78 +386,74 @@ class _DetailsState extends State<Details> {
             data: ThemeData(
             useMaterial3: true,
             iconButtonTheme: IconButtonThemeData(
-                style: ButtonStyle(
-                    foregroundColor: MaterialStatePropertyAll(
-                        paletteDominantColors.isEmpty
-                            ? null
-                            : colorButtonLuminance(paletteDominantColors[activePage].color)))
-                    ),
+              style: ButtonStyle(
+                  foregroundColor: MaterialStatePropertyAll(
+                    paletteLoaded
+                      ? colorLightButton(paletteDominantColors[activePage].color, .15)
+                      : null,
+                  )
+              )
+            ),
             elevatedButtonTheme: ElevatedButtonThemeData(
-                style: ButtonStyle(
-                    animationDuration: const Duration(milliseconds: 200),
-                    backgroundColor: MaterialStateProperty.all(paletteDominantColors.isEmpty
-                        ? Colors.green.shade100
-                        : colorLight(paletteMutedColors[activePage].color, .0)),
-                    foregroundColor:
-                        MaterialStateProperty.resolveWith((states) {
+              style: ButtonStyle(
+                  animationDuration: const Duration(milliseconds: 200),
+                  backgroundColor: MaterialStateProperty.all(paletteLoaded
+                    ? colorLightButton(paletteDominantColors[activePage].color)
+                    : Colors.green.shade100),
+                  foregroundColor:
+                    MaterialStateProperty.resolveWith((states) {
                       if (states.contains(MaterialState.pressed)) {
                         return Colors.white;
                       }
                       return states.contains(MaterialState.hovered)
                           ? Colors.white
-                          : paletteDominantColors.isEmpty
-                              ? Colors.green
-                              : colorDark(paletteDominantColors[activePage].color, .8);
-                    }),
-                    overlayColor: MaterialStateProperty.resolveWith(
-                      (states) {
-                        return states.contains(MaterialState.pressed)
-                            ? paletteDominantColors.isEmpty
-                                ? Colors.green.shade700
-                                : darken(colorButtonLuminance(paletteDominantColors[activePage].color),
-                                    isWebMobile ? .05 : .1)
-                            : paletteDominantColors.isEmpty
-                                ? Colors.green.shade500
-                                : colorLuminance(paletteDominantColors[activePage].color, .5);
-                      },
-                    ))),
+                          : paletteLoaded
+                              ? colorLight(paletteDominantColors[activePage].color, .05)
+                              : Colors.green;
+                  }),
+                  overlayColor: MaterialStateProperty.resolveWith(
+                    (states) {
+                      return states.contains(MaterialState.pressed)
+                          ? paletteLoaded
+                              ? colorLight(paletteDominantColors[activePage].color, .025)
+                              : Colors.green.shade700
+                          : paletteLoaded
+                              ? colorLightButton(paletteDominantColors[activePage].color, .05)
+                              : Colors.green.shade500;
+                    },
+                  ))),
             textSelectionTheme: TextSelectionThemeData(
-              cursorColor: paletteDominantColors.isEmpty
-                  ? null
-                  : colorButtonLuminance(paletteDominantColors[activePage].color),
-              selectionHandleColor: paletteDominantColors.isEmpty
-                  ? null
-                  : colorButtonLuminance(paletteDominantColors[activePage].color),
+              cursorColor: paletteLoaded
+                    ? colorLightButton(paletteDominantColors[activePage].color, .15)
+                    : null,
+              selectionHandleColor: paletteLoaded
+                    ? colorLightButton(paletteDominantColors[activePage].color, .15)
+                    : null,
             ),
             inputDecorationTheme: InputDecorationTheme(
-                iconColor: paletteDominantColors.isEmpty
-                    ? null
-                    : colorButtonLuminance(paletteDominantColors[activePage].color),
-                suffixIconColor: paletteDominantColors.isEmpty
-                    ? null
-                    : colorButtonLuminance(paletteDominantColors[activePage].color),
-                prefixIconColor: paletteDominantColors.isEmpty
-                    ? null
-                    : colorButtonLuminance(paletteDominantColors[activePage].color),
+                iconColor: paletteLoaded
+                    ? colorLightButton(paletteDominantColors[activePage].color, .15)
+                    : null,
+                suffixIconColor: paletteLoaded
+                    ? colorLightButton(paletteDominantColors[activePage].color, .15)
+                    : null,
+                prefixIconColor: paletteLoaded
+                    ? colorLightButton(paletteDominantColors[activePage].color, .15)
+                    : null,
+                isDense: true,
                 enabledBorder: OutlineInputBorder(
                     borderSide: const BorderSide(color: Colors.transparent),
                     borderRadius: BorderRadius.circular(25.7)),
                 focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25.7),
+                    borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                        width: 2,
-                        color: paletteDominantColors.isEmpty
-                            ? Colors.blue
-                            : lighten(paletteDominantColors[activePage].color, .2).computeLuminance() > 0.8
-                                ? darken(paletteDominantColors[activePage].color, .5)
-                                : lighten(paletteDominantColors[activePage].color, .2)))),
-            textButtonTheme: TextButtonThemeData(
-              style: ButtonStyle(
-                foregroundColor: MaterialStatePropertyAll(
-                paletteDominantColors.isEmpty
-                  ? null
-                  : colorLuminance(paletteDominantColors[activePage].color, .4),
-            ))),
+                      width: 2,
+                      color: paletteLoaded
+                        ? colorLightButton(paletteDominantColors[activePage].color, .15)
+                        : Colors.blue,
+                    )
+                )
+            ),
             primaryColor: paletteDominantColors.isEmpty ? null : colorLuminance(paletteDominantColors[activePage].color, .4)),
           child: GestureDetector(
             onLongPressDown: (details) => onTapPosition(details),
@@ -469,9 +469,9 @@ class _DetailsState extends State<Details> {
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    color: paletteDominantColors.isEmpty
-                        ? Colors.grey.shade200
-                        : colorLight(paletteDominantColors[activePage].color, 1),
+                    color: paletteLoaded
+                      ? colorLight(paletteMutedColors[activePage].color, .75)
+                      : Colors.grey.shade200,
                     child: Row(
                       children: [
                         Expanded(
@@ -499,37 +499,44 @@ class _DetailsState extends State<Details> {
                                       toolbarHeight: 75,
                                       leadingWidth: 120,
                                       leading: Padding(
-                                        padding: const EdgeInsets.all(12.0),
-                                        child: IconButton(
-                                            onPressed: () => Navigator.of(context).pop(),
-                                            icon: Row(
-                                              children: const [
-                                                SizedBox(width: 6),
-                                                Icon(
-                                                  color: Colors.white,
-                                                  Icons.arrow_back,
-                                                  shadows: [
-                                                    Shadow(
-                                                        color: Colors.black26,
-                                                        offset: Offset(1, 1),
-                                                        blurRadius: 2),
-                                                  ],
+                                        padding: const EdgeInsets.all(16),
+                                        child: TextButton.icon(
+                                          style: ButtonStyle(
+                                            overlayColor: MaterialStateProperty.resolveWith((states) {
+                                              if(states.contains(MaterialState.hovered)) return Colors.white;
+                                              if(states.contains(MaterialState.pressed)) return Colors.grey.shade300;
+
+                                              return Colors.transparent;
+                                            }),
+                                            foregroundColor: MaterialStateProperty.resolveWith((states) {
+                                              return states.contains(MaterialState.hovered)
+                                                ? Colors.black87
+                                                : Colors.white;
+                                            })
+                                          ),
+                                          onPressed: () => Navigator.of(context).pop(),
+                                          label: Text('Back',
+                                            style: GoogleFonts.roboto(
+                                              fontWeight: FontWeight.w600,
+                                              shadows: [
+                                                const Shadow(
+                                                  color: Colors.black26,
+                                                  offset: Offset(1, 1),
+                                                  blurRadius: 2
                                                 ),
-                                                SizedBox(width: 6),
-                                                Text(
-                                                  'Back',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    shadows: [
-                                                      Shadow(
-                                                          color: Colors.black26,
-                                                          offset: Offset(1, 1),
-                                                          blurRadius: 2),
-                                                  ],
-                                                ),
-                                              )
+                                              ],
+                                            ),
+                                          ),
+                                          icon: const Icon(
+                                            Icons.arrow_back,
+                                            shadows: [
+                                              Shadow(
+                                                color: Colors.black26,
+                                                offset: Offset(1, 1),
+                                                blurRadius: 2
+                                              ),
                                             ],
-                                          )
+                                          ),
                                         ),
                                       ),
                                       backgroundColor: Colors.transparent,
@@ -553,7 +560,7 @@ class _DetailsState extends State<Details> {
 
                                           return Padding(
                                             padding: useVerticalLayout
-                                                ? const EdgeInsets.all(6)
+                                                ? const EdgeInsets.fromLTRB(4, 4, 4, 8)
                                                 : EdgeInsets.zero,
                                             child: Card(
                                               clipBehavior: Clip.antiAlias,
@@ -638,12 +645,12 @@ class _DetailsState extends State<Details> {
                                                         ? null
                                                         : 0,
                                                     child: Card(
-                                                      color: paletteMutedColors.isEmpty
-                                                        ? Colors.grey.shade50
-                                                        : lighten(paletteMutedColors[activePage].color, .25),
-                                                      surfaceTintColor: paletteMutedColors.isEmpty
-                                                        ? Colors.grey.shade50
-                                                        : lighten(paletteMutedColors[activePage].color, .25),
+                                                      color: paletteLoaded
+                                                        ? colorLight(paletteMutedColors[activePage].color, .9)
+                                                        : Colors.grey.shade50,
+                                                      surfaceTintColor: paletteLoaded
+                                                        ? colorLight(paletteMutedColors[activePage].color, .9)
+                                                        : Colors.grey.shade50,
                                                       elevation: useVerticalLayout ? 2 : 0,
                                                       shadowColor: Colors.black26,
                                                       margin: useVerticalLayout
@@ -719,7 +726,7 @@ class _DetailsState extends State<Details> {
                                       ? const EdgeInsets.only(
                                           top: 14, left: 0, right: 12, bottom: 14)
                                       : const EdgeInsets.only(
-                                          top: 12, left: 0, right: 24, bottom: 12),
+                                          top: 12, left: 0, right: 24, bottom: 14),
                                   child: DetailCard(
                                     notifyParent: updateTheme, 
                                     key: _detailCardKey,
@@ -767,6 +774,8 @@ class DetailCard extends StatefulWidget {
 
 late ScrollController controller, controllerComment, _scrollViewController;
 late TabController _tabController;
+late FocusNode _msgInputFocusNode;
+final GlobalKey<State<StatefulWidget>> _msgInputKey = GlobalKey<State<StatefulWidget>>();
 int tabIndex = 0;
 
 class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateMixin {
@@ -781,8 +790,14 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
 
   @override
   void initState() {
+    _msgInputFocusNode = FocusNode();
+    _msgInputFocusNode.addListener(() { 
+      if (_msgInputFocusNode.hasFocus) {
+
+      }
+    });
+
     _tabController = TabController(length: 2, vsync: this);
-      
     _tabController.animation?.addListener(() { 
       if (_tabController.offset <= 0.499 && _tabController.offset >= 0.001 
       || _tabController.offset <= -0.501 && _tabController.offset >= -1.0) {
@@ -841,9 +856,9 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
           AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             width: double.infinity,
-            color: paletteMutedColors.isEmpty
-                ? Colors.grey.shade100
-                : lighten(paletteMutedColors[activePage].color, .25),
+            color: widget.paletteLoaded
+              ? colorLight(paletteMutedColors[activePage].color, .9)
+              : Colors.grey.shade50,
             child: AnimatedPadding(
               duration: const Duration(milliseconds: 200),
               padding: widget.useVerticalLayout
@@ -857,8 +872,11 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                     height: widget.useVerticalLayout ? null : 4,
                     width: widget.useVerticalLayout ? null : 32,
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25.7),
-                        color: Colors.grey.shade400),
+                      borderRadius: BorderRadius.circular(25.7),
+                      color: widget.paletteLoaded
+                        ? colorLightButton(paletteMutedColors[activePage].color)
+                        : Colors.grey.shade400
+                    ),
                   ),
                 ),
               ),
@@ -866,9 +884,9 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
           ),
           AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            color: paletteMutedColors.isEmpty
-                ? Colors.grey.shade100
-                : lighten(paletteMutedColors[activePage].color, .25),
+            color: widget.paletteLoaded
+                  ? colorLight(paletteMutedColors[activePage].color, .9)
+                  : Colors.grey.shade50,
             child: AnimatedPadding(
               duration: const Duration(milliseconds: 200),
               padding: EdgeInsets.only(
@@ -884,16 +902,18 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                       controller: _tabController,
                       indicator: UnderlineTabIndicator(
                           borderSide: BorderSide(
-                            color: paletteDominantColors.isEmpty
-                              ? Colors.orange
-                              : colorButtonLuminance(paletteDominantColors[activePage].color), width: 2),
+                            color: widget.paletteLoaded
+                              ? colorLight(paletteDominantColors[activePage].color, .2)
+                              : Colors.orange, width: 2),
                           insets: const EdgeInsets.only(left: 20, right: 15)),
                       isScrollable: true,
                       indicatorWeight: 3,
-                      labelColor: paletteDominantColors.isEmpty
-                        ? Colors.orange
-                        : colorButtonLuminance(paletteDominantColors[activePage].color),
-                      unselectedLabelColor: Colors.black54,
+                      labelColor: widget.paletteLoaded
+                        ? colorLight(paletteDominantColors[activePage].color, .1)
+                        : Colors.orange,
+                      unselectedLabelColor: widget.paletteLoaded
+                        ? colorLight(paletteDominantColors[activePage].color, .2)
+                        : Colors.grey.shade700,
                       padding: EdgeInsets.zero,
                       labelPadding: const EdgeInsets.only(top: 0, left: 15, right: 15, bottom: 0),
                       labelStyle: GoogleFonts.roboto(fontWeight: FontWeight.w500, fontSize: 16),
@@ -906,18 +926,24 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                       tabs: <Widget>[
                         Tab(
                           child: Row(
-                            children: const [
-                              Icon(Icons.data_object, size: 18),
-                              SizedBox(width: 6),
-                              Text("About")
+                            children: [
+                              const Icon(Icons.window, size: 18),
+                              const SizedBox(width: 6),
+                              Text("About", 
+                                style: GoogleFonts.roboto(
+                                  fontWeight: FontWeight.w600)
+                              )
                             ],
                           )),
                         Tab(
                           child: Row(
-                            children: const [
-                              Icon(Icons.forum_outlined, size: 18),
-                              SizedBox(width: 4),
-                              Text("Comments")
+                            children: [
+                              const Icon(Icons.chat, size: 18),
+                              const SizedBox(width: 6),
+                              Text("Chat", 
+                                style: GoogleFonts.roboto(
+                                  fontWeight: FontWeight.w600)
+                              )
                             ],
                           ))
                       ]),
@@ -926,6 +952,9 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                         Visibility(
                           visible: widget.useVerticalLayout ? false : true,
                           child: ToggleButtons(
+                            fillColor: widget.paletteLoaded
+                              ? colorLight(paletteDominantColors[activePage].color, .7)
+                              : null,
                             borderRadius:BorderRadius.circular(25.7),
                             constraints: const BoxConstraints(minHeight: 34, minWidth: 34),
                             renderBorder: false,
@@ -984,9 +1013,9 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
           Expanded(
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              color: paletteMutedColors.isEmpty
-                  ? Colors.grey.shade50
-                  : lighten(paletteMutedColors[activePage].color, .25),
+              color: widget.paletteLoaded
+                  ? colorLight(paletteMutedColors[activePage].color, .9)
+                  : Colors.grey.shade50,
               child: SizedBox(
                 height: MediaQuery.of(context).size.height / 2,
                 child: TabBarView(
@@ -996,7 +1025,7 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                       controller: controller,
                       thumbVisibility: true,
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 25, right: 25, bottom: 0, top: 4),
+                        padding: const EdgeInsets.only(left: 25, right: 25, bottom: 0, top: 12),
                         child: ScrollConfiguration(
                           behavior: DragOnScroll().copyWith(scrollbars: false),
                           child: NotificationListener(
@@ -1034,25 +1063,22 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                                       },
                                       tilePadding: const EdgeInsets.symmetric(horizontal: 0),
                                       title: Text(
-                                        'Aragon Malay',
+                                        widget.data.first['name'],
                                         style: GoogleFonts.roboto(
-                                            color: Colors.black87,
+                                            color: Colors.grey.shade800,
                                             fontSize: 24,
-                                            fontWeight: FontWeight.w400,
+                                            fontWeight: FontWeight.w500,
                                             letterSpacing: -0.5),
                                       ),
-                                      subtitle: Text('Legends of Zelda',
+                                      subtitle: Text(
+                                          widget.data.first['brand'].toString().toTitleCase(),
                                           style: GoogleFonts.roboto(
-                                              color: Colors.black87,
+                                              color: Colors.grey.shade700,
                                               fontSize: 14,
-                                              fontWeight: FontWeight.w400)),
+                                              fontWeight: FontWeight.w500)),
                                       trailing: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Text('4.7 (246)',
-                                              style: GoogleFonts.roboto(
-                                                  fontWeight:FontWeight.w500,
-                                                  color: Colors.black87)),
                                           IconButton(
                                               tooltip: 'Add to Favorites',
                                               onPressed: () {},
@@ -1064,33 +1090,60 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                                       ),
                                       children: [
                                         const SizedBox(height: 4),
-                                        SelectionArea(
+                                        const SelectionArea(
                                           child: Text(
                                             "A cat is a furry animal that has a long tail and sharp claws. Cats are often kept as pets. Cats are lions, tigers, and other wild animals in the same family.",
-                                            style: GoogleFonts.roboto(
+                                            style: TextStyle(
                                                 fontSize: 14,
-                                                fontWeight: FontWeight.w400,
+                                                fontWeight: FontWeight.w500,
                                                 letterSpacing: 0.1,
                                                 height: 1.6,
                                                 color: Colors.black87),
                                           ),
                                         ),
-                                        Row(
-                                            mainAxisAlignment: MainAxisAlignment.end,
-                                            children: [
-                                              TextButton.icon(
-                                                  onPressed: () {
-                                                    urlLink(context, 'https://en.wikipedia.org/wiki/The_Legend_of_Zelda');
-                                                  },
-                                                  icon: const Icon(FontAwesomeIcons.wikipediaW, size: 14),
-                                                  label: const Text('Wikipedia')),
-                                              TextButton.icon(
-                                                  onPressed: () {
-                                                    urlLink(context, 'https://www.google.com/search?q=legend+of+zelda');
-                                                  },
-                                                  icon: const Icon(FontAwesomeIcons.google, size: 14),
-                                                  label: const Text('Google'))
-                                            ]),
+                                        Theme(
+                                          data: ThemeData(
+                                            textButtonTheme: TextButtonThemeData(
+                                              style: ButtonStyle(
+                                                shape: MaterialStatePropertyAll(
+                                                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.7))),
+                                                foregroundColor: MaterialStateProperty.resolveWith((states) {
+                                                  return states.contains(MaterialState.hovered)
+                                                    ? Colors.white
+                                                    : widget.paletteLoaded
+                                                      ? colorLight(paletteDominantColors[activePage].color, .1)
+                                                      : null;
+                                                }),
+                                                overlayColor: MaterialStateProperty.resolveWith((states) {
+                                                  return states.contains(MaterialState.hovered)
+                                                    ? widget.paletteLoaded 
+                                                      ? colorLight(paletteDominantColors[activePage].color, .1)
+                                                      : null
+                                                    : null;
+                                                })
+                                              ),
+                                            )
+                                          ),
+                                          child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.end,
+                                              children: [
+                                                TextButton.icon(
+                                                    onPressed: () => urlLink(context, 'https://en.wikipedia.org/wiki/The_Legend_of_Zelda'),
+                                                    icon: const Icon(FontAwesomeIcons.wikipediaW, size: 14),
+                                                    label: const Text('Wikipedia', 
+                                                      style: TextStyle(fontWeight: FontWeight.w600)
+                                                    )
+                                                ),
+                                                const SizedBox(width: 4),
+                                                TextButton.icon(
+                                                    onPressed: () => urlLink(context, 'https://www.google.com/search?q=${widget.data.first['name']}'),
+                                                    icon: const Icon(FontAwesomeIcons.google, size: 14),
+                                                    label: const Text('Google',
+                                                      style: TextStyle(fontWeight: FontWeight.w600)
+                                                    )
+                                                )
+                                              ]),
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -1098,16 +1151,17 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                                     padding: const EdgeInsets.only(bottom: 12, top: 20),
                                     child: Wrap(
                                       spacing: 8,
+                                      runSpacing: 8,
                                         children: List.generate(widget.data.first['tags'].length, (i) {
                                           // TODO: Theme is only workaround for ripple splash effect on chips
                                           return Theme(
                                             data: Theme.of(context).copyWith(
                                               splashColor: widget.paletteLoaded 
                                                 ? colorLight(paletteMutedColors[activePage].color, .8)
-                                                : Colors.grey.shade200,
+                                                : Colors.grey.shade100,
                                               canvasColor: widget.paletteLoaded 
                                                 ? colorLightButton(paletteMutedColors[activePage].color)
-                                                : Colors.grey
+                                                : Colors.grey.shade200
                                             ),
                                             child: ActionChip(
                                               visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
@@ -1119,8 +1173,8 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                                               onPressed: () {},
                                               label: Text(
                                                 widget.data.first['tags'][i],
-                                                style: const TextStyle(
-                                                  color: Colors.black54,
+                                                style: TextStyle(
+                                                  color: Colors.grey.shade700,
                                                   fontSize: 12, fontWeight: FontWeight.w600
                                                 )
                                               ),
@@ -1358,13 +1412,13 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                               children: <Widget>[
                                 CardComment(
+                                  paletteLoaded: widget.paletteLoaded,
                                   palettecolor: paletteMutedColors.isEmpty
-                                      ? null
-                                      : paletteMutedColors,
-                                  dominantcolor:
-                                      paletteDominantColors.isEmpty
-                                          ? null
-                                          : paletteDominantColors,
+                                    ? null
+                                    : paletteMutedColors,
+                                  dominantcolor: paletteDominantColors.isEmpty
+                                    ? null
+                                    : paletteDominantColors,
                                   colorindex: activePage,
                                 ),
                               ],
@@ -1380,9 +1434,9 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
           ),
           AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            color: paletteMutedColors.isEmpty
-                ? Colors.grey.shade50
-                : lighten(paletteMutedColors[activePage].color, .25),
+            color: widget.paletteLoaded
+                  ? colorLight(paletteMutedColors[activePage].color, .9)
+                  : Colors.grey.shade50,
             padding: EdgeInsets.only(
                 top: 10,
                 left: 20,
@@ -1405,40 +1459,62 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                            onPressed: () {},
-                            icon: const Icon(Icons.add_circle_outline)),
+                          onPressed: () {},
+                          icon: const Icon(Icons.add_circle_outline)),
                         const SizedBox(width: 8),
                         Expanded(
-                          child: TextField(
-                            autofocus: isWebMobile ? false : true,
-                            autocorrect: true,
-                            decoration: InputDecoration(
-                              contentPadding: isWebMobile
-                                  ? const EdgeInsets.symmetric(vertical: 12)
-                                  : null,
-                              isDense: true,
-                              filled: true,
-                              fillColor: paletteMutedColors.isEmpty
-                                  ? Colors.white70
-                                  : lighten(paletteMutedColors[activePage].color, .25),
-                              hoverColor: paletteMutedColors.isEmpty
-                                  ? Colors.white
-                                  : lighten(paletteMutedColors[activePage].color, .15),
-                              hintText: "Message...",
-                              hintStyle: GoogleFonts.roboto(fontWeight: FontWeight.w500),
-                              prefixIcon: const Icon(Icons.account_circle, size: 24),
-                              prefixIconConstraints: const BoxConstraints(minWidth: 55),
-                              suffixIcon: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 4),
-                                child: IconButton(
+                          child: StatefulBuilder(
+                            key: _msgInputKey,
+                            builder: (context, setState) => TextField(
+                              autofocus: isWebMobile ? false : true,
+                              autocorrect: true,
+                              focusNode: _msgInputFocusNode,
+                              onTap: () => setState(() {
+                                _msgInputFocusNode.requestFocus();
+                              }),
+                              onTapOutside: (event) => setState(() {
+                                _msgInputFocusNode.unfocus();
+                              }),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600
+                              ),
+                              decoration: InputDecoration(
+                                contentPadding: isWebMobile
+                                    ? const EdgeInsets.symmetric(vertical: 12)
+                                    : null,
+                                isDense: true,
+                                filled: true,
+                                fillColor: widget.paletteLoaded
+                                    ? colorLight(paletteDominantColors[activePage].color)
+                                    : Colors.white70,
+                                hoverColor: widget.paletteLoaded
+                                    ? colorLight(paletteDominantColors[activePage].color, .75)
+                                    : Colors.white,
+                                hintText: _msgInputFocusNode.hasFocus 
+                                  ? null
+                                  : "Message...",
+                                hintStyle: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: widget.paletteLoaded
+                                    ? colorLight(paletteDominantColors[activePage].color, .4)
+                                    : Colors.grey
+                                ),
+                                prefixIcon: const Icon(Icons.account_circle, size: 24),
+                                prefixIconConstraints: const BoxConstraints(minWidth: 55),
+                                suffixIcon: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                                  child: IconButton(
                                     onPressed: () {},
-                                    icon: const Icon(Icons.send, size: 24)),
+                                    icon: const Icon(Icons.send_rounded, size: 24)),
+                                ),
                               ),
                             ),
                           ),
                         ),
                         const SizedBox(width: 8),
-                        IconButton(onPressed: () {}, icon: const Icon(Icons.mood)
+                        IconButton(
+                          onPressed: () {},
+                          icon: const Icon(Icons.mood)
                       ),
                     ],
                   ),

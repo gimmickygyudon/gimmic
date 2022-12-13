@@ -1188,9 +1188,15 @@ class CardYoutube extends StatelessWidget {
 
 // Comment Card
 class CardComment extends StatefulWidget {
-  const CardComment(
-      {Key? key, this.palettecolor, this.dominantcolor, this.colorindex})
-      : super(key: key);
+  const CardComment({
+    Key? key, 
+    required this.paletteLoaded,
+    this.palettecolor, 
+    this.dominantcolor, 
+    this.colorindex,
+  }) : super(key: key);
+
+  final bool paletteLoaded;
   final List? palettecolor;
   final List? dominantcolor;
   final int? colorindex;
@@ -1204,117 +1210,183 @@ bool expandComment = false;
 class _CardCommentState extends State<CardComment> {
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      color: widget.palettecolor == null
-          ? Colors.grey.shade100
-          : colorLight(widget.palettecolor![widget.colorindex!].color, .2),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        hoverColor: widget.palettecolor == null
-            ? Colors.grey.shade200
-            : colorLight(widget.palettecolor![widget.colorindex!].color, .0),
-        splashColor: widget.palettecolor == null
-            ? Colors.grey.shade50
-            : colorLightText(
-                widget.palettecolor![widget.colorindex!].color, .1),
-        onTap: () {
-          if (expandComment == false) {
-            setState(() {
-              expandComment = true;
-            });
-          } else {
-            setState(() {
-              expandComment = false;
-            });
-          }
-        },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ListTile(
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-              horizontalTitleGap: 10,
-              leading: CircleAvatar(
-                  foregroundColor: widget.dominantcolor == null
-                      ? null
-                      : colorDark(
-                          widget.dominantcolor![widget.colorindex!].color, .8),
-                  backgroundColor: widget.palettecolor == null
-                      ? null
-                      : colorLight(
-                          widget.palettecolor![widget.colorindex!].color),
+    return Theme(
+      data: ThemeData(
+        useMaterial3: true,
+        iconButtonTheme: IconButtonThemeData(
+          style: ButtonStyle(
+              foregroundColor: MaterialStatePropertyAll(
+                widget.paletteLoaded
+                  ? colorLightButton(paletteDominantColors[widget.colorindex!].color, .15)
+                  : Colors.black54,
+              )
+          )
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: ButtonStyle(
+            shape: MaterialStatePropertyAll(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.7))),
+            foregroundColor: MaterialStateProperty.resolveWith((states) {
+              return states.contains(MaterialState.hovered)
+                ? widget.paletteLoaded
+                  ? colorLight(paletteDominantColors[widget.colorindex!].color, .1)
+                  : Colors.white
+                : widget.paletteLoaded
+                  ? colorLight(paletteDominantColors[widget.colorindex!].color, .2)
+                  : null;
+            }),
+            backgroundColor: MaterialStateProperty.resolveWith((states) {
+              if (states.contains(MaterialState.pressed)) {
+                widget.paletteLoaded
+                  ? colorLight(paletteDominantColors[widget.colorindex!].color, .75)
+                  : Colors.white;
+              }
+              return states.contains(MaterialState.hovered)
+                ? widget.paletteLoaded
+                  ? colorLight(paletteDominantColors[widget.colorindex!].color, .7)
+                  : Colors.white
+                : widget.paletteLoaded
+                  ? colorLight(paletteDominantColors[widget.colorindex!].color)
+                  : null;
+            })
+          ),
+        )
+      ),
+      child: Card(
+        elevation: 0,
+        color: widget.paletteLoaded
+            ? colorLight(widget.dominantcolor![widget.colorindex!].color)
+            : Colors.grey.shade100,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          hoverColor: widget.paletteLoaded
+              ? colorLightButton(widget.dominantcolor![widget.colorindex!].color)
+              : Colors.grey.shade200,
+          splashColor: widget.paletteLoaded
+              ? colorLight(widget.dominantcolor![widget.colorindex!].color, .7)
+              : Colors.grey.shade50,
+          onTap: () {
+            expandComment == false
+              ? setState(() => expandComment = true)
+              : setState(() => expandComment = false);          
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ListTile(
+                contentPadding:  const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                horizontalTitleGap: 14,
+                leading: CircleAvatar(
+                  foregroundColor: widget.paletteLoaded
+                      ? colorLight(widget.dominantcolor![widget.colorindex!].color, .125)
+                      : null,
+                  backgroundColor: widget.paletteLoaded
+                      ? colorLight(widget.dominantcolor![widget.colorindex!].color)
+                      : null,
                   maxRadius: 18,
-                  child: const Icon(Icons.face, size: 36)),
-              title: Text('Comment Bots',
-                  style: GoogleFonts.roboto(fontWeight: FontWeight.w600)),
-              subtitle: Text('August 30, 7:27PM',
+                  child: const Icon(Icons.face, size: 40)),
+                title: Text('Chat Bots',
                   style: GoogleFonts.roboto(
-                      fontSize: 12, fontWeight: FontWeight.w600)),
-              trailing: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Icon(
-                        expandComment ? Icons.expand_less : Icons.expand_more),
-                  ),
-                ],
+                    color: Colors.grey.shade800,
+                    fontWeight: FontWeight.w600
+                  )
+                ),
+                subtitle: Text('December 12, 7:27 PM'.toUpperCase(),
+                  style: GoogleFonts.roboto(
+                    letterSpacing: 0.4,
+                    fontSize: 12, 
+                    fontWeight: FontWeight.w600
+                  )
+                ),
+                trailing: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Icon(expandComment ? Icons.expand_less : Icons.expand_more),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Padding(
-              padding:
-                  const EdgeInsets.only(left: 20, right: 20, bottom: 0, top: 2),
-              child: Text(
-                maxLines: expandComment ? 10 : 2,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.roboto(
-                    color: Colors.black87,
-                    fontWeight: FontWeight.w400,
+              Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20, bottom: 0, top: 2),
+                child: Text(
+                  maxLines: expandComment ? 10 : 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.grey.shade800,
                     height: 1.4),
-                "I'm dedicating every day to you Domestic life was never quite my style When you smile, you knock me out, I fall apart! And I thought I was so smart",
+                  "I'm dedicating every day to you Domestic life was never quite my style When you smile, " 
+                  "you knock me out, I fall apart! And I thought I was so smart. It's great to think highly of yourself and to believe in your abilities. " 
+                  "Intelligence is not a fixed trait, and it can vary from situation to situation. It's important to continue learning and growing in order to develop your intelligence and become the best version of yourself.",
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ButtonBar(
-                buttonPadding: EdgeInsets.zero,
-                buttonMinWidth: 0,
-                children: [
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 600),
-                    child: expandComment
-                        ? IconButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () {},
-                            icon: TextButton(
-                                onPressed: () {},
-                                child: const Text('Add Reaction')))
-                        : IconButton(
-                            tooltip: 'Add Reaction',
-                            onPressed: () {},
-                            icon: const Icon(Icons.add_reaction,
-                                color: Colors.black54, size: 22)),
-                  ),
-                  AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 600),
-                      child: expandComment
-                          ? IconButton(
-                              padding: EdgeInsets.zero,
-                              onPressed: () {},
-                              icon: TextButton(
-                                  onPressed: () {}, child: const Text('Reply')))
-                          : IconButton(
-                              tooltip: 'Reply',
-                              onPressed: () {},
-                              icon: const Icon(
-                                Icons.reply,
-                                color: Colors.black54,
-                              )))
-                ],
-              ),
-            )
-          ],
+              Padding(
+                padding: EdgeInsets.fromLTRB(12, expandComment ? 12 : 8, 16, 8),
+                child: ButtonBar(
+                  buttonPadding: EdgeInsets.zero,
+                  buttonMinWidth: 0,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: expandComment
+                        ? null
+                        : widget.paletteLoaded
+                          ? colorLight(widget.dominantcolor![widget.colorindex!].color, .825)
+                          : Colors.white,
+                        borderRadius: BorderRadius.circular(25.7)
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 600),
+                            child: expandComment
+                              ? TextButton.icon(
+                                  style: const ButtonStyle(
+                                    padding: MaterialStatePropertyAll(
+                                      EdgeInsets.only(left: 8, right: 10))
+                                  ),
+                                  onPressed: () {},
+                                  icon: const Icon(Icons.add_reaction, size: 22),
+                                  label: const Text('Add Reaction', 
+                                    style: TextStyle(fontWeight: FontWeight.w600))
+                                )
+                              : IconButton(
+                                  visualDensity: VisualDensity.compact,
+                                  tooltip: 'Add Reaction',
+                                  onPressed: () {},
+                                  icon: const Icon(Icons.add_reaction, size: 22)
+                                ),
+                          ),
+                          SizedBox(width: expandComment ? 8 : null),
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 600),
+                            child: expandComment
+                              ? TextButton.icon(
+                                  style: const ButtonStyle(
+                                    padding: MaterialStatePropertyAll(
+                                      EdgeInsets.only(left: 8, right: 10))
+                                  ),
+                                  onPressed: () {}, 
+                                  icon: const Icon(Icons.comment, size: 22),
+                                  label: const Text('Reply', 
+                                    style: TextStyle(fontWeight: FontWeight.w600))
+                                )
+                              : IconButton(
+                                  visualDensity: VisualDensity.compact,
+                                  tooltip: 'Reply',
+                                  onPressed: () {},
+                                  icon: const Icon(Icons.comment, size: 22)
+                                )
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

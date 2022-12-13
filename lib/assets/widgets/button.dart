@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gimmic/assets/functions/colors.dart';
@@ -91,47 +90,45 @@ Widget buttonNotification(context) {
       label: Text('0', style: GoogleFonts.roboto(fontWeight: FontWeight.w500)));
 }
 
-Widget buttonView3DIcon(
-    context, String name, List palettecolor, int colorindex) {
+Widget buttonView3DIcon(context, String name, List palettecolor, int colorindex) {
   return Container(
     padding: const EdgeInsets.all(4),
     decoration: BoxDecoration(
-        color: Colors.black45, borderRadius: BorderRadius.circular(12)),
+      color: Colors.black45, borderRadius: BorderRadius.circular(12)),
     child: IconButton(
-        visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
-        tooltip: '3D View',
-        hoverColor: Colors.transparent,
-        onPressed: () => GoRouter.of(context).pushNamed('viewer', params: {
-              'name': name.toLowerCase(),
-            }),
-        icon: const Icon(Icons.view_in_ar_rounded, color: Colors.white)),
+      visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
+      tooltip: '3D View',
+      hoverColor: Colors.transparent,
+      onPressed: () => GoRouter.of(context).pushNamed('viewer', 
+        params: { 'name': name.toLowerCase(), }),
+      icon: const Icon(Icons.view_in_ar_rounded, color: Colors.white)
+    ),
   );
 }
 
 Widget buttonView3D(context, String name, List palettecolor, int colorindex) {
   return ElevatedButton.icon(
-      style: ButtonStyle(
-          side: const MaterialStatePropertyAll(BorderSide.none),
-          visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
-          backgroundColor: const MaterialStatePropertyAll(Colors.black45),
-          foregroundColor: MaterialStateProperty.resolveWith((states) {
-            return states.contains(MaterialState.hovered)
-                ? Colors.white
-                : palettecolor.isEmpty
-                    ? Colors.blue.shade100
-                    : lightening(
-                        palettecolor[colorindex].color, kIsWeb ? 50 : 90);
-          }),
-          elevation: const MaterialStatePropertyAll(0),
-          padding: const MaterialStatePropertyAll(EdgeInsets.all(16))),
-      onPressed: () => GoRouter.of(context).pushNamed('viewer', params: {
-            'name': name.toLowerCase(),
-          }),
-      icon: const Icon(Icons.view_in_ar_rounded),
-      label: Text(
-        '3D View',
-        style: GoogleFonts.roboto(fontWeight: FontWeight.w400),
-      ));
+    style: ButtonStyle(
+      side: const MaterialStatePropertyAll(BorderSide.none),
+      visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
+      backgroundColor: const MaterialStatePropertyAll(Colors.black45),
+      foregroundColor: MaterialStateProperty.resolveWith((states) {
+        return states.contains(MaterialState.hovered)
+            ? Colors.white
+            : palettecolor.isEmpty
+                ? Colors.blue.shade100
+                : colorLight(palettecolor[colorindex].color, .65);
+      }),
+      elevation: const MaterialStatePropertyAll(0),
+      padding: const MaterialStatePropertyAll(EdgeInsets.all(16))
+    ),
+    onPressed: () => GoRouter.of(context).pushNamed('viewer', 
+      params: { 'name': name.toLowerCase(), }),
+    icon: const Icon(Icons.view_in_ar_rounded),
+    label: Text('3D View',
+      style: GoogleFonts.roboto(fontWeight: FontWeight.w500),
+    )
+  );
 }
 
 Widget buttonMoreMenu(String url, String image, String hero, command) {

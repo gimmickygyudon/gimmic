@@ -5,7 +5,6 @@ import 'package:gimmic/assets/label.dart';
 import 'package:gimmic/assets/widgets/button.dart';
 import 'package:gimmic/assets/widgets/card.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../assets/functions/platform.dart';

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 Color colorButtonLuminance(Color color,
@@ -40,8 +39,7 @@ Color colorLight(Color color, [double amount = .8, double power = .45]) {
   double luminance = lighten(color, power).computeLuminance();
   Color palette = color;
 
-  if (luminance < amount)
-  {
+  if (luminance < amount) {
     for (var i = luminance; i < amount; power += .01) {
       if (power > 1) break;
 
@@ -59,7 +57,7 @@ Color colorLight(Color color, [double amount = .8, double power = .45]) {
     // Input color might be too bright -> try darken the color.
     if (power < 0) {
       power = 0;
-      debugPrint('darkening the color');
+      // debugPrint('darkening the color');
       for (var i = luminance; i > amount; power += .01) {
         if (power > 1) break;
 
