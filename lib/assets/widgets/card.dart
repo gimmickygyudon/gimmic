@@ -1081,7 +1081,7 @@ class CardYoutube extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           child: Image(
                               height: 70,
-                              image: ResizeImage(AssetImage(thumbnails), height: 300, width: 300),
+                              image: ResizeImage(AssetImage(thumbnails), height: 300, width: 450),
                               fit: BoxFit.cover),
                         ),
                         Align(
@@ -1108,39 +1108,40 @@ class CardYoutube extends StatelessWidget {
                               Flexible(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: const <Widget>[
+                                  children: <Widget>[
                                     Text(
                                       'Sheep Overflow Easy Tutorial',
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
+                                      style: GoogleFonts.roboto(
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    Padding(padding: EdgeInsets.only(bottom: 2.0)),
+                                    const Padding(padding: EdgeInsets.only(bottom: 2.0)),
                                     Text(
                                       'An complete tutorial for Beginner to Adapt into',
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
+                                      style: GoogleFonts.roboto(
                                         fontSize: 12.0,
+                                        fontWeight: FontWeight.w600,
                                         color: Colors.black54,
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                              SizedBox(
-                                  height: constraints.maxWidth > 320 ? null : 8),
+                              SizedBox(height: constraints.maxWidth > 320 ? null : 8),
                               Flexible(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: <Widget>[
-                                    const Text(
+                                    Text(
                                       "Raze Im",
-                                      style: TextStyle(
+                                      style: GoogleFonts.roboto(
                                         fontSize: 12,
+                                        fontWeight: FontWeight.w600,
                                         color: Colors.black87,
                                       ),
                                     ),
@@ -1148,10 +1149,11 @@ class CardYoutube extends StatelessWidget {
                                       text: TextSpan(
                                         children: [
                                           TextSpan(
-                                              text: 'Sep 2 • 12 min  ',
-                                              style: GoogleFonts.roboto(
-                                                  fontSize: 12,
-                                                  color: Colors.black54)),
+                                            text: 'Sep 2 • 12 min  ',
+                                            style: GoogleFonts.roboto(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.black54)),
                                           const WidgetSpan(
                                             child: Padding(
                                               padding: EdgeInsets.only(bottom: 1),
@@ -1287,12 +1289,12 @@ class _CardCommentState extends State<CardComment> {
                   child: const Icon(Icons.face, size: 40)),
                 title: Text('Chat Bots',
                   style: GoogleFonts.roboto(
-                    color: Colors.grey.shade800,
                     fontWeight: FontWeight.w600
                   )
                 ),
                 subtitle: Text('December 12, 7:27 PM'.toUpperCase(),
                   style: GoogleFonts.roboto(
+                    color: Colors.grey.shade700,                    
                     letterSpacing: 0.4,
                     fontSize: 12, 
                     fontWeight: FontWeight.w600
@@ -1347,7 +1349,7 @@ class _CardCommentState extends State<CardComment> {
                                       EdgeInsets.only(left: 8, right: 10))
                                   ),
                                   onPressed: () {},
-                                  icon: const Icon(Icons.add_reaction, size: 22),
+                                  icon: const Icon(Icons.add_reaction, size: 20),
                                   label: const Text('Add Reaction', 
                                     style: TextStyle(fontWeight: FontWeight.w600))
                                 )
@@ -1355,7 +1357,7 @@ class _CardCommentState extends State<CardComment> {
                                   visualDensity: VisualDensity.compact,
                                   tooltip: 'Add Reaction',
                                   onPressed: () {},
-                                  icon: const Icon(Icons.add_reaction, size: 22)
+                                  icon: const Icon(Icons.add_reaction, size: 20)
                                 ),
                           ),
                           SizedBox(width: expandComment ? 8 : null),
@@ -1368,7 +1370,7 @@ class _CardCommentState extends State<CardComment> {
                                       EdgeInsets.only(left: 8, right: 10))
                                   ),
                                   onPressed: () {}, 
-                                  icon: const Icon(Icons.comment, size: 22),
+                                  icon: const Icon(Icons.comment, size: 20),
                                   label: const Text('Reply', 
                                     style: TextStyle(fontWeight: FontWeight.w600))
                                 )
@@ -1376,7 +1378,7 @@ class _CardCommentState extends State<CardComment> {
                                   visualDensity: VisualDensity.compact,
                                   tooltip: 'Reply',
                                   onPressed: () {},
-                                  icon: const Icon(Icons.comment, size: 22)
+                                  icon: const Icon(Icons.comment, size: 20)
                                 )
                           )
                         ],

@@ -203,7 +203,7 @@ class _DetailsState extends State<Details> {
       return ConstrainedBox(
         constraints: BoxConstraints(maxHeight: useVerticalLayout ? 116 : 88),
         child: AspectRatio(
-          aspectRatio: 1 / 1,
+          aspectRatio: 1 / 0.95,
           child: AnimatedPadding(
             curve: Curves.easeOut,
             duration: const Duration(milliseconds: 300),
@@ -243,7 +243,7 @@ class _DetailsState extends State<Details> {
                   child: Image(
                     image: ResizeImage(
                       MemoryImage(data.first["images"][index]), 
-                      width: 250, height: 250),
+                      width: 350, height: 250),
                     fit: BoxFit.cover,
                   )
                 ),
@@ -900,14 +900,20 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                   children: [
                     TabBar(
                       controller: _tabController,
+                      dividerColor: Colors.transparent,
                       indicator: UnderlineTabIndicator(
                           borderSide: BorderSide(
                             color: widget.paletteLoaded
                               ? colorLight(paletteDominantColors[activePage].color, .2)
                               : Colors.orange, width: 2),
-                          insets: const EdgeInsets.only(left: 20, right: 15)),
+                          insets: const EdgeInsets.only(left: 10, right: 5)),
                       isScrollable: true,
                       indicatorWeight: 3,
+                      overlayColor: MaterialStateProperty.resolveWith((states) {
+                        return states.contains(MaterialState.hovered)
+                          ? Colors.black
+                          : null;
+                      }),
                       labelColor: widget.paletteLoaded
                         ? colorLight(paletteDominantColors[activePage].color, .1)
                         : Colors.orange,
@@ -1191,7 +1197,7 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                                       Expanded(
                                         child: Column(crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
-                                            Text('Creator', style: GoogleFonts.roboto(fontWeight: FontWeight.w500)),
+                                            const Text('Creator', style: TextStyle(fontWeight: FontWeight.w600)),
                                             Row(
                                               mainAxisAlignment: MainAxisAlignment.center,
                                               children: const [
@@ -1207,8 +1213,8 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
-                                            Text('License',
-                                                style: GoogleFonts.roboto(fontWeight: FontWeight.w500)),
+                                            const Text('License',
+                                                style: TextStyle(fontWeight: FontWeight.w600)),
                                             Row(
                                               mainAxisAlignment: MainAxisAlignment.center,
                                               children: const [
@@ -1225,11 +1231,9 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Text('Date',
-                                                style: GoogleFonts.roboto(
-                                                    fontWeight: FontWeight.w500)),
-                                            const Text('3 Sep 2022')
+                                          children: const [
+                                            Text('Date', style: TextStyle(fontWeight: FontWeight.w600)),
+                                            Text('3 Sep 2022')
                                           ],
                                         ),
                                       )
@@ -1243,11 +1247,11 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                                     child: ListTileTheme(
                                       child: ExpansionTile(
                                         tilePadding: const EdgeInsets.symmetric(horizontal: 0),
-                                        title: Text(
+                                        title: const Text(
                                           'Blender',
-                                          style: GoogleFonts.roboto(
+                                          style: TextStyle(
                                               fontSize: 18,
-                                              fontWeight: FontWeight.w400),
+                                              fontWeight: FontWeight.w500),
                                         ),
                                         subtitle: const Text('3.2.2 (bcfdb14560e7)'),
                                         textColor: Colors.orange,
@@ -1281,11 +1285,11 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                                         .copyWith(dividerColor: Colors.transparent),
                                     child: ExpansionTile(
                                       tilePadding: const EdgeInsets.symmetric(horizontal: 0),
-                                      title: Text(
+                                      title: const Text(
                                         'Renderer',
-                                        style: GoogleFonts.roboto(
+                                        style: TextStyle(
                                             fontSize: 18,
-                                            fontWeight: FontWeight.w400),
+                                            fontWeight: FontWeight.w500),
                                       ),
                                       subtitle: const Text('Cycles / Eevee'),
                                       leading: IconButton(
@@ -1311,10 +1315,10 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                                         .copyWith(dividerColor: Colors.transparent),
                                     child: ExpansionTile(
                                       tilePadding: const EdgeInsets.symmetric(horizontal: 0),
-                                      title: Text(
+                                      title: const Text(
                                         'Textures & Materials',
-                                        style: GoogleFonts.roboto(
-                                            fontWeight: FontWeight.w400),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500),
                                       ),
                                       textColor: Colors.green,
                                       iconColor: Colors.green,
