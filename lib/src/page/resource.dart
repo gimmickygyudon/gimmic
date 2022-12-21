@@ -886,6 +886,7 @@ class _ResourceState extends State<Resource> {
                                 child: CircularProgressIndicator(strokeWidth: 3),
                               );
                             }
+
                             return _foundResource.isNotEmpty
                               ? _layouts[0] || _layouts[1]
                                   ? GridResource(

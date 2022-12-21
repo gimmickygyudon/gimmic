@@ -57,7 +57,7 @@ class _DetailsState extends State<Details> {
 
   final String timenow = DateFormat("EEEEE, MMMM dd").format(DateTime.now());
 
-  bool isAnimated = false;
+  bool isAnimated = true;
   bool paletteLoaded = false;
   Map<dynamic, dynamic> arguments = {
     'name': 'default',
@@ -125,12 +125,12 @@ class _DetailsState extends State<Details> {
     _scrollViewController = ScrollController();
 
     super.initState();
-    isAnimated = false;
+    /* isAnimated = false;
     Future.delayed(const Duration(milliseconds: 50)).whenComplete(() {
       setState(() {
         isAnimated = true;
       });
-    });
+    }); */
 
     if (widget.arguments != null) {
       arguments = widget.arguments!;
@@ -289,7 +289,7 @@ class _DetailsState extends State<Details> {
                       });
                     },
                     itemBuilder: (context, pagePosition) {
-                      void push() => imageDialogHero(context,images[pagePosition], arguments, pagePosition);
+                      void push() => imageDialogHero(context, images[pagePosition], arguments, pagePosition);
 
                       return GestureDetector(
                         onSecondaryTapDown: (details) => onRightClickImageMainMenu(context, images[pagePosition], push, details),
@@ -298,18 +298,12 @@ class _DetailsState extends State<Details> {
                         onTap: () {
                           push();
                         },
-                        child: Hero(
-                          createRectTween: (Rect? begin, Rect? end) {
-                            return MaterialRectCenterArcTween(begin: begin, end: end);
-                          },
-                          tag: arguments['hero'] + pagePosition.toString(),
-                          child: InteractiveViewer(
-                            maxScale: 4.5,
-                            minScale: 1,
-                            child: Image(
-                              image: MemoryImage(data.first["images"][pagePosition]),
-                              fit: BoxFit.cover,
-                            ),
+                        child: InteractiveViewer(
+                          maxScale: 4.5,
+                          minScale: 1,
+                          child: Image(
+                            image: MemoryImage(data.first["images"][pagePosition]),
+                            fit: BoxFit.cover,
                           ),
                         ),
                       );
@@ -548,68 +542,71 @@ class _DetailsState extends State<Details> {
                                               : constraints.maxHeight > 600
                                                   ? constraints.maxHeight - 485
                                                   : constraints.maxHeight - 325,
-                                      flexibleSpace: FutureBuilder(
-                                        future: _loadItems,
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState == ConnectionState.waiting) {
-                                            return const FlexibleSpaceBar(
-                                              title: null,
-                                              background: Center(child: CircularProgressIndicator(strokeWidth: 3)),
-                                            );
-                                          }
-
-                                          return Padding(
+                                      flexibleSpace: Hero(
+                                        tag: arguments['hero'] + 0.toString(), // TODO:replace '0' later with a images index
+                                        child: FutureBuilder(
+                                          future: _loadItems,
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState == ConnectionState.waiting) {
+                                              return const FlexibleSpaceBar(
+                                                title: null,
+                                                background: Center(child: CircularProgressIndicator(strokeWidth: 3)),
+                                              );
+                                            }
+                                      
+                                            return Padding(
                                             padding: useVerticalLayout
                                                 ? const EdgeInsets.fromLTRB(4, 4, 4, 8)
                                                 : EdgeInsets.zero,
-                                            child: Card(
-                                              clipBehavior: Clip.antiAlias,
-                                              elevation: useVerticalLayout ? 2 : 0,
-                                              color: Colors.transparent,
-                                              shadowColor: Colors.black26,
-                                              margin: EdgeInsets.zero,
-                                              shape: RoundedRectangleBorder(
-                                                  borderRadius: useVerticalLayout
-                                                    ? BorderRadius.circular(20)
-                                                    : const BorderRadius.only(
-                                                        bottomLeft: Radius.circular(12),
-                                                        bottomRight: Radius.circular(12)),
-                                              ),
-                                              child: Stack(
-                                                children: [
-                                                  FlexibleSpaceBar(
-                                                    title: null,
-                                                    background: imageMain(context, arguments),
-                                                  ),
-                                                  Align(
-                                                      alignment: Alignment.bottomRight,
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.all(16),
-                                                          child: buttonView3D(
-                                                              context,
-                                                              arguments['name'].toLowerCase(),
-                                                              paletteDominantColors.isEmpty
-                                                                  ? paletteDominantColors = []
-                                                                  : paletteDominantColors,
-                                                              activePage))
-                                                  ),
-                                                  data.first["images"].length != 1 
-                                                    ? Align(
-                                                    alignment: Alignment.bottomCenter,
-                                                    child: Padding(
-                                                      padding: const EdgeInsets.symmetric(vertical: 16),
-                                                      child: Row(
-                                                        mainAxisAlignment: MainAxisAlignment.center,
-                                                        children: imageIndicators(activePage, useVerticalLayout),
-                                                      ),
+                                              child: Card(
+                                                clipBehavior: Clip.antiAlias,
+                                                elevation: useVerticalLayout ? 2 : 0,
+                                                color: Colors.transparent,
+                                                shadowColor: Colors.black26,
+                                                margin: EdgeInsets.zero,
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius: useVerticalLayout
+                                                      ? BorderRadius.circular(20)
+                                                      : const BorderRadius.only(
+                                                          bottomLeft: Radius.circular(12),
+                                                          bottomRight: Radius.circular(12)),
+                                                ),
+                                                child: Stack(
+                                                  children: [
+                                                    FlexibleSpaceBar(
+                                                      title: null,
+                                                      background: imageMain(context, arguments),
                                                     ),
-                                                  )
-                                                  : const SizedBox()
-                                                ]
+                                                    Align(
+                                                        alignment: Alignment.bottomRight,
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.all(16),
+                                                            child: buttonView3D(
+                                                                context,
+                                                                arguments['name'].toLowerCase(),
+                                                                paletteDominantColors.isEmpty
+                                                                    ? paletteDominantColors = []
+                                                                    : paletteDominantColors,
+                                                                activePage))
+                                                    ),
+                                                    data.first["images"].length != 1 
+                                                    ? Align(
+                                                      alignment: Alignment.bottomCenter,
+                                                      child: Padding(
+                                                        padding: const EdgeInsets.symmetric(vertical: 16),
+                                                        child: Row(
+                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          children: imageIndicators(activePage, useVerticalLayout),
+                                                        ),
+                                                      ),
+                                                    )
+                                                    : const SizedBox()
+                                                  ]
+                                                ),
                                               ),
-                                            ),
-                                          );
-                                        },
+                                            );
+                                          },
+                                        ),
                                       ),
                                     ),
                                     FutureBuilder(
