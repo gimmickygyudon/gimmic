@@ -9,6 +9,7 @@ import 'package:gimmic/assets/functions/string.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:video_player/video_player.dart';
 
 import 'package:gimmic/assets/functions/platform.dart';
 import 'package:gimmic/assets/icons.dart';
@@ -50,6 +51,8 @@ class _DetailsState extends State<Details> {
   late String resource;
   late String randomEmoji;
   List<Map<String, dynamic>> data = List.empty();
+
+  late VideoPlayerController _videoController;
 
   final GlobalKey<ScaffoldState> detailScaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
@@ -125,6 +128,9 @@ class _DetailsState extends State<Details> {
     randomEmoji = StringResource.emoji[random.nextInt(StringResource.emoji.length)];
 
     _scrollViewController = ScrollController();
+    _videoController = VideoPlayerController.network('https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4')
+    ..initialize().then((value) => setState(() { }) );
+    _videoController.setLooping(true);
 
     super.initState();
     /* isAnimated = false;
@@ -169,6 +175,7 @@ class _DetailsState extends State<Details> {
     _pageController.dispose();
     controller.dispose();
     controllerComment.dispose();
+    _videoController.dispose();
     resetPalette();
     super.dispose();
   }
@@ -273,33 +280,45 @@ class _DetailsState extends State<Details> {
       child: ScrollConfiguration(
           behavior: DragOnScroll(),
           child: PageView.builder(
-              physics:  data.first["images"].length == 1 
+              physics:  data.first["images"].length + 1 == 1 
                 ? const NeverScrollableScrollPhysics() 
                 : const BouncingScrollPhysics(),
               scrollDirection: Axis.horizontal,
-              itemCount: data.first["images"].length,
+              itemCount: data.first["images"].length + 1,
               pageSnapping: true,
               controller: _pageController,
               onPageChanged: (page) {
+                if (page != data.first["images"].length) {
                   updateTheme(page);
-                  _detailCardKey.currentState?.setState(() {                      
-                });
+                  _detailCardKey.currentState?.setState(() {});
+                }
               },
               itemBuilder: (context, pagePosition) {
-                void push() => imageDialogHero(context, images[pagePosition], arguments, pagePosition);
+                int itemCount = data.first["images"].length;
 
-                return GestureDetector(
-                  onSecondaryTapDown: (details) => onRightClickImageMainMenu(context, images[pagePosition], push, details),
-                  onLongPress: () => onRightClickImageMainMenu(context, images[pagePosition], push),
-                  onTapDown: (details) => onTapPosition(details),
-                  onTap: () {
-                    push();
-                  },
-                  child: Image(
-                    image: MemoryImage(data.first["images"][pagePosition]),
-                    fit: BoxFit.cover,
-                  ),
-                );
+                if (pagePosition == itemCount) { 
+                  return _videoController.value.isInitialized
+                    ? ResourceVideo(videoController: _videoController)
+                    : Container(); 
+                } else { 
+                  void push() => imageDialogHero(context, images[pagePosition], arguments, pagePosition);
+                  return GestureDetector(
+                    onSecondaryTapDown: (details) => onRightClickImageMainMenu(context, images[pagePosition], push, details),
+                    onLongPress: () => onRightClickImageMainMenu(context, images[pagePosition], push),
+                    onTapDown: (details) => onTapPosition(details),
+                    onTap: () {
+                      push();
+                    },
+                    child: InteractiveViewer(
+                      maxScale: 4.5,
+                      minScale: 1.0,
+                      child: Image(
+                        image: MemoryImage(data.first["images"][pagePosition]),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  );
+                }
               }
           ),
         )
@@ -483,7 +502,7 @@ class _DetailsState extends State<Details> {
                                       toolbarHeight: 75,
                                       leadingWidth: 120,
                                       leading: Padding(
-                                        padding: const EdgeInsets.all(16),
+                                        padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
                                         child: TextButton.icon(
                                           style: ButtonStyle(
                                             overlayColor: MaterialStateProperty.resolveWith((states) {
@@ -800,6 +819,182 @@ class NonFutureImage extends StatelessWidget {
             ),
           )
           : const SizedBox()
+        ]
+      ),
+    );
+  }
+}
+
+class ResourceVideo extends StatefulWidget {
+  const ResourceVideo({super.key, required this.videoController});
+  final VideoPlayerController videoController;
+
+  @override
+  State<ResourceVideo> createState() => _ResourceVideoState();
+}
+
+class _ResourceVideoState extends State<ResourceVideo> {
+  bool onHover = false;
+  bool onClick = false;
+  late Duration durationVideo;
+
+  @override
+  void initState() {
+    durationVideo = widget.videoController.value.duration;
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (event) => setState(() {
+        onHover = true;
+      }),
+      onExit: (event) => setState(() {
+        onHover = false;
+        onClick = false;
+      }),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          SizedBox.expand(
+            child: FittedBox(
+              fit: BoxFit.cover,
+              child: SizedBox(
+                height: widget.videoController.value.size.height,
+                width: widget.videoController.value.size.width,
+                child: VideoPlayer(widget.videoController)
+              ),
+            ),
+          ),
+          Center(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 100),
+              child: widget.videoController.value.isPlaying && !onHover || onClick
+              ? null 
+              : AnimatedScale(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.ease,
+                scale: onHover ? 1.15 : 1,
+                child: Container(
+                  height: 84,
+                  width: 84,
+                  decoration: BoxDecoration(
+                    color: Colors.black45,
+                    borderRadius: BorderRadius.circular(60)
+                  )
+                ),
+              ),
+            ),
+          ),
+          IconButton(
+            style: ButtonStyle(
+              shape: const MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
+              foregroundColor: MaterialStateProperty.resolveWith((states) {
+                return widget.videoController.value.isPlaying
+                  ? states.contains(MaterialState.hovered)
+                    ? onClick ? Colors.transparent : Colors.white
+                    : Colors.transparent
+                  : states.contains(MaterialState.hovered)
+                    ? Colors.white
+                    : Colors.white;
+              }),
+              overlayColor: MaterialStateProperty.resolveWith((states) {
+                return widget.videoController.value.isPlaying
+                  ? states.contains(MaterialState.pressed)
+                    ? Colors.black26
+                    : Colors.transparent
+                  : states.contains(MaterialState.pressed)
+                    ? Colors.black26
+                    : null;
+              }),
+              backgroundColor: MaterialStateProperty.resolveWith((states) {
+                return widget.videoController.value.isPlaying
+                  ? states.contains(MaterialState.hovered)
+                    ? onClick ? Colors.transparent : Colors.black12
+                    : Colors.transparent
+                  : states.contains(MaterialState.hovered)
+                    ? Colors.black12
+                    : null;
+              }),
+            ),
+            icon: AnimatedScale(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.ease,
+              scale: onHover ? 1.15 : 1,
+              child: Icon(size: 72, widget.videoController.value.isPlaying ? Icons.pause : Icons.play_arrow)),
+            onPressed: () {
+              setState(() {
+                if (widget.videoController.value.isPlaying) {
+                  onClick = false;
+                  widget.videoController.pause();
+                } else {
+                  onClick = true;
+                  widget.videoController.play();
+                }
+              });
+            }
+          ),
+          Align(
+            alignment: Alignment.bottomLeft, 
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 20),
+              child: IgnorePointer(
+                ignoring: true,
+                child: ValueListenableBuilder(
+                  valueListenable: widget.videoController,
+                  builder: (context, VideoPlayerValue value, child) {
+                    final minutes = value.position.inMinutes.toString().padLeft(2, '0');
+                    final seconds = (value.position.inSeconds % 60).toString().padLeft(2, '0');
+
+                    final dminutes = widget.videoController.value.duration.inMinutes.toString().padLeft(2, '0');
+                    final dseconds = ((widget.videoController.value.duration.inSeconds % 60) - 1).toString().padLeft(2, '0');
+
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: Icon(color: Colors.white, size: 18,
+                            shadows: const [
+                              Shadow(
+                                color: Colors.black26,
+                                offset: Offset(1, 1),
+                                blurRadius: 2
+                              ),
+                            ],
+                            widget.videoController.value.isPlaying 
+                            ? Icons.play_circle : Icons.pause_circle
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          "$minutes:$seconds / $dminutes:$dseconds",
+                          style: GoogleFonts.roboto(
+                            shadows: const [
+                              Shadow(
+                                color: Colors.black45,
+                                offset: Offset(1, 1),
+                                blurRadius: 2
+                              ),
+                            ],
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey.shade200
+                          ),
+                        ), 
+                      ],
+                    );              
+                  },
+                ),
+              ),
+            )
+          ),
         ]
       ),
     );

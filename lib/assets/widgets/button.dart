@@ -94,7 +94,7 @@ Widget buttonView3DIcon(context, String name, List palettecolor, int colorindex)
   return Container(
     padding: const EdgeInsets.all(4),
     decoration: BoxDecoration(
-      color: Colors.black45, borderRadius: BorderRadius.circular(12)),
+      color: Colors.black54, borderRadius: BorderRadius.circular(12)),
     child: IconButton(
       visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
       tooltip: '3D View',
