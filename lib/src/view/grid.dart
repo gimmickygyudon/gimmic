@@ -437,177 +437,190 @@ class _BigCardState extends State<BigCard> with SingleTickerProviderStateMixin {
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide.none
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Stack(
+                  fit: StackFit.expand, 
                   children: [
-                    Expanded(
-                      flex: 3,
-                      child: Stack(
-                        fit: StackFit.expand, children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: AnimatedContainer(
-                            curve: Curves.fastOutSlowIn,
-                            duration: const Duration(milliseconds: 500),
-                            foregroundDecoration: BoxDecoration(
-                              border: selectedIndex == widget.index
-                                ? const Border(
-                                    top: BorderSide(color: Colors.blue, width: 3),
-                                    bottom: BorderSide(color: Colors.blue, width: 3)
-                                  )
-                                : null,
+                  Hero(
+                    flightShuttleBuilder: (
+                    flightContext, animation, flightDirection, fromHeroContext, toHeroContext) {
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            Image(
+                              image: MemoryImage(widget.foundResource[widget.index]["images"][i]),
+                              fit: BoxFit.cover,
                             ),
-                            child: AnimatedScale(
-                              curve: Curves.easeOutQuart,
-                              duration: const Duration(milliseconds: 600),
-                              scale: selectedIndex == widget.index ? 1.05 : 1,
-                              child: ScrollConfiguration(
-                                behavior: DragOnScroll(),
-                                child: PageView.builder(
-                                  pageSnapping: true,
-                                  onPageChanged: (value) {
-                                      _imageIndicatorKey.currentState?.setState(() {
-                                      i = value;
-                                    });
-                                  },
-                                  physics: const BouncingScrollPhysics(),
-                                  itemCount: widget.foundResource[widget.index]["images"].length,
-                                  itemBuilder: (context, i) {
-                                    return Hero(
-                                      tag: hero + i.toString(),
-                                      child: InteractiveViewer(
-                                        child: Image(
-                                          image: MemoryImage(widget.foundResource[widget.index]["images"][i]),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Visibility(
-                          visible: 
-                            widget.foundResource[widget.index]["images"].length == 1
-                              ? false
-                              : true,
-                          child: Padding(
-                            padding: EdgeInsets.fromLTRB(8, 8, 8, widget.layouts[1] ? 80 : 8),
-                            child: Align(
+                            Align(
                               alignment: Alignment.bottomCenter,
-                              child: StatefulBuilder(
-                                key: _imageIndicatorKey,
-                                builder: (context, setState) => Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: imageIndicators(
-                                        widget.foundResource[widget.index]["images"].length,
-                                        i,
-                                        widget.useVerticalLayout3x)),
+                              child: SizeTransition(
+                                sizeFactor: ReverseAnimation(animation),
+                                child: Container(height: 60, color: Colors.white)
                               ),
-                            ),
-                          ),
+                            )
+                          ],
                         ),
-                        AnimatedOpacity(
-                          opacity: selectedIndex == widget.index || isWebMobile
-                                  ? 1
-                                  : 0,
-                          duration: const Duration(milliseconds: 200),
-                          child: Align(
-                              alignment: Alignment.topRight,
-                              child: Transform(
-                                transform: Matrix4.identity()
-                                    ..translate(
-                                        defaultPosition ? 0.0 : (5 * (percentageX / 50) + -5),
-                                        defaultPosition ? 0.0 : (10 * (percentageY / 50) + -10), 
-                                      0.0),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: buttonMoreMenu(
-                                    url, images[widget.index], hero + i.toString(), pushNamed),
-                                ),
-                              )),
+                      );
+                    },
+                  tag: hero + i.toString(),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: AnimatedContainer(
+                        curve: Curves.fastOutSlowIn,
+                        duration: const Duration(milliseconds: 500),
+                        foregroundDecoration: BoxDecoration(
+                          border: selectedIndex == widget.index
+                            ? const Border(
+                                top: BorderSide(color: Colors.blue, width: 3),
+                                bottom: BorderSide(color: Colors.blue, width: 3)
+                              )
+                            : null,
                         ),
-                        AnimatedOpacity(
-                          opacity: selectedIndex == widget.index || isWebMobile
-                                  ? 1
-                                  : 0,
-                          curve: Curves.easeIn,
-                          duration: const Duration(milliseconds: 150),
-                          child: Align(
-                            alignment: Alignment.bottomRight,
-                            child: AnimatedScale(
-                              scale: selectedIndex == widget.index || isWebMobile
-                                  ? 1
-                                  : 0.9,
-                              curve: Curves.easeOut,
-                              duration: const Duration(milliseconds: 350),
-                              child: Transform(
-                                transform: Matrix4.identity()
-                                    ..translate(
-                                        defaultPosition ? 0.0 : (15 * (percentageX / 50) + -15),
-                                        defaultPosition ? 0.0 : (30 * (percentageY / 50) + -30), 
-                                      0.0),
-                                child: Padding(
-                                  padding: EdgeInsets.fromLTRB(8, 8, 8, widget.layouts[1] ? 76 : 8),
-                                  child: TextButton(
-                                    style: const ButtonStyle(
-                                        foregroundColor: MaterialStatePropertyAll(Colors.white),
-                                        textStyle: MaterialStatePropertyAll(
-                                          TextStyle(
-                                          shadows: [
-                                            Shadow(
-                                                color: Colors.black26,
-                                                offset: Offset(1, 1),
-                                                blurRadius: 2),
-                                            ],
-                                          ))),
-                                    onPressed: () {},
-                                    child: Text(widget.foundResource[widget.index]["time"])
+                        child: AnimatedScale(
+                          curve: Curves.easeOutQuart,
+                          duration: const Duration(milliseconds: 600),
+                          scale: selectedIndex == widget.index ? 1.05 : 1,
+                          child: ScrollConfiguration(
+                            behavior: DragOnScroll(),
+                            child: PageView.builder(
+                              pageSnapping: true,
+                              onPageChanged: (value) {
+                                  _imageIndicatorKey.currentState?.setState(() {
+                                  i = value;
+                                });
+                              },
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: widget.foundResource[widget.index]["images"].length,
+                              itemBuilder: (context, i) {
+                                return InteractiveViewer(
+                                  child: Image(
+                                    image: MemoryImage(widget.foundResource[widget.index]["images"][i]),
+                                    fit: BoxFit.cover,
                                   ),
-                                ),
-                              ),
+                                );
+                              },
                             ),
                           ),
                         ),
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Transform(
-                            transform: Matrix4.identity()
-                                ..translate(
-                                    defaultPosition ? 0.0 : (10 * (percentageX / 50) + -10),
-                                    defaultPosition ? 0.0 : (20 * (percentageY / 50) + -20), 
-                                  0.0),
-                            child: AnimatedContainer(
-                              curve: Curves.ease,
-                              duration: const Duration(milliseconds: 300),
-                              margin: EdgeInsets.all(selectedIndex == widget.index ? 12 : 0),
-                              decoration: BoxDecoration(
-                                color: selectedIndex == widget.index
-                                  ? Colors.blueGrey.shade50
-                                  : Colors.white,
-                                borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(selectedIndex == widget.index ? 12 : 0), 
-                                  bottom: const Radius.circular(12))
-                              ),
-                              child: Transform(
-                                transform: Matrix4.identity()
-                                ..translate(
-                                    defaultPosition ? 0.0 : (7.5 * (percentageX / 50) + -7.5),
-                                    defaultPosition ? 0.0 : (5 * (percentageY / 50) + -5), 
-                                  0.0),
-                                child: gridDescription(
-                                  context, setState, widget.layouts, 
-                                  name, widget, selectedIndex, widget.index))
-                                ),
-                          ))
-                      ]),
+                      ),
                     ),
-                  ],
-                )),
+                  ),
+                  Visibility(
+                    visible: widget.foundResource[widget.index]["images"].length == 1
+                        ? false
+                        : true,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(8, 8, 8, widget.layouts[1] ? 80 : 8),
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: StatefulBuilder(
+                          key: _imageIndicatorKey,
+                          builder: (context, setState) => Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: imageIndicators(
+                                  widget.foundResource[widget.index]["images"].length,
+                                  i,
+                                  widget.useVerticalLayout3x)),
+                        ),
+                      ),
+                    ),
+                  ),
+                  AnimatedOpacity(
+                    opacity: selectedIndex == widget.index || isWebMobile
+                      ? 1
+                      : 0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: Transform(
+                        transform: Matrix4.identity()
+                            ..translate(
+                                defaultPosition ? 0.0 : (5 * (percentageX / 50) + -5),
+                                defaultPosition ? 0.0 : (10 * (percentageY / 50) + -10), 
+                              0.0),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: buttonMoreMenu(url, images[widget.index], hero + i.toString(), pushNamed),
+                        ),
+                      )
+                    ),
+                  ),
+                  AnimatedOpacity(
+                    opacity: selectedIndex == widget.index || isWebMobile
+                      ? 1
+                      : 0,
+                    curve: Curves.easeIn,
+                    duration: const Duration(milliseconds: 150),
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: AnimatedScale(
+                        scale: selectedIndex == widget.index || isWebMobile
+                            ? 1
+                            : 0.9,
+                        curve: Curves.easeOut,
+                        duration: const Duration(milliseconds: 350),
+                        child: Transform(
+                          transform: Matrix4.identity()
+                              ..translate(
+                                  defaultPosition ? 0.0 : (15 * (percentageX / 50) + -15),
+                                  defaultPosition ? 0.0 : (30 * (percentageY / 50) + -30), 
+                                0.0),
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(8, 8, 8, widget.layouts[1] ? 76 : 8),
+                            child: TextButton(
+                              style: const ButtonStyle(
+                                  foregroundColor: MaterialStatePropertyAll(Colors.white),
+                                  textStyle: MaterialStatePropertyAll(
+                                    TextStyle(
+                                    shadows: [
+                                      Shadow(
+                                          color: Colors.black26,
+                                          offset: Offset(1, 1),
+                                          blurRadius: 2),
+                                      ],
+                                    ))),
+                              onPressed: () {},
+                              child: Text(widget.foundResource[widget.index]["time"])
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Transform(
+                      transform: Matrix4.identity()
+                          ..translate(
+                              defaultPosition ? 0.0 : (10 * (percentageX / 50) + -10),
+                              defaultPosition ? 0.0 : (20 * (percentageY / 50) + -20), 
+                            0.0),
+                      child: AnimatedContainer(
+                        curve: Curves.ease,
+                        duration: const Duration(milliseconds: 300),
+                        margin: EdgeInsets.all(selectedIndex == widget.index ? 12 : 0),
+                        decoration: BoxDecoration(
+                          color: selectedIndex == widget.index
+                            ? Colors.blueGrey.shade50
+                            : Colors.white,
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(selectedIndex == widget.index ? 12 : 0), 
+                            bottom: const Radius.circular(12))
+                        ),
+                        child: Transform(
+                          transform: Matrix4.identity()
+                          ..translate(
+                              defaultPosition ? 0.0 : (7.5 * (percentageX / 50) + -7.5),
+                              defaultPosition ? 0.0 : (5 * (percentageY / 50) + -5), 
+                            0.0),
+                          child: gridDescription(
+                            context, setState, widget.layouts, 
+                            name, widget, selectedIndex, widget.index))
+                          ),
+                    ))
+                ])),
           ),
         ),
       ),

@@ -77,8 +77,13 @@ class _DetailsState extends State<Details> {
       int pos = currentUrl.lastIndexOf('/');
       resource = (pos != -1) ? currentUrl.substring(pos + 1, currentUrl.length) : currentUrl;
       resource = resource.replaceAll(RegExp(r'%20'), ' ');
-      
+
+      int index = json.indexWhere((element) => element["name"].toLowerCase().contains(resource.toLowerCase()));
       data = json.where((element) => element["name"].toLowerCase().contains(resource.toLowerCase())).toList();
+
+      setState(() {
+        arguments['hero'] = '${data.first['name']}_$index';
+      });
       
       if (data.first["name"].toLowerCase() != resource.toLowerCase()) { 
         data = List.empty();
@@ -93,17 +98,14 @@ class _DetailsState extends State<Details> {
         }
 
         Timer(const Duration(milliseconds: 200), () {
-          String blob = GoRouter.of(context).location;
-          blob = blob.substring(blob.lastIndexOf('/') + 1, blob.length).replaceAll('%20', ' ');
-          
-          updatePaletteGen(data.first["images"], blob, bindSnackBar, updatePaletteGenCompleter).whenComplete(() async {
+          updatePaletteGen(data.first["images"], data.first["name"].toLowerCase(), bindSnackBar, updatePaletteGenCompleter).whenComplete(() async {
             await updatePaletteGenCompleter.future.whenComplete(() {
               if (loadingpalette == false) {
                 rootScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
               }
               if (snackbarbinding == false) {
-                detailScaffoldKey.currentState?.setState(() {
-                  setState(() {
+                setState(() {
+                  detailScaffoldKey.currentState?.setState(() {
                     if (paletteMutedColors.isNotEmpty 
                     && paletteVibrantColors.isNotEmpty 
                     && paletteDominantColors.isNotEmpty) {
@@ -265,54 +267,42 @@ class _DetailsState extends State<Details> {
                             
   // Main Images
   Widget imageMain(context, arguments) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          flex: 3,
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height / 8,
-            width: MediaQuery.of(context).size.width / 2,
-            child: ScrollConfiguration(
-                behavior: DragOnScroll(),
-                child: PageView.builder(
-                    physics:  data.first["images"].length == 1 
-                      ? const NeverScrollableScrollPhysics() 
-                      : const BouncingScrollPhysics(),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: data.first["images"].length,
-                    pageSnapping: true,
-                    controller: _pageController,
-                    onPageChanged: (page) {
-                        updateTheme(page);
-                        _detailCardKey.currentState?.setState(() {                      
-                      });
-                    },
-                    itemBuilder: (context, pagePosition) {
-                      void push() => imageDialogHero(context, images[pagePosition], arguments, pagePosition);
+    return SizedBox(
+      height: MediaQuery.of(context).size.height / 8,
+      width: MediaQuery.of(context).size.width / 2,
+      child: ScrollConfiguration(
+          behavior: DragOnScroll(),
+          child: PageView.builder(
+              physics:  data.first["images"].length == 1 
+                ? const NeverScrollableScrollPhysics() 
+                : const BouncingScrollPhysics(),
+              scrollDirection: Axis.horizontal,
+              itemCount: data.first["images"].length,
+              pageSnapping: true,
+              controller: _pageController,
+              onPageChanged: (page) {
+                  updateTheme(page);
+                  _detailCardKey.currentState?.setState(() {                      
+                });
+              },
+              itemBuilder: (context, pagePosition) {
+                void push() => imageDialogHero(context, images[pagePosition], arguments, pagePosition);
 
-                      return GestureDetector(
-                        onSecondaryTapDown: (details) => onRightClickImageMainMenu(context, images[pagePosition], push, details),
-                        onLongPress: () => onRightClickImageMainMenu(context, images[pagePosition], push),
-                        onTapDown: (details) => onTapPosition(details),
-                        onTap: () {
-                          push();
-                        },
-                        child: InteractiveViewer(
-                          maxScale: 4.5,
-                          minScale: 1,
-                          child: Image(
-                            image: MemoryImage(data.first["images"][pagePosition]),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      );
-                    }
-                ),
-              )
+                return GestureDetector(
+                  onSecondaryTapDown: (details) => onRightClickImageMainMenu(context, images[pagePosition], push, details),
+                  onLongPress: () => onRightClickImageMainMenu(context, images[pagePosition], push),
+                  onTapDown: (details) => onTapPosition(details),
+                  onTap: () {
+                    push();
+                  },
+                  child: Image(
+                    image: MemoryImage(data.first["images"][pagePosition]),
+                    fit: BoxFit.cover,
+                  ),
+                );
+              }
           ),
-        ),
-      ],
+        )
     );
   }
 
@@ -476,9 +466,9 @@ class _DetailsState extends State<Details> {
                             padding: useVerticalLayout
                                 ? useSmallLayout
                                     ? const EdgeInsets.only(
-                                        top: 12, left: 12, right: 0, bottom: 12)
+                                        top: 16, left: 12, right: 0, bottom: 12)
                                     : const EdgeInsets.only(
-                                        top: 12, left: 24, right: 0, bottom: 12)
+                                        top: 16, left: 24, right: 0, bottom: 12)
                                 : EdgeInsets.zero,
                             child: ScrollConfiguration(
                               behavior: ScrollConfiguration.of(context)
@@ -508,7 +498,13 @@ class _DetailsState extends State<Details> {
                                                 : Colors.white;
                                             })
                                           ),
-                                          onPressed: () => Navigator.of(context).pop(),
+                                          onPressed: () {
+                                            // TODO:Cached future palette color workarounds
+                                            /* arguments['name'] == 'default'
+                                              ? context.push('/resource') 
+                                              : context.pop(); */
+                                              context.pop();
+                                          },
                                           label: Text('Back',
                                             style: GoogleFonts.roboto(
                                               fontWeight: FontWeight.w600,
@@ -542,70 +538,26 @@ class _DetailsState extends State<Details> {
                                               : constraints.maxHeight > 600
                                                   ? constraints.maxHeight - 485
                                                   : constraints.maxHeight - 325,
-                                      flexibleSpace: Hero(
-                                        tag: arguments['hero'] + 0.toString(), // TODO:replace '0' later with a images index
-                                        child: FutureBuilder(
-                                          future: _loadItems,
-                                          builder: (context, snapshot) {
-                                            if (snapshot.connectionState == ConnectionState.waiting) {
-                                              return const FlexibleSpaceBar(
-                                                title: null,
-                                                background: Center(child: CircularProgressIndicator(strokeWidth: 3)),
-                                              );
-                                            }
-                                      
-                                            return Padding(
-                                            padding: useVerticalLayout
-                                                ? const EdgeInsets.fromLTRB(4, 4, 4, 8)
-                                                : EdgeInsets.zero,
-                                              child: Card(
-                                                clipBehavior: Clip.antiAlias,
-                                                elevation: useVerticalLayout ? 2 : 0,
-                                                color: Colors.transparent,
-                                                shadowColor: Colors.black26,
-                                                margin: EdgeInsets.zero,
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius: useVerticalLayout
-                                                      ? BorderRadius.circular(20)
-                                                      : const BorderRadius.only(
-                                                          bottomLeft: Radius.circular(12),
-                                                          bottomRight: Radius.circular(12)),
-                                                ),
-                                                child: Stack(
-                                                  children: [
-                                                    FlexibleSpaceBar(
-                                                      title: null,
-                                                      background: imageMain(context, arguments),
-                                                    ),
-                                                    Align(
-                                                        alignment: Alignment.bottomRight,
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.all(16),
-                                                            child: buttonView3D(
-                                                                context,
-                                                                arguments['name'].toLowerCase(),
-                                                                paletteDominantColors.isEmpty
-                                                                    ? paletteDominantColors = []
-                                                                    : paletteDominantColors,
-                                                                activePage))
-                                                    ),
-                                                    data.first["images"].length != 1 
-                                                    ? Align(
-                                                      alignment: Alignment.bottomCenter,
-                                                      child: Padding(
-                                                        padding: const EdgeInsets.symmetric(vertical: 16),
-                                                        child: Row(
-                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                          children: imageIndicators(activePage, useVerticalLayout),
-                                                        ),
-                                                      ),
-                                                    )
-                                                    : const SizedBox()
-                                                  ]
-                                                ),
-                                              ),
-                                            );
-                                          },
+                                      flexibleSpace: Container(
+                                        margin: useVerticalLayout
+                                          ? const EdgeInsets.symmetric(horizontal: 4)
+                                          : EdgeInsets.zero,
+                                        child: Hero(
+                                          tag: arguments['hero'] + 0.toString(), // TODO:replace '0' later with a images index
+                                          child: itemLoaded.isCompleted 
+                                          ? NonFutureImage(
+                                            useVerticalLayout: useVerticalLayout, 
+                                            imageMain: imageMain, 
+                                            arguments: arguments, 
+                                            imageIndicators: imageIndicators, 
+                                            data: data)
+                                          : FutureImage(
+                                            loadItems: _loadItems,
+                                            useVerticalLayout: useVerticalLayout, 
+                                            imageMain: imageMain, 
+                                            arguments: arguments, 
+                                            imageIndicators: imageIndicators, 
+                                            data: data)
                                         ),
                                       ),
                                     ),
@@ -651,7 +603,7 @@ class _DetailsState extends State<Details> {
                                                       elevation: useVerticalLayout ? 2 : 0,
                                                       shadowColor: Colors.black26,
                                                       margin: useVerticalLayout
-                                                        ? const EdgeInsets.all(4)
+                                                        ? const EdgeInsets.fromLTRB(4, 8, 4, 4)
                                                         : const EdgeInsets.fromLTRB(4, 6, 4, 2),
                                                       shape: RoundedRectangleBorder(
                                                         borderRadius: BorderRadius.circular(12),
@@ -721,7 +673,7 @@ class _DetailsState extends State<Details> {
                                   duration: const Duration(milliseconds: 600),
                                   padding: useSmallLayout
                                       ? const EdgeInsets.only(
-                                          top: 14, left: 0, right: 12, bottom: 14)
+                                          top: 10, left: 0, right: 10, bottom: 14)
                                       : const EdgeInsets.only(
                                           top: 12, left: 0, right: 24, bottom: 14),
                                   child: DetailCard(
@@ -747,6 +699,110 @@ class _DetailsState extends State<Details> {
         },
       );
     });
+  }
+}
+
+class FutureImage extends StatelessWidget {
+  const FutureImage({
+    super.key, 
+    required this.useVerticalLayout, 
+    required this.imageMain, 
+    required this.arguments, 
+    required this.imageIndicators, 
+    required this.data,
+    required this.loadItems
+  });
+
+  final bool useVerticalLayout;
+  final Future loadItems;
+  // ignore: prefer_typing_uninitialized_variables
+  final imageMain, arguments, imageIndicators, data;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: loadItems,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const FlexibleSpaceBar(
+            title: null,
+            background: Center(child: CircularProgressIndicator(strokeWidth: 3)),
+          );
+        }
+  
+        return NonFutureImage(
+          useVerticalLayout: useVerticalLayout, imageMain: imageMain, 
+          arguments: arguments, imageIndicators: imageIndicators, 
+          data: data
+        );
+      },
+    );
+  }
+}
+
+class NonFutureImage extends StatelessWidget {
+  const NonFutureImage({
+    super.key, 
+    required this.useVerticalLayout, 
+    required this.imageMain, 
+    required this.arguments, 
+    required this.imageIndicators, 
+    required this.data
+  });
+
+  final bool useVerticalLayout;
+  // ignore: prefer_typing_uninitialized_variables
+  final imageMain, arguments, imageIndicators, data;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      elevation: useVerticalLayout ? 2 : 0,
+      color: Colors.transparent,
+      shadowColor: Colors.black26,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+          borderRadius: useVerticalLayout
+            ? BorderRadius.circular(20)
+            : const BorderRadius.only(
+                bottomLeft: Radius.circular(12),
+                bottomRight: Radius.circular(12)),
+      ),
+      child: Stack(
+        children: [
+          FlexibleSpaceBar(
+            title: null,
+            background: imageMain(context, arguments),
+          ),
+          Align(
+              alignment: Alignment.bottomRight,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                  child: buttonView3D(context,
+                      arguments['name'].toLowerCase(),
+                      paletteDominantColors.isEmpty
+                          ? paletteDominantColors = []
+                          : paletteDominantColors,
+                      activePage
+                  )
+              )
+          ),
+          data.first["images"].length != 1 
+          ? Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: imageIndicators(activePage, useVerticalLayout),
+              ),
+            ),
+          )
+          : const SizedBox()
+        ]
+      ),
+    );
   }
 }
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:async/async.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -7,6 +9,7 @@ import 'package:gimmic/assets/functions/string.dart';
 import 'package:gimmic/assets/functions/time.dart';
 
 final AsyncMemoizer _memoizer = AsyncMemoizer();
+final Completer itemLoaded = Completer();
 
 Future loadItems() async {
   return _memoizer.runOnce(() async {
@@ -113,6 +116,9 @@ Future loadItems() async {
     var btime = b['timestamp'];
     return btime.compareTo(atime);
   });
+
+  itemLoaded.complete();
+  debugPrint("itemLoaded = ${itemLoaded.isCompleted}");
   return items;
   });
 }

@@ -22,6 +22,20 @@ class PopupItem {
   PopupItem(this.index, this.name, this.icon);
 }
 
+/// Local Variables
+List<Map<String, dynamic>> _foundResource = []; // This list holds the data for the list view
+final List<bool> _layouts = [false, true, false];
+late bool _useVerticalLayout;
+late bool _useVerticalLayout2x;
+late bool _useVerticalLayout3x;
+late bool _hideDetailHorizontal;
+late bool parallax;
+int gridRowCount = 1;
+late ScrollController _scrollGridViewController;
+late ScrollController _scrollListViewController;
+bool _loading = true;
+final FocusNode _searchBarFocusNode = FocusNode();
+
 class Resource extends StatefulWidget {
   const Resource({Key? key, this.arguments}) : super(key: key);
   final String? arguments;
@@ -33,14 +47,10 @@ class Resource extends StatefulWidget {
 TextEditingController _searchController = TextEditingController();
 
 class _ResourceState extends State<Resource> {
-  late ScrollController _scrollGridViewController;
-  late ScrollController _scrollListViewController;
   bool _showAppbar = true;
-  bool _loading = true;
   bool isScrollingDown = false;
   bool initated = false;
   bool _showBackToTopButton = false;
-  late bool parallax;
 
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   final GlobalKey<State<StatefulWidget>> _appBarKey = GlobalKey<State<StatefulWidget>>();
@@ -52,7 +62,6 @@ class _ResourceState extends State<Resource> {
 
   final FocusNode _buttonTagsFocusNode = FocusNode();
   final FocusNode _buttonSortFocusNode = FocusNode();
-  final FocusNode _searchBarFocusNode = FocusNode();
 
   late Future _loadItems;
   late AsyncSnapshot snapshots;
@@ -60,7 +69,6 @@ class _ResourceState extends State<Resource> {
   /// You can use data fetched from a database or a server as well
 
   List<Map<String, dynamic>> json = [];
-  List<Map<String, dynamic>> _foundResource = []; // This list holds the data for the list view
   String resultCount(int data) {    
       String count = 'No Result';
       if (data == 1) {
@@ -198,10 +206,10 @@ class _ResourceState extends State<Resource> {
     
     // SearchBar FocusNode
     _searchBarFocusNode.addListener(() { 
-      if (_searchBarFocusNode.hasFocus && useVerticalLayout3x) {
+      if (_searchBarFocusNode.hasFocus && _useVerticalLayout3x) {
         _appBarKey.currentState?.setState(() {});
       }
-      else if(useVerticalLayout3x) {
+      else if(_useVerticalLayout3x) {
         _appBarKey.currentState?.setState(() {});
       }
     });
@@ -277,23 +285,17 @@ class _ResourceState extends State<Resource> {
     PopupItem(3, "Size", Icons.signal_cellular_alt),
   ];
 
-  late bool useVerticalLayout;
-  late bool useVerticalLayout2x;
-  late bool useVerticalLayout3x;
-  late bool hideDetailHorizontal;
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      useVerticalLayout = constraints.maxWidth > 1000;
-      useVerticalLayout2x = constraints.maxWidth > 620;
-      useVerticalLayout3x = constraints.maxWidth > 460;
-      hideDetailHorizontal = constraints.maxWidth > 550;
+      _useVerticalLayout = constraints.maxWidth > 1000;
+      _useVerticalLayout2x = constraints.maxWidth > 620;
+      _useVerticalLayout3x = constraints.maxWidth > 460;
+      _hideDetailHorizontal = constraints.maxWidth > 550;
 
-      int gridRowCount = 1;
-      useVerticalLayout3x ? gridRowCount = 1 : null;
-      useVerticalLayout2x ? gridRowCount = 2 : null;
-      useVerticalLayout ? gridRowCount = 3 : null;
+      _useVerticalLayout3x ? gridRowCount = 1 : null;
+      _useVerticalLayout2x ? gridRowCount = 2 : null;
+      _useVerticalLayout ? gridRowCount = 3 : null;
 
       return GestureDetector(
         onLongPressDown: (details) => onTapPosition(details),
@@ -356,7 +358,7 @@ class _ResourceState extends State<Resource> {
                             child: AnimatedPadding(
                               curve: Curves.fastOutSlowIn,
                               duration: const Duration(milliseconds: 600),
-                              padding: useVerticalLayout
+                              padding: _useVerticalLayout
                                   ? const EdgeInsets.only(
                                       top: 24, bottom: 8, left: 20, right: 20)
                                   : const EdgeInsets.only(
@@ -378,7 +380,7 @@ class _ResourceState extends State<Resource> {
                                     icon: const Icon(Icons.arrow_back)
                                   ),
                                   const SizedBox(width: 8),
-                                  useVerticalLayout
+                                  _useVerticalLayout
                                     ? IconButton(
                                       tooltip: 'Open the Home Page',
                                       style: ButtonStyle(
@@ -393,7 +395,7 @@ class _ResourceState extends State<Resource> {
                                       icon: const Icon(Icons.home)
                                     ) 
                                     : const SizedBox(),
-                                  SizedBox(width: useVerticalLayout ? 100 : 12),
+                                  SizedBox(width: _useVerticalLayout ? 100 : 12),
                                   Flexible(
                                     child: Material(
                                       elevation: 2,
@@ -421,7 +423,7 @@ class _ResourceState extends State<Resource> {
                                           prefixIconConstraints: const BoxConstraints(minWidth: 55),
                                           suffixIcon: _searchController.text.isEmpty
                                             ? Visibility(
-                                                visible: useVerticalLayout2x ? false : true,
+                                                visible: _useVerticalLayout2x ? false : true,
                                                 child: PopupMenuButton(
                                                   tooltip: '',
                                                   key: _openSortMenuKey,
@@ -452,7 +454,7 @@ class _ResourceState extends State<Resource> {
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 Visibility(
-                                                  visible: useVerticalLayout2x ? false : true,
+                                                  visible: _useVerticalLayout2x ? false : true,
                                                   child: Padding(
                                                     padding: const EdgeInsets.only(right: 8),
                                                     child: Chip(
@@ -486,7 +488,7 @@ class _ResourceState extends State<Resource> {
                                                   ),
                                                 ),
                                                 Visibility(
-                                                  visible: useVerticalLayout2x ? true : false,
+                                                  visible: _useVerticalLayout2x ? true : false,
                                                   child: Padding(
                                                     padding: const EdgeInsets.only(right: 4),
                                                     child: IconButton(
@@ -520,19 +522,19 @@ class _ResourceState extends State<Resource> {
                                       ),
                                     ),
                                   ),
-                                  SizedBox(width: useVerticalLayout ? 80 : 0),
+                                  SizedBox(width: _useVerticalLayout ? 80 : 0),
                                   AnimatedSize(
                                     curve: Curves.ease,
                                     duration: const Duration(milliseconds: 300),
                                     child: SizedBox(
-                                      width: useVerticalLayout 
+                                      width: _useVerticalLayout 
                                         ? null 
                                         : _searchBarFocusNode.hasFocus ? 0 : null,
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           const SizedBox(width: 8),
-                                          appbarSetting(useVerticalLayout2x)
+                                          appbarSetting(_useVerticalLayout2x)
                                         ],
                                       ),
                                     ),
@@ -548,13 +550,13 @@ class _ResourceState extends State<Resource> {
                         AnimatedPadding(
                           curve: Curves.fastOutSlowIn,
                           duration: const Duration(milliseconds: 600),
-                          padding: useVerticalLayout
+                          padding: _useVerticalLayout
                             ? _showAppbar
                                 ? EdgeInsets.symmetric(
-                                    vertical: useVerticalLayout ? 0 : 8, horizontal: 48)
+                                    vertical: _useVerticalLayout ? 0 : 8, horizontal: 48)
                                 : const EdgeInsets.symmetric(
                                     vertical: 0, horizontal: 12)
-                            : useVerticalLayout2x
+                            : _useVerticalLayout2x
                                 ? _showAppbar
                                     ? const EdgeInsets.symmetric(
                                         vertical: 0,
@@ -665,7 +667,7 @@ class _ResourceState extends State<Resource> {
                                   const SizedBox(width: 8),
                                   AnimatedSwitcher(
                                       duration: const Duration(milliseconds: 200),
-                                      child: useVerticalLayout2x
+                                      child: _useVerticalLayout2x
                                           ? ElevatedButton.icon(
                                               style: const ButtonStyle(
                                                   backgroundColor: MaterialStatePropertyAll(Colors.transparent),
@@ -713,7 +715,7 @@ class _ResourceState extends State<Resource> {
                                 children: [
                                   AnimatedSwitcher(
                                       duration: const Duration(milliseconds: 200),
-                                      child: useVerticalLayout2x
+                                      child: _useVerticalLayout2x
                                           ? PopupMenuButton(
                                               tooltip: '',
                                               key: _openSortMenuKey,
@@ -828,7 +830,7 @@ class _ResourceState extends State<Resource> {
                                   : const SizedBox(),
                                   const SizedBox(width: 10),
                                   Visibility(
-                                    visible: useVerticalLayout2x ? false : true,
+                                    visible: _useVerticalLayout2x ? false : true,
                                     child: AnimatedSize(
                                       duration: const Duration(milliseconds: 300),
                                       child: AnimatedOpacity(
@@ -877,109 +879,9 @@ class _ResourceState extends State<Resource> {
                             child: child,
                           );
                         },
-                       child: FutureBuilder(
-                          future: _loadItems,
-                          builder: (context, AsyncSnapshot snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return const Center(
-                                heightFactor: 2,
-                                child: CircularProgressIndicator(strokeWidth: 3),
-                              );
-                            }
-
-                            return _foundResource.isNotEmpty
-                              ? _layouts[0] || _layouts[1]
-                                  ? GridResource(
-                                      layouts: _layouts,
-                                      useVerticalLayout: useVerticalLayout,
-                                      useVerticalLayout2x: useVerticalLayout2x,
-                                      useVerticalLayout3x: useVerticalLayout3x,
-                                      parallax: parallax,
-                                      gridRowCount: gridRowCount,
-                                      foundResource: _foundResource,
-                                      scrollViewController: _scrollGridViewController,
-                                    )
-                                  : useVerticalLayout3x
-                                      ? useVerticalLayout2x
-                                          ? ListBigResource(
-                                              foundResource: _foundResource,
-                                              layouts: _layouts[0],
-                                              useVerticalLayout: useVerticalLayout,
-                                              hideDetailHorizontal: hideDetailHorizontal,
-                                              scrollViewController:_scrollListViewController,
-                                            )
-                                          : ListBigResource(
-                                              foundResource: _foundResource,
-                                              layouts: _layouts[0],
-                                              useVerticalLayout: useVerticalLayout,
-                                              hideDetailHorizontal: hideDetailHorizontal,
-                                              scrollViewController: _scrollListViewController,
-                                            )
-                                      : ListResource(foundResource: _foundResource)
-                              : Padding(
-                                  padding: const EdgeInsets.all(20),
-                                  child: AnimatedCrossFade(
-                                    layoutBuilder: ((topChild, topChildKey, bottomChild, bottomChildKey) {
-                                      return Stack(
-                                        clipBehavior: Clip.none,
-                                        alignment: Alignment.topCenter,
-                                        children: [
-                                          Positioned(
-                                              key: bottomChildKey,
-                                              child: bottomChild),
-                                          Positioned(
-                                              key: topChildKey, child: topChild)
-                                        ],
-                                      );
-                                    }),
-                                    crossFadeState: _loading
-                                        ? CrossFadeState.showFirst
-                                        : CrossFadeState.showSecond,
-                                    duration: const Duration(milliseconds: 200),
-                                    firstChild: Padding(
-                                      padding: const EdgeInsets.only(top: 46),
-                                      child: Transform.scale(
-                                          scale: 2,
-                                          child: const CircularProgressIndicator(
-                                              strokeWidth: 2)),
-                                    ),
-                                    secondChild: Column(children: [
-                                      const SizedBox(height: 20),
-                                      Text(
-                                        "No result found for '${_searchController.text.trim()}'",
-                                        style: const TextStyle(
-                                          color: Colors.black54,
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      SelectableText(randomEmoji,
-                                        style: TextStyle(
-                                            fontSize: useVerticalLayout2x ? 124 : 100,
-                                            color: Colors.black54,
-                                            letterSpacing: 10)),
-                                      const SizedBox(height: 36),
-                                      OutlinedButton(
-                                          style: OutlinedButton.styleFrom(
-                                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
-                                              side: const BorderSide(color: Colors.deepPurple),
-                                              shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(4))),
-                                          onPressed: () {
-                                            _searchController.clear();
-                                            _runFilter(_searchController.text);
-                                            _searchBarFocusNode.requestFocus();
-                                          },
-                                          child: const Text(
-                                            'Clear your search and try again',
-                                            style: TextStyle(fontWeight: FontWeight.w600)
-                                          )
-                                      )
-                                    ]),
-                                  ),
-                                );
-                          },
-                       ),
+                       child: itemLoaded.isCompleted
+                       ? NonFutureLayouts(randomEmoji: randomEmoji, runFilter: _runFilter)
+                       : FutureLayouts(loadItems: _loadItems, randomEmoji: randomEmoji, runFilter: _runFilter)
                       ),
                     ),
                   ),
@@ -988,5 +890,139 @@ class _ResourceState extends State<Resource> {
         )),
       );
     });
+  }
+}
+
+class FutureLayouts extends StatelessWidget {
+  const FutureLayouts({
+    super.key, 
+    required this.loadItems, 
+    required this.randomEmoji, 
+    required this.runFilter
+  });
+  final Future loadItems;
+  final String randomEmoji;
+  final Function runFilter;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: loadItems,
+      builder: (context, AsyncSnapshot snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            heightFactor: 2,
+            child: CircularProgressIndicator(strokeWidth: 3),
+          );
+        }
+        return NonFutureLayouts(randomEmoji: randomEmoji, runFilter: runFilter);
+      }
+    );
+  }
+}
+
+class NonFutureLayouts extends StatelessWidget {
+  const NonFutureLayouts({
+    super.key, 
+    required this.randomEmoji, 
+    required this.runFilter
+  });
+
+  final String randomEmoji;
+  final Function runFilter;
+
+  @override
+  Widget build(BuildContext context) {
+    return _foundResource.isNotEmpty
+      ? _layouts[0] || _layouts[1]
+        ? GridResource(
+            layouts: _layouts,
+            useVerticalLayout: _useVerticalLayout,
+            useVerticalLayout2x: _useVerticalLayout2x,
+            useVerticalLayout3x: _useVerticalLayout3x,
+            parallax: parallax,
+            gridRowCount: gridRowCount,
+            foundResource: _foundResource,
+            scrollViewController: _scrollGridViewController,
+          )
+        : _useVerticalLayout3x
+            ? _useVerticalLayout2x
+                ? ListBigResource(
+                    foundResource: _foundResource,
+                    layouts: _layouts[0],
+                    useVerticalLayout: _useVerticalLayout,
+                    hideDetailHorizontal: _hideDetailHorizontal,
+                    scrollViewController:_scrollListViewController,
+                  )
+                : ListBigResource(
+                    foundResource: _foundResource,
+                    layouts: _layouts[0],
+                    useVerticalLayout: _useVerticalLayout,
+                    hideDetailHorizontal: _hideDetailHorizontal,
+                    scrollViewController: _scrollListViewController,
+                  )
+            : ListResource(foundResource: _foundResource)
+    : Padding(
+        padding: const EdgeInsets.all(20),
+        child: AnimatedCrossFade(
+          layoutBuilder: ((topChild, topChildKey, bottomChild, bottomChildKey) {
+            return Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.topCenter,
+              children: [
+                Positioned(
+                    key: bottomChildKey,
+                    child: bottomChild),
+                Positioned(
+                    key: topChildKey, child: topChild)
+              ],
+            );
+          }),
+          crossFadeState: _loading
+              ? CrossFadeState.showFirst
+              : CrossFadeState.showSecond,
+          duration: const Duration(milliseconds: 200),
+          firstChild: Padding(
+            padding: const EdgeInsets.only(top: 46),
+            child: Transform.scale(
+                scale: 2,
+                child: const CircularProgressIndicator(
+                    strokeWidth: 2)),
+          ),
+          secondChild: Column(children: [
+            const SizedBox(height: 20),
+            Text(
+              "No result found for '${_searchController.text.trim()}'",
+              style: const TextStyle(
+                color: Colors.black54,
+                fontSize: 24,
+                fontWeight: FontWeight.w400,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SelectableText(randomEmoji,
+              style: TextStyle(
+                  fontSize: _useVerticalLayout2x ? 124 : 100,
+                  color: Colors.black54,
+                  letterSpacing: 10)),
+            const SizedBox(height: 36),
+            OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
+                    side: const BorderSide(color: Colors.deepPurple),
+                    shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(4))),
+                onPressed: () {
+                  _searchController.clear();
+                  runFilter(_searchController.text);
+                  _searchBarFocusNode.requestFocus();
+                },
+                child: const Text(
+                  'Clear your search and try again',
+                  style: TextStyle(fontWeight: FontWeight.w600)
+                )
+            )
+          ]),
+        ),
+      );
   }
 }
