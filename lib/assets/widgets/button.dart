@@ -107,27 +107,48 @@ Widget buttonView3DIcon(context, String name, List palettecolor, int colorindex)
 }
 
 Widget buttonView3D(context, String name, List palettecolor, int colorindex) {
-  return ElevatedButton.icon(
-    style: ButtonStyle(
-      side: const MaterialStatePropertyAll(BorderSide.none),
-      visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
-      backgroundColor: const MaterialStatePropertyAll(Colors.black45),
-      foregroundColor: MaterialStateProperty.resolveWith((states) {
-        return states.contains(MaterialState.hovered)
-            ? Colors.white
-            : palettecolor.isEmpty
-                ? Colors.blue.shade100
-                : colorLight(palettecolor[colorindex].color, .65);
-      }),
-      elevation: const MaterialStatePropertyAll(0),
-      padding: const MaterialStatePropertyAll(EdgeInsets.all(16))
+  return Tooltip(
+    decoration: BoxDecoration(
+      color: Colors.grey.shade800,
+      borderRadius: BorderRadius.circular(25.7)
     ),
-    onPressed: () => GoRouter.of(context).pushNamed('viewer', 
-      params: { 'name': name.toLowerCase(), }),
-    icon: const Icon(Icons.view_in_ar_rounded),
-    label: Text('3D View',
-      style: GoogleFonts.roboto(fontWeight: FontWeight.w500),
-    )
+    verticalOffset: 26,
+    preferBelow: false,
+    message: "See it freely in 360° perspective",
+    child: ElevatedButton.icon(
+      style: ButtonStyle(
+        animationDuration: const Duration(milliseconds: 800),
+        side: const MaterialStatePropertyAll(BorderSide.none),
+        visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
+        shadowColor: const MaterialStatePropertyAll(Colors.black54),
+        backgroundColor: const MaterialStatePropertyAll(Colors.black45),
+        foregroundColor: MaterialStateProperty.resolveWith((states) {
+          return states.contains(MaterialState.hovered)
+              ? Colors.white
+              : palettecolor.isEmpty
+                  ? Colors.blue.shade100
+                  : colorLight(palettecolor[colorindex].color, .85);
+        }),
+        overlayColor: MaterialStateProperty.resolveWith(
+          (states) {
+            return states.contains(MaterialState.pressed)
+                ? palettecolor.isNotEmpty
+                    ? colorLight(palettecolor[colorindex].color, .025)
+                    : null
+                : palettecolor.isNotEmpty
+                    ? colorLightButton(palettecolor[colorindex].color, .05)
+                    : null;
+          },
+        ),
+        padding: const MaterialStatePropertyAll(EdgeInsets.all(16))
+      ),
+      onPressed: () => GoRouter.of(context).pushNamed('viewer', 
+        params: { 'name': name.toLowerCase(), }),
+      icon: const Icon(Icons.view_in_ar_rounded),
+      label: Text('3D View',
+        style: GoogleFonts.roboto(fontWeight: FontWeight.w500),
+      )
+    ),
   );
 }
 

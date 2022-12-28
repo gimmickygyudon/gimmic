@@ -400,6 +400,14 @@ class _DetailsState extends State<Details> {
             elevatedButtonTheme: ElevatedButtonThemeData(
               style: ButtonStyle(
                   animationDuration: const Duration(milliseconds: 200),
+                  shadowColor: const MaterialStatePropertyAll(Colors.black54),
+                  elevation: MaterialStateProperty.resolveWith(
+                    (states) {
+                      return states.contains(MaterialState.hovered)
+                        ? 4
+                        : 0;
+                    },
+                  ),
                   backgroundColor: MaterialStateProperty.all(paletteLoaded
                     ? colorLightButton(paletteDominantColors[activePage].color)
                     : Colors.green.shade100),
@@ -692,9 +700,9 @@ class _DetailsState extends State<Details> {
                                   duration: const Duration(milliseconds: 600),
                                   padding: useSmallLayout
                                       ? const EdgeInsets.only(
-                                          top: 10, left: 0, right: 10, bottom: 14)
+                                          top: 10, left: 0, right: 10, bottom: 10)
                                       : const EdgeInsets.only(
-                                          top: 12, left: 0, right: 24, bottom: 14),
+                                          top: 12, left: 0, right: 24, bottom: 10),
                                   child: DetailCard(
                                     notifyParent: updateTheme, 
                                     key: _detailCardKey,
@@ -775,51 +783,54 @@ class NonFutureImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      elevation: useVerticalLayout ? 2 : 0,
-      color: Colors.transparent,
-      shadowColor: Colors.black26,
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-          borderRadius: useVerticalLayout
-            ? BorderRadius.circular(20)
-            : const BorderRadius.only(
-                bottomLeft: Radius.circular(12),
-                bottomRight: Radius.circular(12)),
-      ),
-      child: Stack(
-        children: [
-          FlexibleSpaceBar(
-            title: null,
-            background: imageMain(context, arguments),
-          ),
-          Align(
-              alignment: Alignment.bottomRight,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                  child: buttonView3D(context,
-                      arguments['name'].toLowerCase(),
-                      paletteDominantColors.isEmpty
-                          ? paletteDominantColors = []
-                          : paletteDominantColors,
-                      activePage
-                  )
-              )
-          ),
-          data.first["images"].length != 1 
-          ? Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: imageIndicators(activePage, useVerticalLayout),
-              ),
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: Card(
+        clipBehavior: Clip.antiAlias,
+        elevation: useVerticalLayout ? 2 : 0,
+        color: Colors.transparent,
+        shadowColor: Colors.black26,
+        margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+            borderRadius: useVerticalLayout
+              ? BorderRadius.circular(20)
+              : const BorderRadius.only(
+                  bottomLeft: Radius.circular(12),
+                  bottomRight: Radius.circular(12)),
+        ),
+        child: Stack(
+          children: [
+            FlexibleSpaceBar(
+              title: null,
+              background: imageMain(context, arguments),
             ),
-          )
-          : const SizedBox()
-        ]
+            Align(
+                alignment: Alignment.bottomRight,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                    child: buttonView3D(context,
+                        arguments['name'].toLowerCase(),
+                        paletteDominantColors.isEmpty
+                            ? paletteDominantColors = []
+                            : paletteDominantColors,
+                        activePage
+                    )
+                )
+            ),
+            data.first["images"].length != 1 
+            ? Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: imageIndicators(activePage, useVerticalLayout),
+                ),
+              ),
+            )
+            : const SizedBox()
+          ]
+        ),
       ),
     );
   }
@@ -859,106 +870,113 @@ class _ResourceVideoState extends State<ResourceVideo> {
         onHover = false;
         onClick = false;
       }),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          SizedBox.expand(
-            child: FittedBox(
-              fit: BoxFit.cover,
-              child: SizedBox(
-                height: widget.videoController.value.size.height,
-                width: widget.videoController.value.size.width,
-                child: VideoPlayer(widget.videoController)
-              ),
-            ),
-          ),
-          Center(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 100),
-              child: widget.videoController.value.isPlaying && !onHover || onClick
-              ? null 
-              : AnimatedScale(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.ease,
-                scale: onHover ? 1.15 : 1,
-                child: Container(
-                  height: 84,
-                  width: 84,
-                  decoration: BoxDecoration(
-                    color: Colors.black45,
-                    borderRadius: BorderRadius.circular(60)
-                  )
+      child: Container(
+        color: Colors.black,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            IgnorePointer(
+              ignoring: true,
+              child: ClipRect(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SizedBox.expand(
+                      child: FittedBox(
+                        fit: BoxFit.cover,
+                        child: SizedBox(
+                          height: constraints.maxHeight,
+                          width: widget.videoController.value.size.width,
+                          child: VideoPlayer(widget.videoController)
+                        ),
+                      ),
+                    );
+                  }
                 ),
               ),
             ),
-          ),
-          IconButton(
-            style: ButtonStyle(
-              shape: const MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
-              foregroundColor: MaterialStateProperty.resolveWith((states) {
-                return widget.videoController.value.isPlaying
-                  ? states.contains(MaterialState.hovered)
-                    ? onClick ? Colors.transparent : Colors.white
-                    : Colors.transparent
-                  : states.contains(MaterialState.hovered)
-                    ? Colors.white
-                    : Colors.white;
-              }),
-              overlayColor: MaterialStateProperty.resolveWith((states) {
-                return widget.videoController.value.isPlaying
-                  ? states.contains(MaterialState.pressed)
-                    ? Colors.black26
-                    : Colors.transparent
-                  : states.contains(MaterialState.pressed)
-                    ? Colors.black26
-                    : null;
-              }),
-              backgroundColor: MaterialStateProperty.resolveWith((states) {
-                return widget.videoController.value.isPlaying
-                  ? states.contains(MaterialState.hovered)
-                    ? onClick ? Colors.transparent : Colors.black12
-                    : Colors.transparent
-                  : states.contains(MaterialState.hovered)
-                    ? Colors.black12
-                    : null;
-              }),
+            Center(
+              child: widget.videoController.value.isPlaying && !onHover || onClick
+              ? null 
+              : AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOut,
+                height: onHover && !widget.videoController.value.isPlaying ? 96.6 : 84,
+                width: onHover && !widget.videoController.value.isPlaying ? 96.6 : 84,
+                decoration: BoxDecoration(
+                  color: Colors.black45,
+                  borderRadius: BorderRadius.circular(60)
+                )
+              ),
             ),
-            icon: AnimatedScale(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.ease,
-              scale: onHover ? 1.15 : 1,
-              child: Icon(size: 72, widget.videoController.value.isPlaying ? Icons.pause : Icons.play_arrow)),
-            onPressed: () {
-              setState(() {
-                if (widget.videoController.value.isPlaying) {
-                  onClick = false;
-                  widget.videoController.pause();
-                } else {
-                  onClick = true;
-                  widget.videoController.play();
-                }
-              });
-            }
-          ),
-          Align(
-            alignment: Alignment.bottomLeft, 
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 20),
-              child: IgnorePointer(
-                ignoring: true,
-                child: ValueListenableBuilder(
-                  valueListenable: widget.videoController,
-                  builder: (context, VideoPlayerValue value, child) {
-                    final minutes = value.position.inMinutes.toString().padLeft(2, '0');
-                    final seconds = (value.position.inSeconds % 60).toString().padLeft(2, '0');
-
-                    final dminutes = widget.videoController.value.duration.inMinutes.toString().padLeft(2, '0');
-                    final dseconds = ((widget.videoController.value.duration.inSeconds % 60) - 1).toString().padLeft(2, '0');
-
-                    return Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Padding(
+            IconButton(
+              style: ButtonStyle(
+                shape: const MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
+                foregroundColor: MaterialStateProperty.resolveWith((states) {
+                  return widget.videoController.value.isPlaying
+                    ? states.contains(MaterialState.hovered)
+                      ? onClick ? Colors.transparent : Colors.white
+                      : Colors.transparent
+                    : states.contains(MaterialState.hovered)
+                      ? Colors.white
+                      : Colors.white;
+                }),
+                overlayColor: MaterialStateProperty.resolveWith((states) {
+                  return widget.videoController.value.isPlaying
+                    ? states.contains(MaterialState.pressed)
+                      ? Colors.black26
+                      : Colors.transparent
+                    : states.contains(MaterialState.pressed)
+                      ? Colors.black26
+                      : null;
+                }),
+                backgroundColor: MaterialStateProperty.resolveWith((states) {
+                  return widget.videoController.value.isPlaying
+                    ? states.contains(MaterialState.hovered)
+                      ? onClick ? Colors.transparent : Colors.black12
+                      : Colors.transparent
+                    : states.contains(MaterialState.hovered)
+                      ? Colors.black12
+                      : null;
+                }),
+              ),
+              icon: AnimatedScale(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOut,
+                scale: onHover && !widget.videoController.value.isPlaying ? 1.15 : 1,
+                child: Icon(size: 60, widget.videoController.value.isPlaying ? Icons.pause : Icons.play_arrow)),
+              onPressed: () {
+                setState(() {
+                  if (widget.videoController.value.isPlaying) {
+                    onClick = false;
+                    widget.videoController.pause();
+                  } else {
+                    onClick = true;
+                    widget.videoController.play();
+                  }
+                });
+              }
+            ),
+            IgnorePointer(
+              ignoring: true,
+              child: Align(
+                alignment: Alignment.bottomLeft, 
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 20),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: widget.videoController.value.isBuffering
+                        ? const Padding(
+                          padding: EdgeInsets.only(left: 4),
+                          child: SizedBox(
+                              width: 13,
+                              height: 13,
+                              child: CircularProgressIndicator(strokeWidth: 3, color: Colors.yellow,)
+                            ),
+                        )
+                        : Padding(
                           padding: const EdgeInsets.only(bottom: 2),
                           child: Icon(color: Colors.white, size: 18,
                             shadows: const [
@@ -972,30 +990,41 @@ class _ResourceVideoState extends State<ResourceVideo> {
                             ? Icons.play_circle : Icons.pause_circle
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          "$minutes:$seconds / $dminutes:$dseconds",
-                          style: GoogleFonts.roboto(
-                            shadows: const [
-                              Shadow(
-                                color: Colors.black45,
-                                offset: Offset(1, 1),
-                                blurRadius: 2
-                              ),
-                            ],
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey.shade200
-                          ),
-                        ), 
-                      ],
-                    );              
-                  },
-                ),
+                      ),
+                      const SizedBox(width: 8),
+                      ValueListenableBuilder(
+                        valueListenable: widget.videoController,
+                        builder: (context, VideoPlayerValue value, child) {
+                          final minutes = value.position.inMinutes.roundToDouble().toString().padLeft(2, '0');
+                          final seconds = (value.position.inSeconds % 60).roundToDouble().toString().padLeft(2, '0');
+
+                          final dminutes = widget.videoController.value.duration.inMinutes.roundToDouble().toString().padLeft(2, '0');
+                          final dseconds = ((widget.videoController.value.duration.inSeconds.roundToDouble() % 60) - 1).toString().padLeft(2, '0');
+
+                          return Text(
+                            "$minutes:$seconds / $dminutes:$dseconds",
+                            style: GoogleFonts.roboto(
+                              shadows: const [
+                                Shadow(
+                                  color: Colors.black45,
+                                  offset: Offset(1, 1),
+                                  blurRadius: 2
+                                ),
+                              ],
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey.shade200
+                            ),
+                          );
+                        }
+                      ), 
+                    ],
+                  ),
+                )
               ),
-            )
-          ),
-        ]
+            ),
+          ]
+        ),
       ),
     );
   }

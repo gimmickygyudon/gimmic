@@ -1276,6 +1276,7 @@ class _CardCommentState extends State<CardComment> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ListTile(
+                tileColor: Colors.transparent,
                 contentPadding:  const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
                 horizontalTitleGap: 14,
                 leading: CircleAvatar(
