@@ -106,32 +106,74 @@ Widget buttonView3DIcon(context, String name, List palettecolor, int colorindex)
   );
 }
 
-Widget buttonView3D(context, String name, List palettecolor, int colorindex) {
+Widget buttonFullscreen(context, images, arguments, List palettecolor, int position) {
   return Tooltip(
+    textStyle: const TextStyle(fontSize: 14, color: Colors.white),
+    message: 'Fullscreen (f)',
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
     decoration: BoxDecoration(
       color: Colors.grey.shade800,
       borderRadius: BorderRadius.circular(25.7)
     ),
-    verticalOffset: 26,
+    verticalOffset: 20,
     preferBelow: false,
-    message: "See it freely in 360° perspective",
-    child: ElevatedButton.icon(
+    child: IconButton( 
+      onPressed: () async{
+        print('position: $position');
+        await imageDialogHero(context, images[position], arguments, position);
+      }, 
       style: ButtonStyle(
-        animationDuration: const Duration(milliseconds: 800),
+          visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
+          padding: const MaterialStatePropertyAll(EdgeInsets.all(8)),
+          foregroundColor: MaterialStateProperty.resolveWith((states) {
+            return states.contains(MaterialState.hovered)
+                ? colorLight(palettecolor[position].color, .65)
+                : palettecolor.isEmpty
+                    ? Colors.blue.shade100
+                    : Colors.white;
+          }),
+      ),
+      icon: const Icon(
+        size: 22, Icons.fullscreen_rounded,
+        shadows: [
+          Shadow(
+            color: Colors.black45,
+            offset: Offset(1, 1),
+            blurRadius: 2
+          ),
+        ],
+      ) 
+    ),
+  ); 
+}
+
+Widget buttonView3D(context, String name, List palettecolor, int colorindex) {
+  return Tooltip(
+    textStyle: const TextStyle(fontSize: 14, color: Colors.white),
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+    decoration: BoxDecoration(
+      color: Colors.grey.shade800,
+      borderRadius: BorderRadius.circular(25.7)
+    ),
+    verticalOffset: 20,
+    preferBelow: false,
+    message: "See it freely in 360° perspective (b)",
+    child: TextButton.icon(
+      style: ButtonStyle(
         side: const MaterialStatePropertyAll(BorderSide.none),
         visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
         shadowColor: const MaterialStatePropertyAll(Colors.black54),
-        backgroundColor: const MaterialStatePropertyAll(Colors.black45),
+        // backgroundColor: const MaterialStatePropertyAll(Colors.black45),
         foregroundColor: MaterialStateProperty.resolveWith((states) {
           return states.contains(MaterialState.hovered)
-              ? Colors.white
+              ? colorLight(palettecolor[colorindex].color, .55)
               : palettecolor.isEmpty
                   ? Colors.blue.shade100
-                  : colorLight(palettecolor[colorindex].color, .85);
+                  : Colors.white;
         }),
-        overlayColor: MaterialStateProperty.resolveWith(
+        /* overlayColor: MaterialStateProperty.resolveWith(
           (states) {
-            return states.contains(MaterialState.pressed)
+            return states.contains(MaterialState.hovered)
                 ? palettecolor.isNotEmpty
                     ? colorLight(palettecolor[colorindex].color, .025)
                     : null
@@ -139,14 +181,33 @@ Widget buttonView3D(context, String name, List palettecolor, int colorindex) {
                     ? colorLightButton(palettecolor[colorindex].color, .05)
                     : null;
           },
-        ),
-        padding: const MaterialStatePropertyAll(EdgeInsets.all(16))
+        ), */
+        padding: const MaterialStatePropertyAll(EdgeInsets.all(8))
       ),
       onPressed: () => GoRouter.of(context).pushNamed('viewer', 
         params: { 'name': name.toLowerCase(), }),
-      icon: const Icon(Icons.view_in_ar_rounded),
-      label: Text('3D View',
-        style: GoogleFonts.roboto(fontWeight: FontWeight.w500),
+      icon: const Icon(
+        size: 20, Icons.view_in_ar_rounded,
+        shadows: [
+          Shadow(
+            color: Colors.black45,
+            offset: Offset(1, 1),
+            blurRadius: 2
+          ),
+        ],
+      ),
+      label: Text('3D',
+        style: GoogleFonts.roboto(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          shadows: const [
+            Shadow(
+              color: Colors.black45,
+              offset: Offset(1, 1),
+              blurRadius: 2
+            ),
+          ],
+        ),
       )
     ),
   );

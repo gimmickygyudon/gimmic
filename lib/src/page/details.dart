@@ -194,11 +194,11 @@ class _DetailsState extends State<Details> {
               ? currentIndex == index
                   ? 30
                   : 10
-              : 6,
-          height: 6,
+              : 0,
+          height: 4,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(25.7),
-            color: currentIndex == index ? Colors.black54 : Colors.black26,
+            color: currentIndex == index ? Colors.black26 : Colors.black12,
           ),
         ),
       );
@@ -273,7 +273,7 @@ class _DetailsState extends State<Details> {
   }                          
                             
   // Main Images
-  Widget imageMain(context, arguments) {
+  Widget imageMain(context, arguments, useVerticalLayout) {
     return SizedBox(
       height: MediaQuery.of(context).size.height / 8,
       width: MediaQuery.of(context).size.width / 2,
@@ -298,7 +298,7 @@ class _DetailsState extends State<Details> {
 
                 if (pagePosition == itemCount) { 
                   return _videoController.value.isInitialized
-                    ? ResourceVideo(videoController: _videoController)
+                    ? ResourceVideo(videoController: _videoController, useVerticalLayout: useVerticalLayout)
                     : Container(); 
                 } else { 
                   void push() => imageDialogHero(context, images[pagePosition], arguments, pagePosition);
@@ -510,7 +510,7 @@ class _DetailsState extends State<Details> {
                                       toolbarHeight: 75,
                                       leadingWidth: 120,
                                       leading: Padding(
-                                        padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+                                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                                         child: TextButton.icon(
                                           style: ButtonStyle(
                                             overlayColor: MaterialStateProperty.resolveWith((states) {
@@ -582,7 +582,7 @@ class _DetailsState extends State<Details> {
                                             loadItems: _loadItems,
                                             useVerticalLayout: useVerticalLayout, 
                                             imageMain: imageMain, 
-                                            arguments: arguments, 
+                                            arguments: arguments,
                                             imageIndicators: imageIndicators, 
                                             data: data)
                                         ),
@@ -783,62 +783,59 @@ class NonFutureImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: Card(
-        clipBehavior: Clip.antiAlias,
-        elevation: useVerticalLayout ? 2 : 0,
-        color: Colors.transparent,
-        shadowColor: Colors.black26,
-        margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(
-            borderRadius: useVerticalLayout
-              ? BorderRadius.circular(20)
-              : const BorderRadius.only(
-                  bottomLeft: Radius.circular(12),
-                  bottomRight: Radius.circular(12)),
-        ),
-        child: Stack(
-          children: [
-            FlexibleSpaceBar(
-              title: null,
-              background: imageMain(context, arguments),
-            ),
-            Align(
-                alignment: Alignment.bottomRight,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                    child: buttonView3D(context,
-                        arguments['name'].toLowerCase(),
-                        paletteDominantColors.isEmpty
-                            ? paletteDominantColors = []
-                            : paletteDominantColors,
-                        activePage
-                    )
-                )
-            ),
-            data.first["images"].length != 1 
-            ? Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: imageIndicators(activePage, useVerticalLayout),
-                ),
-              ),
-            )
-            : const SizedBox()
-          ]
-        ),
+    return Card(
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      elevation: useVerticalLayout ? 2 : 0,
+      color: Colors.transparent,
+      shadowColor: Colors.black26,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+          borderRadius: useVerticalLayout
+            ? BorderRadius.circular(20)
+            : const BorderRadius.only(
+                bottomLeft: Radius.circular(12),
+                bottomRight: Radius.circular(12)),
+      ),
+      child: Stack(
+        alignment: Alignment.bottomRight,
+        children: [
+          FlexibleSpaceBar(
+            title: null,
+            background: imageMain(context, arguments, useVerticalLayout),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  buttonView3D(context, arguments['name'].toLowerCase(),
+                    paletteDominantColors.isEmpty
+                      ? paletteDominantColors = []
+                      : paletteDominantColors,
+                    activePage
+                  ), 
+                  buttonFullscreen(context, images, arguments, 
+                  paletteDominantColors.isEmpty
+                      ? paletteDominantColors = []
+                      : paletteDominantColors,
+                  activePage),
+                ],
+              )
+          ),
+        ]
       ),
     );
   }
 }
 
 class ResourceVideo extends StatefulWidget {
-  const ResourceVideo({super.key, required this.videoController});
+  const ResourceVideo({
+    super.key, 
+    required this.videoController,
+    required this.useVerticalLayout
+  });
   final VideoPlayerController videoController;
+  final bool useVerticalLayout;
 
   @override
   State<ResourceVideo> createState() => _ResourceVideoState();
@@ -875,22 +872,50 @@ class _ResourceVideoState extends State<ResourceVideo> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            IgnorePointer(
-              ignoring: true,
-              child: ClipRect(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return SizedBox.expand(
-                      child: FittedBox(
-                        fit: BoxFit.cover,
-                        child: SizedBox(
-                          height: constraints.maxHeight,
-                          width: widget.videoController.value.size.width,
-                          child: VideoPlayer(widget.videoController)
-                        ),
+            ClipRect(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  if (!widget.useVerticalLayout) {
+                    return Center(
+                      child: Stack(
+                        children: [
+                          AspectRatio(
+                            aspectRatio: widget.videoController.value.aspectRatio,
+                            child: VideoPlayer(widget.videoController)
+                          ),
+                        ]
                       ),
                     );
                   }
+
+                  return SizedBox.expand(
+                    child: FittedBox(
+                      fit: BoxFit.cover,
+                      child: SizedBox(
+                        height: constraints.maxHeight,
+                        width: widget.videoController.value.size.width,
+                        child: VideoPlayer(widget.videoController)
+                      ),
+                    ),
+                  );
+                }
+              ),
+            ),
+            AnimatedContainer(
+              curve: Curves.easeOut,
+              duration: const Duration(milliseconds: 400),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: const [0, 0.85, 1.0],
+                  colors: <Color>[
+                    Colors.transparent,
+                    Colors.black12,
+                     onHover || !widget.videoController.value.isPlaying
+                      ? onClick ? Colors.black38 : Colors.black54
+                      : Colors.black38
+                  ],
                 ),
               ),
             ),
@@ -899,7 +924,7 @@ class _ResourceVideoState extends State<ResourceVideo> {
               ? null 
               : AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                curve: Curves.easeOut,
+                curve: Curves.fastOutSlowIn,
                 height: onHover && !widget.videoController.value.isPlaying ? 96.6 : 84,
                 width: onHover && !widget.videoController.value.isPlaying ? 96.6 : 84,
                 decoration: BoxDecoration(
@@ -921,27 +946,21 @@ class _ResourceVideoState extends State<ResourceVideo> {
                       : Colors.white;
                 }),
                 overlayColor: MaterialStateProperty.resolveWith((states) {
+                  if (states.contains(MaterialState.pressed)) return Colors.transparent;
+
                   return widget.videoController.value.isPlaying
                     ? states.contains(MaterialState.pressed)
                       ? Colors.black26
                       : Colors.transparent
                     : states.contains(MaterialState.pressed)
                       ? Colors.black26
-                      : null;
+                      : Colors.transparent;
                 }),
-                backgroundColor: MaterialStateProperty.resolveWith((states) {
-                  return widget.videoController.value.isPlaying
-                    ? states.contains(MaterialState.hovered)
-                      ? onClick ? Colors.transparent : Colors.black12
-                      : Colors.transparent
-                    : states.contains(MaterialState.hovered)
-                      ? Colors.black12
-                      : null;
-                }),
+                backgroundColor: const MaterialStatePropertyAll(Colors.transparent),
               ),
               icon: AnimatedScale(
                 duration: const Duration(milliseconds: 200),
-                curve: Curves.easeOut,
+                curve: Curves.fastOutSlowIn,
                 scale: onHover && !widget.videoController.value.isPlaying ? 1.15 : 1,
                 child: Icon(size: 60, widget.videoController.value.isPlaying ? Icons.pause : Icons.play_arrow)),
               onPressed: () {
@@ -1371,20 +1390,18 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                                               )),
                                         ],
                                       ),
-                                      children: [
-                                        const SizedBox(height: 4),
-                                        const SelectionArea(
-                                          child: Text(
-                                            "A cat is a furry animal that has a long tail and sharp claws. Cats are often kept as pets. Cats are lions, tigers, and other wild animals in the same family.",
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                                letterSpacing: 0.1,
-                                                height: 1.6,
-                                                color: Colors.black87),
-                                          ),
+                                      children: const [
+                                        SizedBox(height: 4),
+                                        Text(
+                                          "A cat is a furry animal that has a long tail and sharp claws. Cats are often kept as pets. Cats are lions, tigers, and other wild animals in the same family.",
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              letterSpacing: 0.1,
+                                              height: 1.6,
+                                              color: Colors.black87),
                                         ),
-                                        Theme(
+                                        /* Theme(
                                           data: ThemeData(
                                             textButtonTheme: TextButtonThemeData(
                                               style: ButtonStyle(
@@ -1426,7 +1443,7 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                                                     )
                                                 )
                                               ]),
-                                        ),
+                                        ), */
                                       ],
                                     ),
                                   ),

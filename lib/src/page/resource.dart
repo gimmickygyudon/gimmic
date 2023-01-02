@@ -879,9 +879,108 @@ class _ResourceState extends State<Resource> {
                             child: child,
                           );
                         },
-                       child: itemLoaded.isCompleted
-                       ? NonFutureLayouts(randomEmoji: randomEmoji, runFilter: _runFilter)
-                       : FutureLayouts(loadItems: _loadItems, randomEmoji: randomEmoji, runFilter: _runFilter)
+                       child: FutureBuilder(
+                         future: _loadItems,
+                         builder: (context, AsyncSnapshot snapshot) {
+                           if (snapshot.connectionState == ConnectionState.waiting) {
+                             return const Center(
+                               heightFactor: 2,
+                               child: CircularProgressIndicator(strokeWidth: 3),
+                             );
+                           }
+                           return _foundResource.isNotEmpty
+                             ? _layouts[0] || _layouts[1]
+                               ? GridResource(
+                                   layouts: _layouts,
+                                   useVerticalLayout: _useVerticalLayout,
+                                   useVerticalLayout2x: _useVerticalLayout2x,
+                                   useVerticalLayout3x: _useVerticalLayout3x,
+                                   parallax: parallax,
+                                   gridRowCount: gridRowCount,
+                                   foundResource: _foundResource,
+                                   scrollViewController: _scrollGridViewController,
+                                 )
+                               : _useVerticalLayout3x
+                                   ? _useVerticalLayout2x
+                                       ? ListBigResource(
+                                           foundResource: _foundResource,
+                                           layouts: _layouts[0],
+                                           useVerticalLayout: _useVerticalLayout,
+                                           hideDetailHorizontal: _hideDetailHorizontal,
+                                           scrollViewController:_scrollListViewController,
+                                         )
+                                       : ListBigResource(
+                                           foundResource: _foundResource,
+                                           layouts: _layouts[0],
+                                           useVerticalLayout: _useVerticalLayout,
+                                           hideDetailHorizontal: _hideDetailHorizontal,
+                                           scrollViewController: _scrollListViewController,
+                                         )
+                                   : ListResource(foundResource: _foundResource)
+                            : Padding(
+                               padding: const EdgeInsets.all(20),
+                               child: AnimatedCrossFade(
+                                 layoutBuilder: ((topChild, topChildKey, bottomChild, bottomChildKey) {
+                                   return Stack(
+                                     clipBehavior: Clip.none,
+                                     alignment: Alignment.topCenter,
+                                     children: [
+                                       Positioned(
+                                           key: bottomChildKey,
+                                           child: bottomChild),
+                                       Positioned(
+                                           key: topChildKey, child: topChild)
+                                     ],
+                                   );
+                                 }),
+                                 crossFadeState: _loading
+                                     ? CrossFadeState.showFirst
+                                     : CrossFadeState.showSecond,
+                                 duration: const Duration(milliseconds: 200),
+                                 firstChild: Padding(
+                                   padding: const EdgeInsets.only(top: 46),
+                                   child: Transform.scale(
+                                       scale: 2,
+                                       child: const CircularProgressIndicator(
+                                           strokeWidth: 2)),
+                                 ),
+                                 secondChild: Column(children: [
+                                   const SizedBox(height: 20),
+                                   Text(
+                                     "No result found for '${_searchController.text.trim()}'",
+                                     style: const TextStyle(
+                                       color: Colors.black54,
+                                       fontSize: 24,
+                                       fontWeight: FontWeight.w400,
+                                     ),
+                                     textAlign: TextAlign.center,
+                                   ),
+                                   SelectableText(randomEmoji,
+                                     style: TextStyle(
+                                         fontSize: _useVerticalLayout2x ? 124 : 100,
+                                         color: Colors.black54,
+                                         letterSpacing: 10)),
+                                   const SizedBox(height: 36),
+                                   OutlinedButton(
+                                       style: OutlinedButton.styleFrom(
+                                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
+                                           side: const BorderSide(color: Colors.deepPurple),
+                                           shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(4))),
+                                       onPressed: () {
+                                         _searchController.clear();
+                                         _runFilter(_searchController.text);
+                                         _searchBarFocusNode.requestFocus();
+                                       },
+                                       child: const Text(
+                                         'Clear your search and try again',
+                                         style: TextStyle(fontWeight: FontWeight.w600)
+                                       )
+                                   )
+                                 ]),
+                               ),
+                            );
+                         }
+                       )
                       ),
                     ),
                   ),
@@ -890,139 +989,5 @@ class _ResourceState extends State<Resource> {
         )),
       );
     });
-  }
-}
-
-class FutureLayouts extends StatelessWidget {
-  const FutureLayouts({
-    super.key, 
-    required this.loadItems, 
-    required this.randomEmoji, 
-    required this.runFilter
-  });
-  final Future loadItems;
-  final String randomEmoji;
-  final Function runFilter;
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: loadItems,
-      builder: (context, AsyncSnapshot snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            heightFactor: 2,
-            child: CircularProgressIndicator(strokeWidth: 3),
-          );
-        }
-        return NonFutureLayouts(randomEmoji: randomEmoji, runFilter: runFilter);
-      }
-    );
-  }
-}
-
-class NonFutureLayouts extends StatelessWidget {
-  const NonFutureLayouts({
-    super.key, 
-    required this.randomEmoji, 
-    required this.runFilter
-  });
-
-  final String randomEmoji;
-  final Function runFilter;
-
-  @override
-  Widget build(BuildContext context) {
-    return _foundResource.isNotEmpty
-      ? _layouts[0] || _layouts[1]
-        ? GridResource(
-            layouts: _layouts,
-            useVerticalLayout: _useVerticalLayout,
-            useVerticalLayout2x: _useVerticalLayout2x,
-            useVerticalLayout3x: _useVerticalLayout3x,
-            parallax: parallax,
-            gridRowCount: gridRowCount,
-            foundResource: _foundResource,
-            scrollViewController: _scrollGridViewController,
-          )
-        : _useVerticalLayout3x
-            ? _useVerticalLayout2x
-                ? ListBigResource(
-                    foundResource: _foundResource,
-                    layouts: _layouts[0],
-                    useVerticalLayout: _useVerticalLayout,
-                    hideDetailHorizontal: _hideDetailHorizontal,
-                    scrollViewController:_scrollListViewController,
-                  )
-                : ListBigResource(
-                    foundResource: _foundResource,
-                    layouts: _layouts[0],
-                    useVerticalLayout: _useVerticalLayout,
-                    hideDetailHorizontal: _hideDetailHorizontal,
-                    scrollViewController: _scrollListViewController,
-                  )
-            : ListResource(foundResource: _foundResource)
-    : Padding(
-        padding: const EdgeInsets.all(20),
-        child: AnimatedCrossFade(
-          layoutBuilder: ((topChild, topChildKey, bottomChild, bottomChildKey) {
-            return Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.topCenter,
-              children: [
-                Positioned(
-                    key: bottomChildKey,
-                    child: bottomChild),
-                Positioned(
-                    key: topChildKey, child: topChild)
-              ],
-            );
-          }),
-          crossFadeState: _loading
-              ? CrossFadeState.showFirst
-              : CrossFadeState.showSecond,
-          duration: const Duration(milliseconds: 200),
-          firstChild: Padding(
-            padding: const EdgeInsets.only(top: 46),
-            child: Transform.scale(
-                scale: 2,
-                child: const CircularProgressIndicator(
-                    strokeWidth: 2)),
-          ),
-          secondChild: Column(children: [
-            const SizedBox(height: 20),
-            Text(
-              "No result found for '${_searchController.text.trim()}'",
-              style: const TextStyle(
-                color: Colors.black54,
-                fontSize: 24,
-                fontWeight: FontWeight.w400,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SelectableText(randomEmoji,
-              style: TextStyle(
-                  fontSize: _useVerticalLayout2x ? 124 : 100,
-                  color: Colors.black54,
-                  letterSpacing: 10)),
-            const SizedBox(height: 36),
-            OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
-                    side: const BorderSide(color: Colors.deepPurple),
-                    shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(4))),
-                onPressed: () {
-                  _searchController.clear();
-                  runFilter(_searchController.text);
-                  _searchBarFocusNode.requestFocus();
-                },
-                child: const Text(
-                  'Clear your search and try again',
-                  style: TextStyle(fontWeight: FontWeight.w600)
-                )
-            )
-          ]),
-        ),
-      );
   }
 }
