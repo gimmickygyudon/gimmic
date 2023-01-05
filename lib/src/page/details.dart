@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -9,6 +10,7 @@ import 'package:gimmic/assets/functions/string.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:universal_html/html.dart';
 import 'package:video_player/video_player.dart';
 
 import 'package:gimmic/assets/functions/platform.dart';
@@ -35,6 +37,7 @@ bool isScrollingDown = false;
 final List<String> images = ["images/hellocat.jpg", "images/hellocat1.jpg"];
 List<Uint8List> pictures = [];
 final GlobalKey<State<StatefulWidget>> _thumbnailsKey = GlobalKey<State<StatefulWidget>>();
+final GlobalKey<State<StatefulWidget>> _thumbnailsImageKey = GlobalKey<State<StatefulWidget>>();
 
 class Details extends StatefulWidget {
   const Details({Key? key, this.arguments}) : super(key: key);
@@ -53,6 +56,7 @@ class _DetailsState extends State<Details> {
   List<Map<String, dynamic>> data = List.empty();
 
   late VideoPlayerController _videoController;
+  Uint8List? videoThumbnails;
 
   final GlobalKey<ScaffoldState> detailScaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
@@ -129,9 +133,15 @@ class _DetailsState extends State<Details> {
 
     _scrollViewController = ScrollController();
     _videoController = VideoPlayerController.network('https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4')
-    ..initialize().then((value) => setState(() { }) );
+    ..initialize().then((value) async {
+      setState(() { });
+    });
     _videoController.setLooping(true);
 
+    _getVideoThumbnail('https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4', (imageBytes) { 
+      videoThumbnails = imageBytes;            
+      setState(() { });
+    });
     super.initState();
     /* isAnimated = false;
     Future.delayed(const Duration(milliseconds: 50)).whenComplete(() {
@@ -163,7 +173,7 @@ class _DetailsState extends State<Details> {
         }
       }
     });
-
+    
     activePage = int.parse(arguments['index']);
     _pageController = PageController(viewportFraction: 1, initialPage: int.parse(arguments['index']));
   }
@@ -180,6 +190,33 @@ class _DetailsState extends State<Details> {
     super.dispose();
   }
 
+Future<void> _getVideoThumbnail(String path, void Function(Uint8List? imageBytes) callback) async {
+  VideoElement video = VideoElement()
+    ..crossOrigin = 'anonymous'
+    ..src = path
+    ..muted = true;
+  CanvasElement canvas = CanvasElement();
+  video.onLoadedMetadata.listen((Event event) async {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    video.currentTime = 0;
+  });
+  video.onSeeked.listen((Event event) async {
+    CanvasRenderingContext2D ctx = canvas.context2D;
+    ctx.drawImage(video, 0, 0);
+    Blob blob = await canvas.toBlob('image/png', 0.95);
+    XFile xFile = XFile(Url.createObjectUrlFromBlob(blob),
+        mimeType: 'image/png',
+        lastModified: DateTime.now(),
+        length: blob.size);
+    debugPrint('Obtained xFile=[${xFile.path}] for path=[$path].');
+    callback.call(await xFile.readAsBytes());
+  });
+  video.onError.listen((Event event) async {
+    debugPrint('Error processing path=[$path] with event=[$event].');
+    callback.call(null);
+  });
+}
 
 // indicators of images
   List<Widget> imageIndicators(currentIndex, layout) {
@@ -207,69 +244,112 @@ class _DetailsState extends State<Details> {
 
 // thumbnails of images
   int hoveredThumbnail = -1;
-  List<Widget> imageThumbnails(arguments, currentIndex, useVerticalLayout) {
-    return List<Widget>.generate(data.first["images"].length, (index) {
-      return ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: useVerticalLayout ? 116 : 88),
-        child: AspectRatio(
-          aspectRatio: 1 / 0.95,
-          child: AnimatedPadding(
-            curve: Curves.easeOut,
-            duration: const Duration(milliseconds: 300),
-            padding: hoveredThumbnail == index
-                ? const EdgeInsets.all(4)
-                : const EdgeInsets.all(6),
-            child: MouseRegion(
-              onEnter: (value) => setState(() => hoveredThumbnail = index),
-              onExit: (value) => setState(() => hoveredThumbnail = -1),
-              child: InkWell(
-                onTap: () async {
-                  if (currentIndex == index) {
-                    await imageDialogHero(context, images[index], arguments, index);
-                  }
-                  _pageController.animateToPage(
-                    index,
-                    duration: const Duration(milliseconds: 200),
-                    curve: Curves.ease);
-                },
-                // splashColor: Colors.white10, // Splash color over image
-                child: Card(
-                  shadowColor: Colors.black,
-                  clipBehavior: Clip.antiAlias,
-                  semanticContainer: true,
-                  elevation: hoveredThumbnail == index ? 2 : 0,
-                  shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                          color: currentIndex == index
-                              ? hoveredThumbnail == index
-                                  ? Colors.orange
-                                  : Colors.orange.shade400
-                              : hoveredThumbnail == index
-                                  ? Colors.blue.shade400
-                                  : Colors.transparent,
-                          width: 3),
-                      borderRadius: BorderRadius.circular(12)),
-                  child: Image(
-                    image: ResizeImage(
-                      MemoryImage(data.first["images"][index]), 
-                      width: 350, height: 250),
-                    fit: BoxFit.cover,
-                  )
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-    });
+  double? page = activePage.toDouble();
+  Widget imageThumbnails(arguments, currentIndex, useVerticalLayout) {
+    int length = data.first["images"].length;
+
+    return StatefulBuilder(
+      key: _thumbnailsImageKey,
+      builder: (context, setState) {
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List<Widget>.generate(length + 1, (index) {
+          // video_exist var then -> add videos total +1
+           return ConstrainedBox(
+             constraints: BoxConstraints(maxHeight: useVerticalLayout ? 116 : 88),
+             child: AspectRatio(
+               aspectRatio: 1 / 0.95,
+               child: AnimatedPadding(
+                 curve: Curves.easeOut,
+                 duration: const Duration(milliseconds: 300),
+                 padding: hoveredThumbnail == index
+                     ? const EdgeInsets.all(4)
+                     : const EdgeInsets.all(6),
+                 child: MouseRegion(
+                   onEnter: (value) => setState(() => hoveredThumbnail = index),
+                   onExit: (value) => setState(() => hoveredThumbnail = -1),
+                   child: Card(
+                     shadowColor: Colors.black,
+                     clipBehavior: Clip.antiAlias,
+                     semanticContainer: true,
+                     elevation: hoveredThumbnail == index ? 4 : 2,
+                     shape: RoundedRectangleBorder(
+                       side: BorderSide(
+                         color: page == index
+                           ? hoveredThumbnail == index
+                             ? Colors.orange
+                             : Colors.orange.shade400
+                           : hoveredThumbnail == index
+                             ? Colors.blue.shade400
+                             : Colors.transparent,
+                         width: 3),
+                       borderRadius: BorderRadius.circular(12)),
+                     child: InkWell(
+                       onTap: () async {
+                         if (page == index) {
+                           await imageDialogHero(context, images[index], arguments, index);
+                         }
+
+                         setState(() {
+                           page = index.toDouble();                          
+                         });
+
+                         _pageController.animateToPage(
+                           index,
+                           duration: const Duration(milliseconds: 200),
+                           curve: Curves.ease);
+                       },
+                       child: index == length 
+                         ? videoThumbnails == null
+                           ? const Center(child: CircularProgressIndicator())
+                           : Stack(
+                             fit: StackFit.expand,
+                             children: [
+                               Image(
+                                   image: ResizeImage(
+                                     MemoryImage(videoThumbnails!), width: 450, height: 250),
+                                   fit: BoxFit.cover,
+                               ),
+                               Center(
+                                 child: Icon(
+                                   page == index ? Icons.play_circle_outlined : Icons.play_circle, color: Colors.white, size: 32,
+                                   shadows: const [
+                                     Shadow(
+                                       color: Colors.black26,
+                                       offset: Offset(1, 1),
+                                       blurRadius: 2
+                                     ),
+                                   ]
+                                 )
+                               )
+                             ],
+                           ) 
+                         : Image(
+                           image: ResizeImage(
+                             MemoryImage(data.first["images"][index]), width: 350, height: 250 ),
+                           fit: BoxFit.cover,
+                         ),
+                     ),
+                   ),
+                 ),
+               ),
+             ),
+           );
+         })
+        );
+      }
+    );
   }
 
   void updateTheme(int page) {
-    setState(() {
-      toogleThumbnail = true;
-      isScrollingDown = false;
-      activePage = page;
-    });
+    if (activePage != page) {
+      setState(() {
+        toogleThumbnail = true;
+        isScrollingDown = false;
+        activePage = page;
+      });
+    }
   }                          
                             
   // Main Images
@@ -287,11 +367,12 @@ class _DetailsState extends State<Details> {
               itemCount: data.first["images"].length + 1,
               pageSnapping: true,
               controller: _pageController,
-              onPageChanged: (page) {
-                if (page != data.first["images"].length) {
-                  updateTheme(page);
+              onPageChanged: (value) {
+                if (value != data.first["images"].length) {
+                  updateTheme(value);
                   _detailCardKey.currentState?.setState(() {});
-                }
+                } 
+                _thumbnailsImageKey.currentState?.setState(() { page = value.toDouble(); });
               },
               itemBuilder: (context, pagePosition) {
                 int itemCount = data.first["images"].length;
@@ -639,11 +720,7 @@ class _DetailsState extends State<Details> {
                                                         mainAxisSize: MainAxisSize.min,
                                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                         children: [
-                                                          Row(
-                                                            mainAxisSize: MainAxisSize.min,
-                                                            mainAxisAlignment: MainAxisAlignment.center,
-                                                            children: imageThumbnails(arguments, activePage, useVerticalLayout),
-                                                          ),
+                                                          imageThumbnails(arguments, activePage, useVerticalLayout)
                                                         ],
                                                       ),
                                                     ),
@@ -919,127 +996,153 @@ class _ResourceVideoState extends State<ResourceVideo> {
                 ),
               ),
             ),
-            Center(
-              child: widget.videoController.value.isPlaying && !onHover || onClick
-              ? null 
-              : AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.fastOutSlowIn,
-                height: onHover && !widget.videoController.value.isPlaying ? 96.6 : 84,
-                width: onHover && !widget.videoController.value.isPlaying ? 96.6 : 84,
-                decoration: BoxDecoration(
-                  color: Colors.black45,
-                  borderRadius: BorderRadius.circular(60)
-                )
+            AnimatedScale(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInCubic,
+              scale: onHover && !widget.videoController.value.isPlaying ? 1.15 : 1,
+              child: Center(
+                child: AnimatedSwitcher(
+                  switchInCurve: Curves.easeInCubic,
+                  switchOutCurve: Curves.easeInCubic,
+                  duration: const Duration(milliseconds: 200),
+                  child: widget.videoController.value.isPlaying && !onHover || onClick
+                  ? null 
+                  : Container(
+                      height: 84,
+                      width: 84,
+                      decoration: BoxDecoration(
+                        color: Colors.black45,
+                        borderRadius: BorderRadius.circular(60)
+                      )
+                    ),
+                ),
               ),
             ),
-            IconButton(
-              style: ButtonStyle(
-                shape: const MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
-                foregroundColor: MaterialStateProperty.resolveWith((states) {
-                  return widget.videoController.value.isPlaying
-                    ? states.contains(MaterialState.hovered)
-                      ? onClick ? Colors.transparent : Colors.white
-                      : Colors.transparent
-                    : states.contains(MaterialState.hovered)
-                      ? Colors.white
-                      : Colors.white;
-                }),
-                overlayColor: MaterialStateProperty.resolveWith((states) {
-                  if (states.contains(MaterialState.pressed)) return Colors.transparent;
+            AnimatedOpacity(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInCubic,
+              opacity: widget.videoController.value.isPlaying && !onHover || onClick 
+                ? 0 
+                : 1,
+              child: IconButton(
+                style: ButtonStyle(
+                  shape: const MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
+                  foregroundColor: const MaterialStatePropertyAll(Colors.white),
+                  overlayColor: MaterialStateProperty.resolveWith((states) {
+                    if (states.contains(MaterialState.pressed)) return Colors.transparent;
 
-                  return widget.videoController.value.isPlaying
-                    ? states.contains(MaterialState.pressed)
-                      ? Colors.black26
-                      : Colors.transparent
-                    : states.contains(MaterialState.pressed)
+                    return states.contains(MaterialState.pressed)
                       ? Colors.black26
                       : Colors.transparent;
-                }),
-                backgroundColor: const MaterialStatePropertyAll(Colors.transparent),
+                  }),
+                  backgroundColor: const MaterialStatePropertyAll(Colors.transparent),
+                ),
+                icon: AnimatedScale(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeInCubic,
+                  scale: onHover && !widget.videoController.value.isPlaying ? 1.15 : 1,
+                  child: Icon(size: 60, widget.videoController.value.isPlaying ? Icons.play_arrow : Icons.pause)),
+                onPressed: () {
+                  setState(() {
+                    if (widget.videoController.value.isPlaying) {
+                      onClick = false;
+                      widget.videoController.pause();
+                    } else {
+                      onClick = true;
+                      widget.videoController.play();
+                    }
+                  });
+                }
               ),
-              icon: AnimatedScale(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.fastOutSlowIn,
-                scale: onHover && !widget.videoController.value.isPlaying ? 1.15 : 1,
-                child: Icon(size: 60, widget.videoController.value.isPlaying ? Icons.pause : Icons.play_arrow)),
-              onPressed: () {
-                setState(() {
-                  if (widget.videoController.value.isPlaying) {
-                    onClick = false;
-                    widget.videoController.pause();
-                  } else {
-                    onClick = true;
-                    widget.videoController.play();
-                  }
-                });
-              }
             ),
-            IgnorePointer(
-              ignoring: true,
-              child: Align(
-                alignment: Alignment.bottomLeft, 
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 20),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 200),
-                        child: widget.videoController.value.isBuffering
-                        ? const Padding(
-                          padding: EdgeInsets.only(left: 4),
-                          child: SizedBox(
-                              width: 13,
-                              height: 13,
-                              child: CircularProgressIndicator(strokeWidth: 3, color: Colors.yellow,)
-                            ),
-                        )
-                        : Padding(
-                          padding: const EdgeInsets.only(bottom: 2),
-                          child: Icon(color: Colors.white, size: 18,
-                            shadows: const [
-                              Shadow(
-                                color: Colors.black26,
-                                offset: Offset(1, 1),
-                                blurRadius: 2
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: InkWell(
+                onTap: () {
+                  setState(() {
+                    if (widget.videoController.value.isPlaying) {
+                      onClick = false;
+                      widget.videoController.pause();
+                    } else {
+                      onClick = true;
+                      widget.videoController.play();
+                    }
+                  });
+                },
+                child: Tooltip(
+                  textStyle: const TextStyle(fontSize: 14, color: Colors.white),
+                  message: widget.videoController.value.isPlaying ? 'Pause (space/k)' : 'Play (space/k)',
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade800,
+                    borderRadius: BorderRadius.circular(25.7)
+                  ),
+                  verticalOffset: 20,
+                  preferBelow: false,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 20),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          child: widget.videoController.value.isBuffering
+                          ? const Padding(
+                            padding: EdgeInsets.only(left: 4),
+                            child: SizedBox(
+                                width: 13,
+                                height: 13,
+                                child: CircularProgressIndicator(strokeWidth: 3, color: Colors.yellow,)
                               ),
-                            ],
-                            widget.videoController.value.isPlaying 
-                            ? Icons.play_circle : Icons.pause_circle
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      ValueListenableBuilder(
-                        valueListenable: widget.videoController,
-                        builder: (context, VideoPlayerValue value, child) {
-                          final minutes = value.position.inMinutes.roundToDouble().toString().padLeft(2, '0');
-                          final seconds = (value.position.inSeconds % 60).roundToDouble().toString().padLeft(2, '0');
-
-                          final dminutes = widget.videoController.value.duration.inMinutes.roundToDouble().toString().padLeft(2, '0');
-                          final dseconds = ((widget.videoController.value.duration.inSeconds.roundToDouble() % 60) - 1).toString().padLeft(2, '0');
-
-                          return Text(
-                            "$minutes:$seconds / $dminutes:$dseconds",
-                            style: GoogleFonts.roboto(
+                          )
+                          : Padding(
+                            padding: const EdgeInsets.only(bottom: 2),
+                            child: Icon(color: widget.videoController.value.isPlaying 
+                              ? Colors.redAccent.shade100
+                              : Colors.yellow.shade300, size: 18,
                               shadows: const [
                                 Shadow(
-                                  color: Colors.black45,
+                                  color: Colors.black26,
                                   offset: Offset(1, 1),
                                   blurRadius: 2
                                 ),
                               ],
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey.shade200
+                              widget.videoController.value.isPlaying 
+                              ? Icons.play_circle : Icons.pause_circle
                             ),
-                          );
-                        }
-                      ), 
-                    ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ValueListenableBuilder(
+                          valueListenable: widget.videoController,
+                          builder: (context, VideoPlayerValue value, child) {
+                            final minutes = value.position.inMinutes.roundToDouble().toString().padLeft(2, '0');
+                            final seconds = (value.position.inSeconds % 60).roundToDouble().toString().padLeft(2, '0');
+
+                            final dminutes = widget.videoController.value.duration.inMinutes.roundToDouble().toString().padLeft(2, '0');
+                            final dseconds = ((widget.videoController.value.duration.inSeconds.roundToDouble() % 60) - 1).toString().padLeft(2, '0');
+
+                            return Text(
+                              "$minutes:$seconds / $dminutes:$dseconds",
+                              style: GoogleFonts.roboto(
+                                shadows: const [
+                                  Shadow(
+                                    color: Colors.black45,
+                                    offset: Offset(1, 1),
+                                    blurRadius: 2
+                                  ),
+                                ],
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey.shade200
+                              ),
+                            );
+                          }
+                        ), 
+                      ],
+                    ),
                   ),
-                )
+                ),
               ),
             ),
           ]
