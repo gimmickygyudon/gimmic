@@ -29,6 +29,7 @@ import '../../assets/widgets/button.dart';
 import '../../assets/widgets/card.dart';
 import '../../assets/widgets/dialog.dart';
 import '../../assets/widgets/menu.dart';
+import '../../assets/widgets/shimmer.dart';
 import '../../assets/widgets/snackbar.dart';
 
 int activePage = 0;
@@ -142,7 +143,9 @@ class _DetailsState extends State<Details> {
       videoThumbnails = imageBytes;            
       setState(() { });
     });
+
     super.initState();
+
     /* isAnimated = false;
     Future.delayed(const Duration(milliseconds: 50)).whenComplete(() {
       setState(() {
@@ -672,86 +675,90 @@ Future<void> _getVideoThumbnail(String path, void Function(Uint8List? imageBytes
                                     FutureBuilder(
                                       future: _loadItems,
                                       builder: (context, snapshot) {
-                                        if (snapshot.connectionState == ConnectionState.waiting) {
-                                          return const SliverFillRemaining(
-                                            hasScrollBody: false,
-                                            fillOverscroll: false, 
-                                            child: Center(child: CircularProgressIndicator(strokeWidth: 3)),
-                                          );
-                                        }
-
                                         return SliverFillRemaining(
-                                        hasScrollBody: useVerticalLayout ? false : true,
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Visibility(
-                                              visible: toogleThumbnail || useVerticalLayout 
-                                                ? true
-                                                : false,
-                                              child: StatefulBuilder(
-                                              key: _thumbnailsKey,
-                                              builder: (context, setState) =>
-                                                AnimatedSize(
-                                                  duration: const Duration(milliseconds: 800),
-                                                  curve: Curves.fastOutSlowIn,
-                                                  child: SizedBox(
-                                                    width: double.infinity,
-                                                    height: toogleThumbnail || useVerticalLayout
-                                                        ? null
-                                                        : 0,
-                                                    child: Card(
-                                                      color: paletteLoaded
-                                                        ? colorLight(paletteMutedColors[activePage].color, .9)
-                                                        : Colors.grey.shade50,
-                                                      surfaceTintColor: paletteLoaded
-                                                        ? colorLight(paletteMutedColors[activePage].color, .9)
-                                                        : Colors.grey.shade50,
-                                                      elevation: useVerticalLayout ? 2 : 0,
-                                                      shadowColor: Colors.black26,
-                                                      margin: useVerticalLayout
-                                                        ? const EdgeInsets.fromLTRB(4, 8, 4, 4)
-                                                        : const EdgeInsets.fromLTRB(4, 6, 4, 2),
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(12),
-                                                      ),
-                                                       child: Row(
-                                                        mainAxisSize: MainAxisSize.min,
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children: [
-                                                          imageThumbnails(arguments, activePage, useVerticalLayout)
-                                                        ],
+                                          hasScrollBody: useVerticalLayout ? false : true,
+                                          fillOverscroll: false, 
+                                          child: ShimmerLoading(
+                                            isLoading: snapshot.connectionState == ConnectionState.waiting,
+                                            border: BorderRadius.circular(12),
+                                            margin: useVerticalLayout
+                                              ? const EdgeInsets.fromLTRB(4, 8, 4, 4)
+                                              : const EdgeInsets.fromLTRB(0, 6, 0, 2),
+                                            builder: ShimmerImageThumbnails(
+                                              useVerticalLayout: useVerticalLayout, 
+                                              constraints: constraints
+                                            ),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Visibility(
+                                                  visible: toogleThumbnail || useVerticalLayout 
+                                                    ? true
+                                                    : false,
+                                                  child: StatefulBuilder(
+                                                  key: _thumbnailsKey,
+                                                  builder: (context, setState) =>
+                                                    AnimatedSize(
+                                                      duration: const Duration(milliseconds: 800),
+                                                      curve: Curves.fastOutSlowIn,
+                                                      child: SizedBox(
+                                                        width: double.infinity,
+                                                        height: toogleThumbnail || useVerticalLayout
+                                                            ? null
+                                                            : 0,
+                                                        child: Card(
+                                                          color: paletteLoaded
+                                                            ? colorLight(paletteMutedColors[activePage].color, .9)
+                                                            : Colors.grey.shade50,
+                                                          surfaceTintColor: paletteLoaded
+                                                            ? colorLight(paletteMutedColors[activePage].color, .9)
+                                                            : Colors.grey.shade50,
+                                                          elevation: useVerticalLayout ? 2 : 0,
+                                                          shadowColor: Colors.black26,
+                                                          margin: useVerticalLayout
+                                                            ? const EdgeInsets.fromLTRB(4, 8, 4, 4)
+                                                            : const EdgeInsets.fromLTRB(4, 6, 4, 2),
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(12),
+                                                          ),
+                                                           child: Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              imageThumbnails(arguments, activePage, useVerticalLayout)
+                                                            ],
+                                                          ),
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                            ),
-                                            Visibility(
-                                              visible: useVerticalLayout ? false : true,
-                                              child: Flexible(
-                                                flex: 6,
-                                                child: AnimatedSlide(
-                                                  curve: Curves.easeOutExpo,
-                                                  duration: const Duration( milliseconds: 300),
-                                                  offset: isAnimated
-                                                      ? const Offset(0.0, 0.0)
-                                                      : const Offset(0.0, 1.0),
-                                                  child: DetailCard(
-                                                    notifyParent: updateTheme, 
-                                                    key: _detailCardKey,
-                                                    data: data,
-                                                    paletteLoaded: paletteLoaded,
-                                                    usePhoneLayout: usePhoneLayout,
-                                                    useVerticalLayout: useVerticalLayout
+                                                Visibility(
+                                                  visible: useVerticalLayout ? false : true,
+                                                  child: Flexible(
+                                                    flex: 6,
+                                                    child: AnimatedSlide(
+                                                      curve: Curves.easeOutExpo,
+                                                      duration: const Duration( milliseconds: 300),
+                                                      offset: isAnimated
+                                                          ? const Offset(0.0, 0.0)
+                                                          : const Offset(0.0, 1.0),
+                                                      child: DetailCard(
+                                                        notifyParent: updateTheme, 
+                                                        key: _detailCardKey,
+                                                        data: data,
+                                                        paletteLoaded: paletteLoaded,
+                                                        usePhoneLayout: usePhoneLayout,
+                                                        useVerticalLayout: useVerticalLayout
+                                                      ),
+                                                    )
                                                   ),
                                                 )
-                                              ),
+                                              ],
                                             )
-                                          ],
-                                        ),
-                                      );
+                                          ),
+                                        );
                                     },
                                   )
                                 ]),
@@ -768,25 +775,32 @@ Future<void> _getVideoThumbnail(String path, void Function(Uint8List? imageBytes
                             child: FutureBuilder(
                               future: _loadItems,
                               builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return const Center(child: CircularProgressIndicator(strokeWidth: 3));
-                                }
-
                                 return AnimatedPadding(
                                   curve: Curves.fastOutSlowIn,
                                   duration: const Duration(milliseconds: 600),
                                   padding: useSmallLayout
                                       ? const EdgeInsets.only(
                                           top: 10, left: 0, right: 10, bottom: 10)
-                                      : const EdgeInsets.only(
-                                          top: 12, left: 0, right: 24, bottom: 10),
-                                  child: DetailCard(
-                                    notifyParent: updateTheme, 
-                                    key: _detailCardKey,
-                                    data: data,
-                                    paletteLoaded: paletteLoaded,
-                                    usePhoneLayout: usePhoneLayout,
-                                    useVerticalLayout: useVerticalLayout
+                                      : snapshot.connectionState == ConnectionState.waiting 
+                                          ? const EdgeInsets.only(top: 16, left: 4, right: 28, bottom: 14)
+                                          : const EdgeInsets.only(top: 12, left: 0, right: 24, bottom: 10),
+                                  child: ShimmerLoading(
+                                    builder: ShimmerDetailCard(
+                                      useVerticalLayout: useVerticalLayout
+                                    ),
+                                    isLoading: snapshot.connectionState == ConnectionState.waiting,
+                                    border: BorderRadius.circular(12),
+                                    padding: useVerticalLayout
+                                      ? EdgeInsets.zero
+                                      : const EdgeInsets.only(top: 8),
+                                    child: DetailCard(
+                                      notifyParent: updateTheme, 
+                                      key: _detailCardKey,
+                                      data: data,
+                                      paletteLoaded: paletteLoaded,
+                                      usePhoneLayout: usePhoneLayout,
+                                      useVerticalLayout: useVerticalLayout
+                                    ),
                                   ),
                                 );
                               },
@@ -827,17 +841,23 @@ class FutureImage extends StatelessWidget {
     return FutureBuilder(
       future: loadItems,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const FlexibleSpaceBar(
-            title: null,
-            background: Center(child: CircularProgressIndicator(strokeWidth: 3)),
-          );
-        }
-  
-        return NonFutureImage(
-          useVerticalLayout: useVerticalLayout, imageMain: imageMain, 
-          arguments: arguments, imageIndicators: imageIndicators, 
-          data: data
+        return FlexibleSpaceBar(
+          title: null,
+          background: ShimmerLoading(
+            builder: ShimmerImageMain(useVerticalLayout: useVerticalLayout),
+            isLoading: snapshot.connectionState == ConnectionState.waiting,
+            border: useVerticalLayout
+              ? BorderRadius.circular(20)
+              : const BorderRadius.only(
+                  bottomLeft: Radius.circular(12),
+                  bottomRight: Radius.circular(12)
+            ),
+            child: NonFutureImage(
+              useVerticalLayout: useVerticalLayout, imageMain: imageMain, 
+              arguments: arguments, imageIndicators: imageIndicators, 
+              data: data
+            ),
+          ),
         );
       },
     );

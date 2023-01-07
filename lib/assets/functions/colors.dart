@@ -1,5 +1,140 @@
 import 'package:flutter/material.dart';
 
+class ShimmerLoading extends StatefulWidget {
+  static ShimmerLoadingState? of(BuildContext context) {
+    return context.findAncestorStateOfType<ShimmerLoadingState>();
+  }
+
+  const ShimmerLoading({
+    super.key,
+    required this.isLoading,
+    required this.child,
+    this.duration = const Duration(seconds: 1),
+    this.curve = Curves.ease,
+    required this.border,
+    this.margin = EdgeInsets.zero,
+    this.padding = EdgeInsets.zero,
+    required this.builder
+  });
+
+  final bool isLoading;
+  final Widget child;
+  final Duration duration;
+  final Curve curve;
+  final BorderRadius border;
+  final EdgeInsets margin, padding;
+  final Widget builder;
+
+  @override
+  State<ShimmerLoading> createState() => ShimmerLoadingState();
+}
+
+class ShimmerLoadingState extends State<ShimmerLoading> with SingleTickerProviderStateMixin {
+  late AnimationController _shimmerController;
+  Listenable get shimmerChanges => _shimmerController;
+  Listenable? _shimmerChanges;
+  LinearGradient? shimmerGradient;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_shimmerChanges != null) {
+      _shimmerChanges!.removeListener(_onShimmerChange);
+    }
+    _shimmerChanges = ShimmerLoading.of(context)?.shimmerChanges;
+    if (_shimmerChanges != null) {
+      _shimmerChanges!.addListener(_onShimmerChange);
+    }
+
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _shimmerController = AnimationController.unbounded(
+      vsync: this, 
+    )..repeat(min: -0.5, max: 1.5, period: const Duration(seconds: 1));
+  }
+
+  @override
+  void dispose() {
+    _shimmerController.dispose();
+    _shimmerChanges?.removeListener(_onShimmerChange);
+    super.dispose();
+  }
+
+  void _onShimmerChange() {
+    if (widget.isLoading) {
+      setState(() {
+        // update the shimmer painting.
+      });
+    }
+  }
+
+  Future<void> _onShimmerStop() async {
+    if(!widget.isLoading) {
+        _shimmerController.stop();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: widget.duration,
+      switchInCurve: widget.curve,
+      switchOutCurve: widget.curve,
+      child: (() {
+        _onShimmerStop();
+        return widget.isLoading 
+          ? AnimatedBuilder(
+              animation: _shimmerController,
+              child: widget.builder,
+              builder: (context, child) {
+                return ShaderMask(
+                    blendMode: BlendMode.srcATop,
+                    shaderCallback: (bounds) {
+                      return LinearGradient(
+                        colors: [
+                          Colors.grey.shade300.withOpacity(0.6),
+                          Colors.grey.shade200.withOpacity(0.9),
+                          Colors.grey.shade300.withOpacity(0.6),
+                        ],
+                        stops: const [
+                          0.1,
+                          0.3,
+                          0.4,
+                        ],
+                        begin: const Alignment(-1.0, -0.3),
+                        end: const Alignment(1.0, 0.3),
+                        transform: _SlidingGradientTransform(slidePercent: _shimmerController.value),
+                      ).createShader(bounds);
+                    },
+                    child: widget.builder 
+                );
+              }
+            )
+          : widget.child;
+      }())
+    );
+  }
+}
+
+class _SlidingGradientTransform extends GradientTransform {
+  const _SlidingGradientTransform({
+    required this.slidePercent,
+  });
+
+  final double slidePercent;
+
+  @override
+  Matrix4? transform(Rect bounds, {TextDirection? textDirection}) {
+    return Matrix4.translationValues(bounds.width * slidePercent, 0.0, 0.0);
+  }
+}
+
+
+
+// [DEPRECATED]
 Color colorButtonLuminance(Color color,
     [double darkamount = .5, double lightamount = .2]) {
   final colors = lighten(color, lightamount).computeLuminance() > 0.65
@@ -8,6 +143,7 @@ Color colorButtonLuminance(Color color,
   return colors;
 }
 
+// [DEPRECATED]
 Color colorLuminance(Color color, [double amount = .1, double percent = .5]) {
   final luminance = lighten(color, amount).computeLuminance();
 
@@ -76,6 +212,7 @@ Color colorLightButton(Color color, [double amount = .75, double power = .45]) {
   return colorLight(color, amount, power);
 }
 
+// [DEPRECATED]
 Color colorDark(Color color, [double amount = .1, double percent = .5]) {
   final luminance = darken(color, amount).computeLuminance();
 
