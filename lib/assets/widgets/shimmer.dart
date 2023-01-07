@@ -13,8 +13,13 @@ class ShimmerImageMain extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
               color: Colors.grey,
-              borderRadius: BorderRadius.circular(12),                
-            ),
+              borderRadius: useVerticalLayout
+              ? BorderRadius.circular(20)
+              : const BorderRadius.only(
+                  bottomLeft: Radius.circular(12),
+                  bottomRight: Radius.circular(12)
+            ),            
+          ),
           padding: useVerticalLayout
             ? EdgeInsets.zero
             : const EdgeInsets.only(top: 8),
@@ -42,8 +47,12 @@ class ShimmerImageMain extends StatelessWidget {
             ),
           ),
         ),
-        const Center(
-          child: CircularProgressIndicator()
+        Center(
+          child: Icon(
+            Icons.image, 
+            color: Colors.grey.shade700,
+            size: 60,
+          )
         )
       ],
     );

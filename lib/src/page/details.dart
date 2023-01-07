@@ -1196,6 +1196,10 @@ late TabController _tabController;
 late FocusNode _msgInputFocusNode;
 final GlobalKey<State<StatefulWidget>> _msgInputKey = GlobalKey<State<StatefulWidget>>();
 int tabIndex = 0;
+bool onHoverTileBrand = false;
+bool expandTileBrand = true;
+
+bool favorited = false;
 
 class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateMixin {
 
@@ -1314,64 +1318,107 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                   right: 15,
                   bottom: 0),
               child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    TabBar(
-                      controller: _tabController,
-                      dividerColor: Colors.transparent,
-                      indicator: UnderlineTabIndicator(
-                          borderSide: BorderSide(
-                            color: widget.paletteLoaded
-                              ? colorLight(paletteDominantColors[activePage].color, .2)
-                              : Colors.orange, width: 2),
-                          insets: const EdgeInsets.only(left: 10, right: 5)),
-                      isScrollable: true,
-                      indicatorWeight: 3,
-                      overlayColor: MaterialStateProperty.resolveWith((states) {
-                        return states.contains(MaterialState.hovered)
-                          ? Colors.black
-                          : null;
-                      }),
-                      labelColor: widget.paletteLoaded
-                        ? colorLight(paletteDominantColors[activePage].color, .1)
-                        : Colors.orange,
-                      unselectedLabelColor: widget.paletteLoaded
-                        ? colorLight(paletteDominantColors[activePage].color, .2)
-                        : Colors.grey.shade700,
-                      padding: EdgeInsets.zero,
-                      labelPadding: const EdgeInsets.only(top: 0, left: 15, right: 15, bottom: 0),
-                      labelStyle: GoogleFonts.roboto(fontWeight: FontWeight.w500, fontSize: 16),
-                      onTap: (e) {
-                        _thumbnailsKey.currentState?.setState(() {
-                          toogleThumbnail = false;
-                          isScrollingDown = true;
-                        });
-                      },
-                      tabs: <Widget>[
-                        Tab(
-                          child: Row(
-                            children: [
-                              const Icon(Icons.window, size: 18),
-                              const SizedBox(width: 6),
-                              Text("About", 
-                                style: GoogleFonts.roboto(
-                                  fontWeight: FontWeight.w600)
+                    StatefulBuilder(
+                      builder: (context, setState) {
+                        return TabBar(
+                          mouseCursor: SystemMouseCursors.basic,
+                          controller: _tabController,
+                          dividerColor: Colors.transparent,
+                          indicator: const UnderlineTabIndicator(
+                            borderSide: BorderSide(
+                              color: Colors.transparent, width: 0
+                            ),
+                          ),
+                          indicatorWeight: 0,
+                          isScrollable: true,
+                          overlayColor: MaterialStateProperty.resolveWith((states) {
+                            return states.contains(MaterialState.hovered)
+                              ? Colors.black
+                              : null;
+                          }),
+                          labelColor: widget.paletteLoaded
+                            ? colorLight(paletteDominantColors[activePage].color, .1)
+                            : Colors.orange,
+                          unselectedLabelColor: widget.paletteLoaded
+                            ? colorLight(paletteDominantColors[activePage].color, .2)
+                            : Colors.grey.shade700,
+                          padding: EdgeInsets.zero,
+                          labelPadding: const EdgeInsets.fromLTRB(14, 8, 4, 0),
+                          labelStyle: GoogleFonts.roboto(fontWeight: FontWeight.w500, fontSize: 16),
+                          onTap: (e) {
+                            setState(() {
+                              tabIndex = e;
+                            });
+                            _thumbnailsKey.currentState?.setState(() {
+                              toogleThumbnail = false;
+                              isScrollingDown = true;
+                            });
+                          },
+                          tabs: <Widget>[
+                            Tab(
+                              child: ElevatedButton.icon(
+                                style: ButtonStyle(
+                                  shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                                  backgroundColor: MaterialStatePropertyAll(
+                                    tabIndex == 0 
+                                    ? widget.paletteLoaded
+                                      ? colorLight(paletteDominantColors[activePage].color, .1)
+                                      : Colors.green.shade700
+                                    : null 
+                                  ),
+                                  foregroundColor: MaterialStatePropertyAll(
+                                    tabIndex == 0
+                                    ? Colors.white
+                                    : null
+                                  )
+                                ),
+                                label: Text("About", 
+                                  style: GoogleFonts.roboto(fontWeight: FontWeight.w600)
+                                ),
+                                icon: const Icon(Icons.window, size: 18),
+                                onPressed: () {
+                                  setState(() {
+                                    tabIndex = 0;
+                                    _tabController.animateTo(0);
+                                  });
+                                },
                               )
-                            ],
-                          )),
-                        Tab(
-                          child: Row(
-                            children: [
-                              const Icon(Icons.chat, size: 18),
-                              const SizedBox(width: 6),
-                              Text("Chat", 
-                                style: GoogleFonts.roboto(
-                                  fontWeight: FontWeight.w600)
+                            ),
+                            Tab(
+                              child: ElevatedButton.icon(
+                                style: ButtonStyle(
+                                  shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                                  backgroundColor: MaterialStatePropertyAll(
+                                    tabIndex == 1
+                                    ? widget.paletteLoaded
+                                      ? colorLight(paletteDominantColors[activePage].color, .1)
+                                      : Colors.green.shade700
+                                    : null 
+                                  ),
+                                  foregroundColor: MaterialStatePropertyAll(
+                                    tabIndex == 1
+                                    ? Colors.white
+                                    : null
+                                  )
+                                ),
+                                label: Text("Chat", 
+                                  style: GoogleFonts.roboto(fontWeight: FontWeight.w600)
+                                ),
+                                icon: const Icon(Icons.chat, size: 18),
+                                onPressed: () {
+                                  setState(() {
+                                    tabIndex = 1;
+                                    _tabController.animateTo(1);
+                                  });
+                                },
                               )
-                            ],
-                          ))
-                      ]),
+                            )
+                          ]);
+                      }
+                    ),
                     Row(
                       children: [
                         Visibility(
@@ -1450,7 +1497,7 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                       controller: controller,
                       thumbVisibility: true,
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 25, right: 25, bottom: 0, top: 12),
+                        padding: EdgeInsets.only(left: 24, right: 24, bottom: 0, top: widget.useVerticalLayout ? 6 : 12),
                         child: ScrollConfiguration(
                           behavior: DragOnScroll().copyWith(scrollbars: false),
                           child: NotificationListener(
@@ -1476,99 +1523,153 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                                 physics: const ClampingScrollPhysics(),
                                 shrinkWrap: true,
                                 children: [
-                                  Theme(
-                                    data: ThemeData(useMaterial3: true).copyWith(
-                                      dividerColor: Colors.transparent),
-                                    child: ExpansionTile(
-                                      initiallyExpanded: true,
-                                      onExpansionChanged: (value) {
-                                        _thumbnailsKey.currentState?.setState(() {
-                                          toogleThumbnail = false;
-                                        });
-                                      },
-                                      tilePadding: const EdgeInsets.symmetric(horizontal: 0),
-                                      title: Text(
-                                        widget.data.first['name'],
-                                        style: GoogleFonts.roboto(
-                                            color: Colors.grey.shade800,
-                                            fontSize: 24,
-                                            fontWeight: FontWeight.w500,
-                                            letterSpacing: -0.5),
-                                      ),
-                                      subtitle: Text(
-                                          widget.data.first['brand'].toString().toTitleCase(),
-                                          style: GoogleFonts.roboto(
-                                              color: Colors.grey.shade700,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500)),
-                                      trailing: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          IconButton(
-                                              tooltip: 'Add to Favorites',
-                                              onPressed: () {},
-                                              icon: const Icon(
-                                                Icons.favorite_border,
-                                                color: Colors.black87,
-                                              )),
-                                        ],
-                                      ),
-                                      children: const [
-                                        SizedBox(height: 4),
-                                        Text(
-                                          "A cat is a furry animal that has a long tail and sharp claws. Cats are often kept as pets. Cats are lions, tigers, and other wild animals in the same family.",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              letterSpacing: 0.1,
-                                              height: 1.6,
-                                              color: Colors.black87),
-                                        ),
-                                        /* Theme(
-                                          data: ThemeData(
-                                            textButtonTheme: TextButtonThemeData(
-                                              style: ButtonStyle(
-                                                shape: MaterialStatePropertyAll(
-                                                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.7))),
-                                                foregroundColor: MaterialStateProperty.resolveWith((states) {
-                                                  return states.contains(MaterialState.hovered)
-                                                    ? Colors.white
-                                                    : widget.paletteLoaded
-                                                      ? colorLight(paletteDominantColors[activePage].color, .1)
-                                                      : null;
-                                                }),
-                                                overlayColor: MaterialStateProperty.resolveWith((states) {
-                                                  return states.contains(MaterialState.hovered)
-                                                    ? widget.paletteLoaded 
-                                                      ? colorLight(paletteDominantColors[activePage].color, .1)
-                                                      : null
-                                                    : null;
-                                                })
-                                              ),
-                                            )
-                                          ),
-                                          child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.end,
-                                              children: [
-                                                TextButton.icon(
-                                                    onPressed: () => urlLink(context, 'https://en.wikipedia.org/wiki/The_Legend_of_Zelda'),
-                                                    icon: const Icon(FontAwesomeIcons.wikipediaW, size: 14),
-                                                    label: const Text('Wikipedia', 
-                                                      style: TextStyle(fontWeight: FontWeight.w600)
-                                                    )
+                                  StatefulBuilder(
+                                    builder: (context, setState) {
+                                      return Card(
+                                        color: onHoverTileBrand
+                                          ? widget.paletteLoaded
+                                            ? colorLight(paletteDominantColors[activePage].color, .85)
+                                            : Colors.grey.shade100
+                                          : Colors.transparent,
+                                        elevation: 0,
+                                        margin: EdgeInsets.zero,
+                                        child: InkWell(
+                                          borderRadius: BorderRadius.circular(12),
+                                          hoverColor: widget.paletteLoaded
+                                            ? colorLight(paletteDominantColors[activePage].color, .8)
+                                            : Colors.grey.shade200,
+                                          splashColor: widget.paletteLoaded
+                                            ? colorLight(paletteDominantColors[activePage].color, .85)
+                                            : Colors.grey.shade50,
+                                          onHover:(value) {
+                                            setState(() {                                                                                  
+                                              onHoverTileBrand = value;
+                                            });
+                                          },
+                                          onTap: () {
+                                            setState(() {
+                                              favorited 
+                                                ? favorited = false 
+                                                : favorited = true;
+                                            });
+                                          },
+                                          child: AnimatedPadding(
+                                            curve: Curves.fastOutSlowIn,
+                                            duration: const Duration(milliseconds: 200),
+                                            padding: onHoverTileBrand 
+                                              ? EdgeInsets.fromLTRB(14, 0, 8, expandTileBrand ? 8 : 4)
+                                              : const EdgeInsets.symmetric(horizontal: 2, vertical: 0),
+                                            child: Theme(
+                                              data: ThemeData(useMaterial3: true).copyWith(
+                                                splashFactory: NoSplash.splashFactory,
+                                                hoverColor: Colors.transparent,
+                                                dividerColor: Colors.transparent),
+                                              child: ExpansionTile(
+                                                initiallyExpanded: expandTileBrand,
+                                                onExpansionChanged: (value) {
+                                                  setState(() {
+                                                    expandTileBrand
+                                                      ? expandTileBrand = false 
+                                                      : expandTileBrand = true;
+                                                  });
+                                                  _thumbnailsKey.currentState?.setState(() {
+                                                    toogleThumbnail = false;
+                                                  });
+                                                },
+                                                tilePadding: const EdgeInsets.symmetric(horizontal: 0),
+                                                title: Text(
+                                                  widget.data.first['name'],
+                                                  style: GoogleFonts.roboto(
+                                                      color: Colors.grey.shade800,
+                                                      fontSize: 24,
+                                                      fontWeight: FontWeight.w500,
+                                                      letterSpacing: -0.5),
                                                 ),
-                                                const SizedBox(width: 4),
-                                                TextButton.icon(
-                                                    onPressed: () => urlLink(context, 'https://www.google.com/search?q=${widget.data.first['name']}'),
-                                                    icon: const Icon(FontAwesomeIcons.google, size: 14),
-                                                    label: const Text('Google',
-                                                      style: TextStyle(fontWeight: FontWeight.w600)
-                                                    )
-                                                )
-                                              ]),
-                                        ), */
-                                      ],
-                                    ),
+                                                subtitle: Text(
+                                                    widget.data.first['brand'].toString().toTitleCase(),
+                                                    style: GoogleFonts.roboto(
+                                                        color: Colors.grey.shade700,
+                                                        fontSize: 14,
+                                                        fontWeight: FontWeight.w500)),
+                                                trailing: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    IconButton(
+                                                      tooltip: 'Add to Favorites',
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          favorited 
+                                                            ? favorited = false 
+                                                            : favorited = true;
+                                                        });
+                                                      },
+                                                      icon: Icon(
+                                                        favorited ? Icons.favorite : Icons.favorite_border,
+                                                        color: favorited ? Colors.red.shade300 : Colors.black87,
+                                                      )),
+                                                  ],
+                                                ),
+                                                children: [
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    "A cat is a furry animal that has a long tail and sharp claws. Cats are often kept as pets. Cats are lions, tigers, and other wild animals in the same family.",
+                                                    style: GoogleFonts.roboto(
+                                                        fontSize: 14,
+                                                        fontWeight: FontWeight.w400,
+                                                        letterSpacing: 0.1,
+                                                        height: 1.6,
+                                                        color: Colors.black87),
+                                                  ),
+                                                  /* Theme(
+                                                    data: ThemeData(
+                                                      textButtonTheme: TextButtonThemeData(
+                                                        style: ButtonStyle(
+                                                          shape: MaterialStatePropertyAll(
+                                                            RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.7))),
+                                                          foregroundColor: MaterialStateProperty.resolveWith((states) {
+                                                            return states.contains(MaterialState.hovered)
+                                                              ? Colors.white
+                                                              : widget.paletteLoaded
+                                                                ? colorLight(paletteDominantColors[activePage].color, .1)
+                                                                : null;
+                                                          }),
+                                                          overlayColor: MaterialStateProperty.resolveWith((states) {
+                                                            return states.contains(MaterialState.hovered)
+                                                              ? widget.paletteLoaded 
+                                                                ? colorLight(paletteDominantColors[activePage].color, .1)
+                                                                : null
+                                                              : null;
+                                                          })
+                                                        ),
+                                                      )
+                                                    ),
+                                                    child: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.end,
+                                                        children: [
+                                                          TextButton.icon(
+                                                              onPressed: () => urlLink(context, 'https://en.wikipedia.org/wiki/The_Legend_of_Zelda'),
+                                                              icon: const Icon(FontAwesomeIcons.wikipediaW, size: 14),
+                                                              label: const Text('Wikipedia', 
+                                                                style: TextStyle(fontWeight: FontWeight.w600)
+                                                              )
+                                                          ),
+                                                          const SizedBox(width: 4),
+                                                          TextButton.icon(
+                                                              onPressed: () => urlLink(context, 'https://www.google.com/search?q=${widget.data.first['name']}'),
+                                                              icon: const Icon(FontAwesomeIcons.google, size: 14),
+                                                              label: const Text('Google',
+                                                                style: TextStyle(fontWeight: FontWeight.w600)
+                                                              )
+                                                          )
+                                                        ]),
+                                                  ), */
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 12, top: 20),
@@ -1661,40 +1762,38 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                                   Theme(
                                     data: ThemeData(useMaterial3: true)
                                         .copyWith(dividerColor: Colors.transparent),
-                                    child: ListTileTheme(
-                                      child: ExpansionTile(
-                                        tilePadding: const EdgeInsets.symmetric(horizontal: 0),
-                                        title: const Text(
-                                          'Blender',
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                        subtitle: const Text('3.2.2 (bcfdb14560e7)'),
-                                        textColor: Colors.orange,
-                                        iconColor: Colors.orange,
-                                        leading: IconButton(
-                                            tooltip: 'Blender',
-                                            onPressed: () {},
-                                            icon: const Icon(
-                                              IconSoftware.blender3dfilled,
-                                              color: Colors.orangeAccent,
-                                            )),
-                                        children: const [
-                                          ListTile(
-                                            title: Text('Face Count'),
-                                            subtitle: Text('115,835'),
-                                          ),
-                                          ListTile(
-                                            title: Text('Objects'),
-                                            subtitle: Text('19'),
-                                          ),
-                                          ListTile(
-                                            title: Text('File Size'),
-                                            subtitle: Text('28 MB'),
-                                          ),
-                                        ],
+                                    child: ExpansionTile(
+                                      tilePadding: const EdgeInsets.symmetric(horizontal: 0),
+                                      title: const Text(
+                                        'Blender',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500),
                                       ),
+                                      subtitle: const Text('3.2.2 (bcfdb14560e7)'),
+                                      textColor: Colors.orange,
+                                      iconColor: Colors.orange,
+                                      leading: IconButton(
+                                          tooltip: 'Blender',
+                                          onPressed: () {},
+                                          icon: const Icon(
+                                            IconSoftware.blender3dfilled,
+                                            color: Colors.orangeAccent,
+                                          )),
+                                      children: const [
+                                        ListTile(
+                                          title: Text('Face Count'),
+                                          subtitle: Text('115,835'),
+                                        ),
+                                        ListTile(
+                                          title: Text('Objects'),
+                                          subtitle: Text('19'),
+                                        ),
+                                        ListTile(
+                                          title: Text('File Size'),
+                                          subtitle: Text('28 MB'),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                   Theme(
@@ -1807,7 +1906,7 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                       controller: controllerComment,
                       thumbVisibility: true,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         child: ScrollConfiguration(
                           behavior: ScrollConfiguration.of(context)
                               .copyWith(scrollbars: false),
