@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:gimmic/assets/widgets/shimmer.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -38,6 +39,7 @@ class _CardBigState extends State<CardBig> {
     colors: <Color>[Colors.white, Colors.lightBlue],
   ).createShader(const Rect.fromLTWH(0, 0, 200, 70)); */
   bool cardSelected = false;
+  bool imageLoaded = false;
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +71,7 @@ class _CardBigState extends State<CardBig> {
         child: Hero(
           tag: 'catHello',
           child: Card(
-            color: Colors.blue.shade200,
+            color: Colors.blue,
             margin: const EdgeInsets.all(0),
             elevation: cardSelected ? 8 : 0,
             shadowColor: Colors.black,
@@ -77,7 +79,6 @@ class _CardBigState extends State<CardBig> {
                 borderRadius: BorderRadius.circular(12),
                 side: cardSelected ? BorderSide.none : BorderSide.none),
             clipBehavior: Clip.antiAlias,
-            semanticContainer: true,
             child: ConstrainedBox(
               constraints: BoxConstraints(
                 maxWidth: widget.rowConstraints.maxWidth,
@@ -87,7 +88,9 @@ class _CardBigState extends State<CardBig> {
               ),
               child: AspectRatio(
                 aspectRatio: 1 / 1,
-                child: Stack(fit: StackFit.expand, children: [
+                child: Stack(
+                  fit: StackFit.expand, 
+                  children: [
                   ClipRect(
                     child: AnimatedScale(
                       curve: Curves.easeOut,
@@ -96,19 +99,35 @@ class _CardBigState extends State<CardBig> {
                       child: Image.network(
                         'https://source.unsplash.com/random',
                         fit: BoxFit.cover,
-                        frameBuilder: (BuildContext context, Widget child,
-                            int? frame, bool wasSynchronouslyLoaded) {
-                          if (wasSynchronouslyLoaded == true) return child;
-                          return imageFrameBulilder(
-                              child, frame, wasSynchronouslyLoaded);
+                        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                          if (wasSynchronouslyLoaded) {
+                            return child;
+                          }
+
+                          return AnimatedOpacity(
+                            opacity: imageLoaded ? 1 : 0,
+                            duration: const Duration(seconds: 3),
+                            curve: Curves.easeOut,
+                            child: child,
+                          );
                         },
-                        loadingBuilder: (BuildContext context, Widget child,
-                            ImageChunkEvent? loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Column(
-                            children: [
-                              imageLoadingBuilder(child, loadingProgress)
-                            ]
+                        loadingBuilder: (BuildContext context, 
+                        Widget child, ImageChunkEvent? loadingProgress) {
+                          if (loadingProgress == null) {
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              setState(() => imageLoaded = true);
+                            });
+                            return child;
+                          }
+
+                          imageLoaded = false;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
                           );
                         },
                       ),
@@ -1786,9 +1805,10 @@ class _CardResourceState extends State<CardResource> {
           clipBehavior: Clip.antiAlias,
           child: Column(
             children: [
-              Visibility(
+              /* Visibility(
                 visible: _loading ? true : false,
-                child: const LinearProgressIndicator()),
+                child: const LinearProgressIndicator()
+              ), */
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Theme(
@@ -1802,171 +1822,180 @@ class _CardResourceState extends State<CardResource> {
                     contentPadding: const EdgeInsets.only(left: 6),
                     dense: true,
                     child: ExpansionTile(
-                        expandedAlignment: Alignment.topLeft,
-                        expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                        onExpansionChanged: (value) => setState(() => isTileExpanded = value),
-                        initiallyExpanded: true,
-                        leading: MouseRegion(
-                          onEnter: (event) => setParentState(() => isHeaderHovered = true),
-                          onExit: (event) => setParentState(() => isHeaderHovered = false),
-                          child: Icon(
-                              isHovered
-                                ? Icons.view_in_ar_outlined
-                                : Icons.view_in_ar,
-                              color: isHovered 
-                                ? Colors.black87 
-                                : Colors.black54,
-                              size: 22),
+                      expandedAlignment: Alignment.topLeft,
+                      expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                      onExpansionChanged: (value) => setState(() => isTileExpanded = value),
+                      initiallyExpanded: true,
+                      leading: MouseRegion(
+                        onEnter: (event) => setParentState(() => isHeaderHovered = true),
+                        onExit: (event) => setParentState(() => isHeaderHovered = false),
+                        child: Icon(
+                            isHovered
+                              ? Icons.view_in_ar_outlined
+                              : Icons.view_in_ar,
+                            color: isHovered 
+                              ? Colors.black87 
+                              : Colors.black54,
+                            size: 22),
+                      ),
+                      title: MouseRegion(
+                        onEnter: (event) => setParentState(() => isHeaderHovered = true),
+                        onExit: (event) => setParentState(() => isHeaderHovered = false),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(_loading
+                              ? 'Resource'.toUpperCase()
+                              : 'Resource   · '.toUpperCase(),
+                              style: TextStyle(
+                                color: isHovered 
+                                  ? Colors.black87 
+                                  : Colors.black54,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600)
+                              ),
+                              TextButton(
+                                style: ButtonStyle(
+                                  foregroundColor: MaterialStateProperty.resolveWith((states) {
+                                    return states.contains(MaterialState.hovered)
+                                      ? Colors.blue.shade700
+                                      : Colors.blue.shade500;
+                                  }),
+                                  visualDensity: const VisualDensity(horizontal: -4, vertical: -4)
+                                ),
+                                onPressed: () {},
+                                child: Text(!_data.hasData 
+                                ? _loading 
+                                  ? 'Please Wait' 
+                                  : resultCount(_data.data.length)
+                                : resultCount(_data.data.length), 
+                                    style: GoogleFonts.roboto(
+                                      fontSize: 12, 
+                                      fontWeight: FontWeight.w500
+                                    )
+                                ),
+                              ),
+                          ],
                         ),
-                        title: MouseRegion(
-                          onEnter: (event) => setParentState(() => isHeaderHovered = true),
-                          onExit: (event) => setParentState(() => isHeaderHovered = false),
+                      ),
+                      trailing: MouseRegion(
+                        onEnter: (event) => setParentState(() => isHeaderHovered = true),
+                        onExit: (event) => setParentState(() => isHeaderHovered = false),
+                        child: Theme(
+                          data: ThemeData(useMaterial3: true),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(_loading
-                                ? 'Resource'.toUpperCase()
-                                : 'Resource   · '.toUpperCase(),
-                                style: TextStyle(
-                                  color: isHovered 
-                                    ? Colors.black87 
-                                    : Colors.black54,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600)
-                                ),
-                                // const SizedBox(width: 8),
-                                TextButton(
-                                  style: ButtonStyle(
-                                    foregroundColor: MaterialStateProperty.resolveWith((states) {
-                                      return states.contains(MaterialState.hovered)
-                                        ? Colors.blue.shade700
-                                        : Colors.blue.shade500;
-                                    }),
-                                    visualDensity: const VisualDensity(horizontal: -4, vertical: -4)),
-                                  onPressed: () {},
-                                  child: Text(!_data.hasData 
-                                  ? _loading 
-                                    ? 'Please Wait' 
-                                    : resultCount(_data.data.length)
-                                  : resultCount(_data.data.length), 
-                                      style: GoogleFonts.roboto(
-                                          fontSize: 12, 
-                                          fontWeight: FontWeight.w500)
+                              IconButton(
+                                onPressed: () {},
+                                icon: const Icon(Icons.more_horiz, size: 18, color: Colors.black54)
+                              ),
+                              IconButton(
+                                onPressed: () {},
+                                icon: const Icon(Icons.tune, size: 18, color: Colors.black54)
+                              ),
+                              AnimatedSize(
+                                duration: const Duration(milliseconds: 200),
+                                child: AnimatedOpacity(
+                                  duration: const Duration(milliseconds: 100),
+                                  opacity: isHeaderHovered ? 1 : 0,
+                                  child: SizedBox(
+                                    width: isHeaderHovered ? null : 0,
+                                    child: IconButton(
+                                      mouseCursor: SystemMouseCursors.click,
+                                      onPressed: null,
+                                      icon: Icon(
+                                        isTileExpanded
+                                          ? Icons.remove_circle
+                                          : Icons.expand_circle_down,
+                                        size: 18,
+                                        color: Colors.black54
+                                      )
+                                    ),
                                   ),
-                                ),
+                                )
+                              )
                             ],
                           ),
                         ),
-                        trailing: MouseRegion(
-                          onEnter: (event) => setParentState(() => isHeaderHovered = true),
-                          onExit: (event) => setParentState(() => isHeaderHovered = false),
-                          child: Theme(
-                            data: ThemeData(useMaterial3: true),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(Icons.more_horiz,
-                                        size: 18, color: Colors.black54)),
-                                IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(Icons.tune,
-                                        size: 18, color: Colors.black54)),
-                                AnimatedSize(
+                      ),
+                      children: [
+                        FutureBuilder(
+                          future: _loadItems,
+                          builder: (context, AsyncSnapshot snapshot) {
+                            if (snapshot.connectionState == ConnectionState.done) _data = snapshot;
+                            
+                            return ShimmerLoading(
+                              duration: const Duration(seconds: 5),
+                              isLoading: snapshot.connectionState == ConnectionState.waiting,
+                              border: BorderRadius.circular(12),
+                              builder: ShimmerCardResourceList(smallLayouts: widget.smalllayouts),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ListView.builder(
+                                    physics: const ClampingScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: snapshot.connectionState == ConnectionState.done 
+                                      ? snapshot.data.length
+                                      : 2,
+                                    itemBuilder: (context, index) {
+                                      return Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const SizedBox(height: 6),
+                                          CardResourceList(
+                                            index: index, 
+                                            smallLayouts: widget.smalllayouts, 
+                                            snapshots: snapshot),
+                                          const SizedBox(height: 6)
+                                        ],
+                                      );
+                                    }
+                                  ),
+                                  AnimatedSize(
+                                    curve: Curves.easeOut,
                                     duration: const Duration(milliseconds: 200),
-                                    child: AnimatedOpacity(
-                                      duration: const Duration(milliseconds: 100),
-                                      opacity: isHeaderHovered ? 1 : 0,
-                                      child: SizedBox(
-                                        width: isHeaderHovered ? null : 0,
-                                        child: IconButton(
-                                          mouseCursor: SystemMouseCursors.click,
-                                          onPressed: null,
-                                          icon: Icon(
-                                            isTileExpanded
-                                                ? Icons.remove_circle
-                                                : Icons.expand_circle_down,
-                                            size: 18,
-                                            color: Colors.black54)),
-                                      ),
-                                    ))
-                              ],
-                            ),
-                          ),
-                        ),
-                        children: [
-                          FutureBuilder(
-                            future: _loadItems,
-                            builder: (context, AsyncSnapshot snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return const Center(
-                                  heightFactor: 2,
-                                  child: CircularProgressIndicator(strokeWidth: 3),
-                                );
-                              }
-                              if (snapshot.connectionState == ConnectionState.done) _data = snapshot;
-                              
-                              return Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    ListView.builder(
-                                      physics: const ClampingScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemCount: snapshot.data.length,
-                                      itemBuilder: (context, index) {
-                                        return Column(
-                                          mainAxisAlignment: MainAxisAlignment.start,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            const SizedBox(height: 6),
-                                            CardResourceList(
-                                              index: index, 
-                                              smallLayouts: widget.smalllayouts, 
-                                              snapshots: snapshot),
-                                            const SizedBox(height: 6)
-                                          ],
-                                        );
-                                      }),
-                                    AnimatedSize(
-                                      curve: Curves.easeOut,
-                                      duration: const Duration(milliseconds: 200),
-                                      child: SizedBox(
-                                        height: isHovered || isWebMobile ? null : 0,
-                                        child: Column(
-                                          children: [
-                                            const SizedBox(height: 8),
-                                            ElevatedButton.icon(
-                                              style: ButtonStyle(
-                                                  visualDensity: VisualDensity.compact,
-                                                  foregroundColor: MaterialStateProperty
-                                                    .resolveWith((states) {
-                                                      if (states.contains(MaterialState.hovered) 
-                                                        || states.contains(MaterialState.pressed)) {
-                                                      return Colors.black54;
-                                                    }
-                                                    return Colors.black38;
-                                                  }),
-                                                  backgroundColor: MaterialStatePropertyAll(Colors.grey.shade50),
-                                                  elevation: const MaterialStatePropertyAll(0)),
-                                              onPressed: () => context.push('/resource'),
-                                              icon: const Icon(Icons.refresh, size: 14),
-                                              label: Text(
-                                                'Load More',
-                                                style: GoogleFonts.roboto(
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 12),
-                                              )
-                                            ),
-                                          ],
-                                        ),
+                                    child: SizedBox(
+                                      height: isHovered || isWebMobile ? null : 0,
+                                      child: Column(
+                                        children: [
+                                          const SizedBox(height: 8),
+                                          ElevatedButton.icon(
+                                            style: ButtonStyle(
+                                              visualDensity: VisualDensity.compact,
+                                              foregroundColor: MaterialStateProperty.resolveWith((states) {
+                                                if (states.contains(MaterialState.hovered) 
+                                                || states.contains(MaterialState.pressed)) {
+                                                  return Colors.black54;
+                                                }
+                                                return Colors.black38;
+                                              }),
+                                              backgroundColor: MaterialStatePropertyAll(Colors.grey.shade50),
+                                              elevation: const MaterialStatePropertyAll(0)),
+                                            onPressed: () => context.push('/resource'),
+                                            icon: const Icon(Icons.refresh, size: 14),
+                                            label: Text(
+                                              'Load More',
+                                              style: GoogleFonts.roboto(
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 12
+                                              ),
+                                            )
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ]);
-                            },
-                          ),
-                        ]),
+                                  ),
+                                ]
+                              ),
+                            );
+                          },
+                        ),
+                      ]
+                    ),
                   ),
                 ),
               ),

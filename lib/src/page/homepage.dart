@@ -5,6 +5,7 @@ import 'package:gimmic/assets/label.dart';
 import 'package:gimmic/assets/widgets/button.dart';
 import 'package:gimmic/assets/widgets/card.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../assets/functions/platform.dart';
@@ -273,7 +274,9 @@ class _SearchBarMainState extends State<SearchBarMain> {
               hintStyle: const TextStyle(
                 fontWeight: FontWeight.w600,
               ),
-              labelText:  widget.useVHideDetails ? null : StringResource.greetings,
+              labelText:  widget.useVHideDetails || _textEditingController.text.isNotEmpty ? null : StringResource.greetings,
+              labelStyle: const TextStyle(letterSpacing: -0.25),
+              floatingLabelAlignment: FloatingLabelAlignment.center,
               contentPadding: isSearching
                   ? const EdgeInsets.symmetric(horizontal: 16)
                   : EdgeInsets.zero,
@@ -370,6 +373,7 @@ class _SearchBarMainState extends State<SearchBarMain> {
                               text: TextSpan(
                                 text: _textEditingController.text.trim(),
                                 style: const TextStyle(
+                                    letterSpacing: 0.4,
                                     color: Colors.black87,
                                     fontWeight: FontWeight.w600),
                                 children: const [
@@ -433,7 +437,7 @@ class _SearchBarMainState extends State<SearchBarMain> {
                             leading: Hero(
                               tag: option.hero + option.index.toString(),
                               child: AspectRatio(
-                                aspectRatio: 1 / 1,
+                                aspectRatio: 1.15 / 1,
                                 child: Container(
                                     height: 36,
                                     decoration: BoxDecoration(
@@ -448,14 +452,18 @@ class _SearchBarMainState extends State<SearchBarMain> {
                                 : null,
                             title: Text(
                               option.name,
-                              style: const TextStyle(
-                                fontSize: 16,
+                              style: GoogleFonts.roboto(
+                                color: Colors.grey.shade700,
+                                letterSpacing: -0.5,
+                                fontSize: 18,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             subtitle: Text(
                               option.subname.toTitleCase(),
-                              style: const TextStyle(
+                              style: GoogleFonts.roboto(
+                                color: Colors.grey.shade600,
+                                letterSpacing: 0.3,
                                 fontSize: 12, 
                                 fontWeight: FontWeight.w600,
                                 height: 1
@@ -565,10 +573,9 @@ class LayoutDesktop extends StatelessWidget {
               AnimatedPadding(
                 curve: Curves.fastOutSlowIn,
                 duration: const Duration(milliseconds: 600),
-                padding:
-                    EdgeInsets.only(right: usePhoneLayout ? 40 : 20, top: 5),
+                padding: EdgeInsets.only(right: usePhoneLayout ? 40 : 20, top: 5),
                 child: Row(
-                  children: [appbarSetting(usePhoneLayout)],
+                  children: [ appbarSetting(usePhoneLayout) ],
                 ),
               )
             ],
@@ -584,10 +591,9 @@ class LayoutDesktop extends StatelessWidget {
               child: Column(
                 children: [
                   const Padding(
-                    padding:
-                        EdgeInsets.only(top: 0, left: 4, right: 12, bottom: 0),
+                    padding: EdgeInsets.only(top: 0, left: 4, right: 12, bottom: 0),
                     child: Align(
-                      alignment: Alignment.centerLeft,
+                      alignment: Alignment.topCenter,
                       child: Text(
                         'Hi',
                         style: TextStyle(
@@ -598,10 +604,9 @@ class LayoutDesktop extends StatelessWidget {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(
-                        top: 0, left: 4, right: 12, bottom: 32),
+                    padding: const EdgeInsets.only(top: 0, left: 4, right: 12, bottom: 32),
                     child: Align(
-                      alignment: Alignment.centerLeft,
+                      alignment: Alignment.topCenter,
                       child: Text(
                         useVHideDetails ? timenow : timenow,
                         style: const TextStyle(
@@ -629,33 +634,33 @@ class LayoutDesktop extends StatelessWidget {
                               Row(
                                 children: [
                                   Flexible(
-                                      child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 2),
+                                    child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 2),
                                     child: LayoutBuilder(
-                                      builder: (BuildContext context,
-                                          BoxConstraints rowConstraints) {
+                                      builder: (BuildContext context, BoxConstraints rowConstraints) {
                                         return SearchBarMain(
                                             rowConstraints: rowConstraints,
                                             useVHideDetails: useVHideDetails,
-                                            timenow: timenow);
+                                            timenow: timenow
+                                        );
                                       },
                                     ),
                                   )),
                                 ],
                               ),
                               Flexible(
-                                  child: Padding(
-                                padding: const EdgeInsets.only(top: 8),
-                                child: CardResource(
-                                  layouts: useVHideDetails,
-                                  smalllayouts: usePhoneLayout,
-                                ),
-                              )),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: CardResource(
+                                    layouts: useVHideDetails,
+                                    smalllayouts: usePhoneLayout,
+                                  ),
+                                )
+                              ),
                               Flexible(
                                 child: Padding(
-                                    padding: const EdgeInsets.only(top: 40),
-                                    child: cardUpdateLog()),
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: cardUpdateLog()),
                               ),
                             ],
                           ),

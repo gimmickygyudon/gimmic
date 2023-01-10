@@ -86,10 +86,9 @@ class Gimmic extends StatelessWidget {
                         var arguments = jsonEncode(object);
                         Map valueMap = jsonDecode(arguments);
 
-                        return SharedAxisPage(
+                        // Revert changes workaround for download dialog hero semi-transparent background
+                        return MaterialPage(
                             key: state.pageKey,
-                            duration: const Duration(milliseconds: 600),
-                            transitionType: SharedAxisTransitionType.vertical,
                             child: Details(arguments: valueMap));
                       },
                       routes: <GoRoute>[

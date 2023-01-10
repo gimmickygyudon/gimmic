@@ -1965,16 +1965,21 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               child: tabIndex == 0
-                  ? ElevatedButton.icon(
+                  ? Hero(
+                    tag: 'download',
+                    child: ElevatedButton.icon(
                       icon: const Icon(Icons.file_download_outlined),
                       style: ButtonStyle(
                         visualDensity: const VisualDensity(horizontal: -2, vertical: -2),
                         minimumSize: MaterialStateProperty.all(const Size(double.infinity, 54)),
                         elevation: const MaterialStatePropertyAll(0),
                       ),
-                      onPressed: () {},
+                      onPressed: () { 
+                        downloadDialogHero(context, widget.data.first['name'], widget.usePhoneLayout); 
+                      },
                       label: Text("Download", style: GoogleFonts.roboto(fontWeight: FontWeight.w500)),
-                    )
+                    ),
+                  )
                   : Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
