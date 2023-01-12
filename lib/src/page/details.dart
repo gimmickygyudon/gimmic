@@ -1770,7 +1770,12 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                                             fontSize: 18,
                                             fontWeight: FontWeight.w500),
                                       ),
-                                      subtitle: const Text('3.2.2 (bcfdb14560e7)'),
+                                      subtitle: Text('3.2.2 | bcfdb14560e7', 
+                                        style: TextStyle(
+                                          color: Colors.grey.shade600,
+                                          wordSpacing: 1,
+                                          fontWeight: FontWeight.w500)
+                                      ),
                                       textColor: Colors.orange,
                                       iconColor: Colors.orange,
                                       leading: IconButton(
@@ -1807,7 +1812,11 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                                             fontSize: 18,
                                             fontWeight: FontWeight.w500),
                                       ),
-                                      subtitle: const Text('Cycles / Eevee'),
+                                      subtitle: Text('Cycles / Eevee',
+                                        style: TextStyle(
+                                          color: Colors.grey.shade600,
+                                          fontWeight: FontWeight.w500)
+                                      ),
                                       leading: IconButton(
                                           onPressed: () {},
                                           icon: const Icon(
@@ -1957,11 +1966,11 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
             color: widget.paletteLoaded
                   ? colorLight(paletteMutedColors[activePage].color, .9)
                   : Colors.grey.shade50,
-            padding: EdgeInsets.only(
+            padding: const EdgeInsets.only(
                 top: 10,
                 left: 20,
                 right: 20,
-                bottom: widget.useVerticalLayout ? 10 : 20),
+                bottom: 10),
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
               child: tabIndex == 0
@@ -1975,7 +1984,7 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                         elevation: const MaterialStatePropertyAll(0),
                       ),
                       onPressed: () { 
-                        downloadDialogHero(context, widget.data.first['name'], widget.usePhoneLayout); 
+                        downloadDialogHero(context, widget.data.first['name'], widget.useVerticalLayout); 
                       },
                       label: Text("Download", style: GoogleFonts.roboto(fontWeight: FontWeight.w500)),
                     ),
