@@ -467,8 +467,8 @@ class _DialogHeroState extends State<DialogHero> {
       alignment: FractionalOffset.center,
       child: Hero(
         tag: "download",
-        child: OverflowBox(
-          maxWidth: 400,
+        child: SizedBox(
+          width: 400,
           child: Card(
             elevation: 0,
             color: Colors.white,

@@ -99,37 +99,6 @@ class _CardBigState extends State<CardBig> {
                       child: Image.network(
                         'https://source.unsplash.com/random',
                         fit: BoxFit.cover,
-                        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-                          if (wasSynchronouslyLoaded) {
-                            return child;
-                          }
-
-                          return AnimatedOpacity(
-                            opacity: imageLoaded ? 1 : 0,
-                            duration: const Duration(seconds: 3),
-                            curve: Curves.easeOut,
-                            child: child,
-                          );
-                        },
-                        loadingBuilder: (BuildContext context, 
-                        Widget child, ImageChunkEvent? loadingProgress) {
-                          if (loadingProgress == null) {
-                            WidgetsBinding.instance.addPostFrameCallback((_) {
-                              setState(() => imageLoaded = true);
-                            });
-                            return child;
-                          }
-
-                          imageLoaded = false;
-                          return Center(
-                            child: CircularProgressIndicator(
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
-                                  : null,
-                            ),
-                          );
-                        },
                       ),
                     ),
                   ),
