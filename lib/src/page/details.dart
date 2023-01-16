@@ -1984,7 +1984,7 @@ class _DetailCardState extends State<DetailCard> with SingleTickerProviderStateM
                         elevation: const MaterialStatePropertyAll(0),
                       ),
                       onPressed: () { 
-                        downloadDialogHero(context, widget.data.first['name'], widget.useVerticalLayout); 
+                        downloadDialogHero(context, widget.data.first['name'], 'Blender', widget.useVerticalLayout); 
                       },
                       label: Text("Download", style: GoogleFonts.roboto(fontWeight: FontWeight.w500)),
                     ),

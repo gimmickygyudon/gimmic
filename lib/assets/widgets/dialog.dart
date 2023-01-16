@@ -8,23 +8,52 @@ import '../icons.dart';
 import 'item.dart';
 import 'menu.dart';
 
-List<Widget> dialogsHero(String title, 
-  bool useVerticalLayout, PageController pageController, Function callback) {
+List<Widget> dialogsHero(String title, String mainItems,
+  bool useVerticalLayout, PageController pageController, Function changePage, 
+  Function updateItem, Function setSelectionItem, bool onAgreement, Function updateAgreement, 
+  Map<String, dynamic> isSelected) {
   return [
     DownloadDialogHero(
       title: title, 
+      mainItems: mainItems,
       useVerticalLayout: useVerticalLayout, 
       pageController: pageController,
-      callback: callback,
-    ), const AddDialogHero(),
+      changePage: changePage,
+      updateItem: updateItem,
+      isSelected: isSelected,
+      onAgreement: onAgreement,
+      updateAgreement: updateAgreement,
+    ), AddDialogHero(
+      useVerticalLayout: useVerticalLayout,
+      updateItem: updateItem, 
+      isSelected: isSelected, 
+      setSelectionItem: setSelectionItem,
+      changePage: changePage,
+    ),
   ];
 }
 
 class AddDialogHero extends StatelessWidget {
-  const AddDialogHero({super.key});
+  const AddDialogHero({
+    super.key, 
+    required this.updateItem, 
+    required this.changePage, 
+    required this.isSelected, 
+    required this.setSelectionItem, 
+    required this.useVerticalLayout
+  });
+
+  final Function updateItem, changePage, setSelectionItem;
+  final Map<String, dynamic> isSelected;
+  final bool useVerticalLayout;
 
   @override
   Widget build(BuildContext context) {
+    final List<String> listItems = ['All', 'Blender', 'Image', 'Video'];
+    final List<IconData> listItemsIcon = [
+      Icons.apps, IconSoftware.blender3doutlinedalt, Icons.image_outlined, Icons.play_circle_outline
+    ];
+
     return Column(
       mainAxisSize: MainAxisSize.max,
       children: [
@@ -49,98 +78,81 @@ class AddDialogHero extends StatelessWidget {
                   ),
                   child: Wrap(
                     spacing: 4,
-                    children: [
-                      InputChip(
-                        backgroundColor: Colors.blueGrey.shade50,
+                    children: List.generate(listItems.length, (index) {
+                      return InputChip(
                         visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
                         label: Padding(
                           padding: const EdgeInsets.only(bottom: 1),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.apps, size: 14, color: Colors.grey.shade800),
+                              Icon(listItemsIcon[index], size: 14, color: listItems[index] != 'Blender' 
+                                ? Colors.grey.shade800 
+                                : Colors.orangeAccent
+                              ),
                               const SizedBox(width: 4),
-                              Text('All ', style: GoogleFonts.roboto(
+                              Text(listItems[index], style: GoogleFonts.roboto(
                                 color: Colors.grey.shade800,
                                 fontWeight: FontWeight.w600)
                               ),
                             ],
                           ),
-                        ), 
-                        onSelected: (value) {},
-                      ),
-                      InputChip(
-                        visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
-                        label: Padding(
-                          padding: const EdgeInsets.only(bottom: 1),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(IconSoftware.blender3doutlinedalt, size: 14, color: Colors.orangeAccent),
-                              const SizedBox(width: 4),
-                              Text('Blender', style: GoogleFonts.roboto(
-                                color: Colors.grey.shade600,
-                                fontWeight: FontWeight.w600)
-                              ),
-                            ],
-                          ),
-                        ), 
-                        onSelected: (value) {},
-                      ),
-                      InputChip(
-                        visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
-                        label: Padding(
-                          padding: const EdgeInsets.only(bottom: 1),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.image_outlined, size: 14),
-                              const SizedBox(width: 4),
-                              Text('Image', style: GoogleFonts.roboto(
-                                color: Colors.grey.shade600,
-                                fontWeight: FontWeight.w600)
-                              ),
-                            ],
-                          ),
-                        ), 
-                        onSelected: (value) {},
-                      ),
-                      InputChip(
-                        visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
-                        label: Padding(
-                          padding: const EdgeInsets.only(bottom: 1),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.movie_outlined, size: 14),
-                              const SizedBox(width: 4),
-                              Text('Video', style: GoogleFonts.roboto(
-                                color: Colors.grey.shade600,
-                                fontWeight: FontWeight.w600)
-                              ),
-                            ],
-                          ),
-                        ), 
-                        onSelected: (value) {},
-                      ),
-                    ]
+                        ),
+                        showCheckmark: false,
+                        selected: listItems[index] == 'All' 
+                          ? isSelected.values.every((element) => element == true)
+                          : !isSelected.values.every((element) => element == true) && isSelected[listItems[index]] == true,
+                        selectedColor: Colors.blueGrey.shade50,
+                        onSelected: (value) {
+                          if (listItems[index] == 'All') {
+                            setSelectionItem(value);
+                          } else {
+                            setSelectionItem(false); // TODO: Unnecessary double setState
+                            updateItem(listItems[index], value);
+                          }
+                        },
+                      );
+                    })
                   ),
                 ),
               ),
             )
           ],
         ),
-        const SizedBox(height: 8),
-        ItemImage(),
-        const SizedBox(height: 8),
-        const ItemRenderEngine(),
-        const SizedBox(height: 8),
+        SizedBox(
+          height: 400,
+          child: ListView(
+            shrinkWrap: true,
+            children: [ 
+              Column(
+                children: [
+                  const SizedBox(height: 8),
+                  ItemImage(useVerticalLayout: useVerticalLayout, 
+                    updateItem: updateItem, 
+                    isSelected: isSelected['Image']
+                  ),
+                  const SizedBox(height: 8),
+                  ItemRenderEngine(useVerticalLayout: useVerticalLayout,
+                    updateItem: updateItem, 
+                    isSelected: isSelected['Blender']
+                  ),
+                  const SizedBox(height: 8),
+                  ItemVideo(useVerticalLayout: useVerticalLayout,
+                    updateItem: updateItem, 
+                    isSelected: isSelected['Video']
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ) 
+            ]
+          ),
+        ),
         Card(
           surfaceTintColor: Colors.transparent,
           color: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            side: BorderSide(color: Colors.grey.shade200, width: 1),
+            side: BorderSide(color: Colors.grey.shade300, width: 1),
             borderRadius: BorderRadius.circular(6)
           ),
           child: Padding(
@@ -151,34 +163,59 @@ class AddDialogHero extends StatelessWidget {
                 Row(
                   children: [
                     IconButton(
-                      onPressed: () {}, 
-                      icon: Icon(Icons.indeterminate_check_box_outlined, color: Colors.grey.shade700)
+                      onPressed: () {
+                        bool value;
+                        isSelected.values.where((element) => element == true).isEmpty 
+                          ? value = true : value = false;
+
+                        setSelectionItem(value);
+                      }, 
+                      icon: Icon(isSelected.values.where((element) => element == true).isEmpty
+                        ? Icons.check_box_outline_blank
+                        : Icons.indeterminate_check_box_outlined, 
+                        color: Colors.grey.shade600)
                     ),
                     const SizedBox(width: 4),
-                    Text('1 Item Selected', style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontWeight: FontWeight.w600),
+                    Text('${isSelected.values.where((element) => element == true).length} Item Selected',
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.w600
+                      ),
                     ),
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ElevatedButton.icon(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: ElevatedButton(
                     style: ButtonStyle(
+                      padding: const MaterialStatePropertyAll(EdgeInsets.symmetric(horizontal: 8)),
                       textStyle: MaterialStatePropertyAll(
                         TextStyle(
                           color: Colors.grey.shade800,
                           fontWeight: FontWeight.w600
                         )
                       ),
+                      visualDensity: VisualDensity.compact,
                       shape: MaterialStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
-                      backgroundColor: MaterialStatePropertyAll(Colors.deepPurpleAccent.shade200),
+                      backgroundColor: MaterialStateProperty.resolveWith((states) {
+                        return states.contains(MaterialState.disabled) 
+                          ? Colors.deepPurple.shade200
+                          : Colors.deepPurple;
+                      }),
                       foregroundColor: const MaterialStatePropertyAll(Colors.white),
                       shadowColor: const MaterialStatePropertyAll(Colors.black38)
                     ),
-                    onPressed: () {}, 
-                    icon: const Icon(Icons.add, size: 20),
-                    label: Text('Add', style: GoogleFonts.roboto())
+                    onPressed: isSelected.containsValue(true) ? () {
+                      changePage(0);
+                    } : null,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.playlist_add_check, size: 24),
+                        const SizedBox(width: 4),
+                        Text('Add ', style: GoogleFonts.roboto()),
+                      ],
+                    )
                   ),
                 ),
               ],
@@ -195,19 +232,32 @@ bool addMenu = false;
 class DownloadDialogHero extends StatelessWidget {
   const DownloadDialogHero({
     super.key, 
-    required this.title, 
+    required this.title, required this.mainItems,
     required this.useVerticalLayout, 
     required this.pageController, 
-    required this.callback, 
+    required this.changePage, required this.updateItem, required this.updateAgreement,
+    required this.isSelected, required this.onAgreement,  
   });
 
-  final String title;
-  final Function callback;
-  final bool useVerticalLayout;
+  final String title, mainItems;
+  final Function changePage, updateItem, updateAgreement;
+  final bool useVerticalLayout, onAgreement;
   final PageController pageController;
+  final Map<String, dynamic> isSelected;
 
   @override
   Widget build(BuildContext context) {
+    final GlobalKey<TooltipState> keyTooltip = GlobalKey<TooltipState>();
+    final List<String> listItems = ['Blender', 'Image', 'Video'];
+    final List<IconData> listItemsIcon = [
+      IconSoftware.blender3dfilled, Icons.image_outlined, Icons.play_circle_outline
+    ];
+    final List<double> listItemsSize = [28, 3, 45];
+
+    listItemsIcon.removeAt(listItems.indexOf(mainItems));
+    listItemsSize.removeAt(listItems.indexOf(mainItems));
+    listItems.remove(mainItems);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -291,42 +341,122 @@ class DownloadDialogHero extends StatelessWidget {
               ),
               OutlinedButton(
                 onPressed: () {
-                  addMenu = true;
-                  callback(1);
+                  changePage(1);
                 }, 
                 style: ButtonStyle(
                   visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-                  padding: const MaterialStatePropertyAll(EdgeInsets.symmetric(vertical: 12, horizontal: 8)),
+                  padding: const MaterialStatePropertyAll(EdgeInsets.symmetric(vertical: 21, horizontal: 8)),
                   side: MaterialStatePropertyAll(BorderSide(color: Colors.grey.shade300)),
                   textStyle: const MaterialStatePropertyAll(
                     TextStyle(fontWeight: FontWeight.w600)
                   ),
-                  foregroundColor: MaterialStatePropertyAll(Colors.grey.shade700)
+                  foregroundColor: MaterialStatePropertyAll(Colors.grey.shade600)
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.add, size: 16, color: Colors.grey.shade800),
-                    const SizedBox(width: 2),
-                    const Text('add ')
+                    const SizedBox(width: 4),
+                    const Text('extra'),
+                    const SizedBox(width: 4),
+                    Icon(Icons.more_horiz, size: 16, color: Colors.grey.shade700),
                   ],
                 ),
-              )
-            ],
+              ),
+            ] + List.generate(listItems.length, (index) {
+              return Visibility(
+                visible: isSelected[listItems[index]],
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 4),
+                  child: Theme(
+                    data: ThemeData(
+                      useMaterial3: true,
+                      chipTheme: ChipThemeData(
+                        side: isSelected[listItems[index]] 
+                          ? BorderSide.none 
+                          : BorderSide(color: Colors.grey.shade300),
+                        labelPadding: EdgeInsets.zero,
+                        labelStyle: const TextStyle(fontSize: 12),
+                      )
+                    ).copyWith(
+                      splashColor: Colors.blueGrey,
+                      canvasColor: isSelected[listItems[index]]
+                        ? listItems[index] == 'Blender'
+                          ? Colors.orangeAccent
+                          : Colors.blueGrey.shade400
+                        : Colors.transparent
+                    ),
+                    child: Tooltip(
+                      message: listItems[index],
+                      child: ActionChip(
+                        onPressed: () {
+                          changePage(1);
+                        },
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                        visualDensity: const VisualDensity(vertical: -4, horizontal: -4),
+                        label: Padding(
+                          padding: const EdgeInsets.only(left: 4, right: 4),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(listItemsIcon[index], size: 14, opticalSize: 14, color: isSelected[listItems[index]] 
+                                ? Colors.white : Colors.grey.shade700
+                              ),
+                              const SizedBox(width: 6),
+                              Text('${listItemsSize[index]} MB', style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade50)
+                              )
+                            ],
+                          ),
+                        )
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            })
           ),
         ),
-        ItemRenderEngine(),
+        (() { 
+          switch (mainItems) {
+            case 'Blender':
+              return ItemRenderEngine(useVerticalLayout: useVerticalLayout, 
+                updateItem: updateItem, isSelected: isSelected['Blender']);
+            case 'Image':
+              return ItemImage(updateItem: updateItem, isSelected: isSelected['Image'], 
+                useVerticalLayout: useVerticalLayout);
+            case 'Video':
+              return ItemVideo(updateItem: updateItem, useVerticalLayout: useVerticalLayout,
+                isSelected: isSelected['Video']);
+            default: 
+              return const SizedBox();
+          }
+        }()),
         const SizedBox(height: 8),
         Padding(
           padding: const EdgeInsets.all(4),
           child: CheckboxListTile(
+            value: onAgreement, 
+            onChanged: (value) {
+              updateAgreement(value);
+            },
             shape: RoundedRectangleBorder(
-              side: BorderSide(color: Colors.grey.shade200),
+              side: BorderSide(color: onAgreement
+                ? Colors.blue.shade200 : Colors.grey.shade300,
+                width: onAgreement ? 2 : 1
+              ),
               borderRadius: BorderRadius.circular(12)
             ),
-            checkboxShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.7)),
-            checkColor: Colors.green.shade400,
-            activeColor: Colors.transparent,
+            tileColor: onAgreement ? Colors.blue.shade50 : null,
+            // checkColor: Colors.green,
+            activeColor: Colors.blue.shade400,
+            checkboxShape: RoundedRectangleBorder(
+              side: const BorderSide(color: Colors.grey),
+              borderRadius: BorderRadius.circular(3)
+            ),
             contentPadding: const EdgeInsets.only(left: 16, right: 8),
             controlAffinity: ListTileControlAffinity.trailing,
             title: Text('Terms and Conditions', 
@@ -348,6 +478,12 @@ class DownloadDialogHero extends StatelessWidget {
                       alignment: Alignment.centerLeft,
                       overlayColor: const MaterialStatePropertyAll(Colors.transparent),
                       foregroundColor: MaterialStateProperty.resolveWith((states) {
+                        if (onAgreement) {
+                          return states.contains(MaterialState.hovered)
+                            ? Colors.blue.shade700
+                            : Colors.blue;
+                        }
+
                         return states.contains(MaterialState.hovered)
                           ? Colors.lightBlue
                           : Colors.grey;
@@ -360,7 +496,7 @@ class DownloadDialogHero extends StatelessWidget {
                         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                         context: context,
                         builder: (context) {
-                          return const AgreementsDialogHero();                                     
+                          return AgreementsDialogHero(updateAgreement: updateAgreement);
                         },
                       );
                     }, 
@@ -370,8 +506,6 @@ class DownloadDialogHero extends StatelessWidget {
                 ),
               ),
             ),
-            value: true, 
-            onChanged: (value) {}
           ),
         ),
         const SizedBox(height: 12),
@@ -393,23 +527,80 @@ class DownloadDialogHero extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),                        
             ),
-            ElevatedButton(
-              style: ButtonStyle(
-                elevation: const MaterialStatePropertyAll(0),
-                shape: MaterialStatePropertyAll(
-                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
+            TooltipVisibility(
+              visible: !onAgreement || !isSelected.containsValue(true),
+              child: Tooltip(
+                key: keyTooltip,
+                richMessage: TextSpan(
+                  style: TextStyle(fontSize: 14, color: Colors.grey.shade400),
+                  text: ' ${
+                    onAgreement || isSelected.containsValue(true) ? 'One' 
+                    : !onAgreement && !isSelected.containsValue(true) ? 'Two' : 'One'
+                  } of the following requirements need to be made \n',
+                  children: [
+                    WidgetSpan(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 8, 8, 2),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(onAgreement 
+                                  ? Icons.check_box
+                                  : Icons.check_box_outline_blank, size: 16, color: Colors.grey.shade200),
+                                const SizedBox(width: 8),
+                                Text('Terms and Conditions', style: TextStyle(fontSize: 14, color: Colors.grey.shade200))
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(isSelected.containsValue(true)
+                                  ? Icons.check_box
+                                  : Icons.check_box_outline_blank, size: 16, color: Colors.grey.shade200
+                                ),
+                                const SizedBox(width: 8),
+                                Text('Project files', style: TextStyle(fontSize: 14, color: Colors.grey.shade200))
+                              ],
+                            ),
+                          ],
+                        ),
+                      )
+                    ),
+                  ]
                 ),
-                backgroundColor: MaterialStateProperty.resolveWith((states) {
-                  return states.contains(MaterialState.hovered) 
-                    ? Colors.deepPurple.shade600
-                    : Colors.deepPurple.shade400;
-                }),
-                foregroundColor: const MaterialStatePropertyAll(Colors.white),
-              ),
-              onPressed: () {},
-              child: const Text(
-                'Download',
-                style: TextStyle(fontWeight: FontWeight.w600),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade800,
+                  borderRadius: BorderRadius.circular(12)
+                ),
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    elevation: const MaterialStatePropertyAll(0),
+                    shape: MaterialStatePropertyAll(
+                      RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
+                    ),
+                    backgroundColor: MaterialStateProperty.resolveWith((states) {
+                      return isSelected.containsValue(true) && onAgreement 
+                        ? states.contains(MaterialState.hovered) 
+                          ? Colors.deepPurple.shade400
+                          : Colors.deepPurple.shade600
+                        : Colors.deepPurple.shade200;
+                    }),
+                    foregroundColor: const MaterialStatePropertyAll(Colors.white),
+                  ),
+                  onPressed: isSelected.containsValue(true) && onAgreement ? () {
+                    // Download Commands []
+                  } : () => keyTooltip.currentState?.ensureTooltipVisible(),
+                  child: Text(
+                    'Download',
+                    style: GoogleFonts.roboto(fontWeight: FontWeight.w600),
+                  ),
+                ),
               ),
             )
           ],
@@ -425,11 +616,13 @@ class DialogHero extends StatefulWidget {
   const DialogHero({
     super.key, 
     required this.useVerticalLayout, 
-    required this.title
+    required this.title,
+    required this.mainItems
   });
 
   final bool useVerticalLayout;
   final String title;
+  final String mainItems;
 
   @override
   State<DialogHero> createState() => _DialogHeroState();
@@ -438,7 +631,19 @@ class DialogHero extends StatefulWidget {
 
 class _DialogHeroState extends State<DialogHero> {
   late PageController _pageController;
-  
+  final Map<String, dynamic> itemSelected = {
+    'Blender' : false,
+    'Image' : false,
+    'Video' : false
+  }; 
+
+  bool onAgreement = false;
+  void updateAgreement(bool value) {
+    setState(() {
+      onAgreement = value;     
+    });
+  }
+
   @override
   void initState() {
     addMenu = false;
@@ -452,12 +657,25 @@ class _DialogHeroState extends State<DialogHero> {
     super.dispose();
   }
 
+  void setSelectionItem(bool selection) {
+    setState(() {
+      itemSelected.updateAll((key, value) => selection);
+    });
+  }
+
+  void updateItem(String item, bool selected) {
+    setState(() {      
+      itemSelected.update(item, (value) => selected);
+    });
+  }
+
   void changePage(int i) {
     setState(() {
       _pageController.animateToPage(i,
         duration: const Duration(milliseconds: 600), 
         curve: Curves.ease
-      );       
+      );
+      i == 0 ? addMenu = false : addMenu = true;       
     });
   }
 
@@ -487,10 +705,7 @@ class _DialogHeroState extends State<DialogHero> {
                             children: [
                               IconButton(
                                 onPressed:() {
-                                  setState(() {
-                                    changePage(0);
-                                    addMenu = false;
-                                  });
+                                  changePage(0);
                                 }, 
                                 icon: const Icon(Icons.arrow_back)
                               ),
@@ -553,8 +768,16 @@ class _DialogHeroState extends State<DialogHero> {
                   ExpandablePageView(
                     controller: _pageController,
                     itemCount: 2,
+                    onPageChanged: (value) {
+                      setState(() {
+                        value == 1 
+                          ? addMenu = true 
+                          : addMenu = false;                       
+                      });
+                    },
                     itemBuilder: (context, index) => dialogsHero(
-                      widget.title, widget.useVerticalLayout, _pageController, changePage)[index]
+                      widget.title, widget.mainItems, widget.useVerticalLayout, 
+                      _pageController, changePage, updateItem, setSelectionItem, onAgreement, updateAgreement, itemSelected)[index]
                   )
                 ],
               ),
@@ -566,14 +789,18 @@ class _DialogHeroState extends State<DialogHero> {
   }
 }
 
-downloadDialogHero(context, title, useVerticalLayout) {
+downloadDialogHero(BuildContext context, String title, String mainItems, bool useVerticalLayout) {
   Navigator.push(context, PageRouteBuilder(
     fullscreenDialog: false,
     opaque: false,
     barrierDismissible: true,
     barrierColor: Colors.black38,
     pageBuilder: (BuildContext context, animation, secondaryAnimation) {
-      return DialogHero(useVerticalLayout: useVerticalLayout, title: title); 
+      return DialogHero(
+        useVerticalLayout: useVerticalLayout, 
+        title: title, 
+        mainItems: mainItems
+      ); 
     }
   ));
 }
@@ -582,7 +809,10 @@ downloadDialogHero(context, title, useVerticalLayout) {
 class AgreementsDialogHero extends StatelessWidget {
   const AgreementsDialogHero({
     super.key, 
+    required this.updateAgreement, 
   });
+
+  final Function updateAgreement;
 
   Widget sideButtons(context, useVerticalLayout) {
     List<Icon> icons = [
@@ -695,7 +925,10 @@ class AgreementsDialogHero extends StatelessWidget {
                                   ButtonBar(
                                     children: [
                                        TextButton(
-                                        onPressed: () => context.pop(), 
+                                        onPressed: () {
+                                          updateAgreement(false);
+                                          context.pop();
+                                        }, 
                                         child: Text('Disagree', 
                                           style: GoogleFonts.roboto(
                                             fontWeight: FontWeight.w600,
@@ -704,7 +937,10 @@ class AgreementsDialogHero extends StatelessWidget {
                                         )
                                       ),
                                       TextButton(
-                                        onPressed: () => context.pop(), 
+                                        onPressed: () {
+                                          updateAgreement(true);
+                                          context.pop();
+                                        }, 
                                         child: Text('Agree', style: GoogleFonts.roboto(fontWeight: FontWeight.w600))
                                       )
                                     ]
